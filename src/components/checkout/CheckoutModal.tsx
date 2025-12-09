@@ -1,0 +1,696 @@
+import { useState } from "react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { useCart } from "@/contexts/CartContext";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "@/hooks/use-toast";
+import { Loader2, QrCode, Building2, MapPin, Phone, User, ChevronRight, ChevronLeft, CheckCircle } from "lucide-react";
+import { cn } from "@/lib/utils";
+
+interface CheckoutModalProps {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+}
+
+interface CompanyData {
+  razaoSocial: string;
+  nomeFantasia: string;
+  cnpj: string;
+  inscricaoEstadual: string;
+  isento: boolean;
+  inscricaoMunicipal: string;
+  dataAbertura: string;
+  naturezaJuridica: string;
+  cnae: string;
+}
+
+interface AddressData {
+  cep: string;
+  endereco: string;
+  numero: string;
+  complemento: string;
+  bairro: string;
+  cidade: string;
+  estado: string;
+}
+
+interface ContactData {
+  telefoneFixo: string;
+  whatsapp: string;
+  email: string;
+}
+
+interface ResponsibleData {
+  nomeCompleto: string;
+  cpf: string;
+  rg: string;
+  cargo: string;
+  dataNascimento: string;
+}
+
+const formatCNPJ = (value: string) => {
+  return value
+    .replace(/\D/g, '')
+    .replace(/^(\d{2})(\d)/, '$1.$2')
+    .replace(/^(\d{2})\.(\d{3})(\d)/, '$1.$2.$3')
+    .replace(/\.(\d{3})(\d)/, '.$1/$2')
+    .replace(/(\d{4})(\d)/, '$1-$2')
+    .slice(0, 18);
+};
+
+const formatCPF = (value: string) => {
+  return value
+    .replace(/\D/g, '')
+    .replace(/(\d{3})(\d)/, '$1.$2')
+    .replace(/(\d{3})(\d)/, '$1.$2')
+    .replace(/(\d{3})(\d{1,2})/, '$1-$2')
+    .slice(0, 14);
+};
+
+const formatPhone = (value: string) => {
+  return value
+    .replace(/\D/g, '')
+    .replace(/(\d{2})(\d)/, '($1) $2')
+    .replace(/(\d{4,5})(\d{4})/, '$1-$2')
+    .slice(0, 15);
+};
+
+const formatCEP = (value: string) => {
+  return value
+    .replace(/\D/g, '')
+    .replace(/(\d{5})(\d)/, '$1-$2')
+    .slice(0, 9);
+};
+
+export const CheckoutModal = ({ open, onOpenChange }: CheckoutModalProps) => {
+  const { items, getTotal, clearCart } = useCart();
+  const [step, setStep] = useState(1);
+  const [isLoading, setIsLoading] = useState(false);
+  const [paymentUrl, setPaymentUrl] = useState<string | null>(null);
+  const [paymentCreated, setPaymentCreated] = useState(false);
+
+  const [companyData, setCompanyData] = useState<CompanyData>({
+    razaoSocial: '',
+    nomeFantasia: '',
+    cnpj: '',
+    inscricaoEstadual: '',
+    isento: false,
+    inscricaoMunicipal: '',
+    dataAbertura: '',
+    naturezaJuridica: '',
+    cnae: '',
+  });
+
+  const [addressData, setAddressData] = useState<AddressData>({
+    cep: '',
+    endereco: '',
+    numero: '',
+    complemento: '',
+    bairro: '',
+    cidade: '',
+    estado: '',
+  });
+
+  const [contactData, setContactData] = useState<ContactData>({
+    telefoneFixo: '',
+    whatsapp: '',
+    email: '',
+  });
+
+  const [responsibleData, setResponsibleData] = useState<ResponsibleData>({
+    nomeCompleto: '',
+    cpf: '',
+    rg: '',
+    cargo: '',
+    dataNascimento: '',
+  });
+
+  const formatPrice = (price: number) => {
+    return new Intl.NumberFormat("pt-BR", {
+      style: "currency",
+      currency: "BRL",
+    }).format(price);
+  };
+
+  const fetchAddressByCep = async (cep: string) => {
+    const cleanCep = cep.replace(/\D/g, '');
+    if (cleanCep.length === 8) {
+      try {
+        const response = await fetch(`https://viacep.com.br/ws/${cleanCep}/json/`);
+        const data = await response.json();
+        if (!data.erro) {
+          setAddressData(prev => ({
+            ...prev,
+            endereco: data.logradouro || '',
+            bairro: data.bairro || '',
+            cidade: data.localidade || '',
+            estado: data.uf || '',
+          }));
+        }
+      } catch (error) {
+        console.error('Erro ao buscar CEP:', error);
+      }
+    }
+  };
+
+  const handleCreatePayment = async () => {
+    setIsLoading(true);
+    try {
+      const products = items.map(item => ({
+        externalId: item.product.id,
+        name: item.product.name,
+        description: `${item.quantity} ${item.product.unit}`,
+        quantity: item.quantity,
+        price: Math.round(item.product.price * 100), // Converter para centavos
+      }));
+
+      const customer = {
+        name: responsibleData.nomeCompleto,
+        cellphone: contactData.whatsapp,
+        email: contactData.email,
+        taxId: companyData.cnpj.replace(/\D/g, ''),
+      };
+
+      const { data, error } = await supabase.functions.invoke('create-pix-payment', {
+        body: {
+          products,
+          customer,
+          returnUrl: `${window.location.origin}/carrinho`,
+          completionUrl: `${window.location.origin}/checkout/sucesso`,
+        },
+      });
+
+      if (error) {
+        console.error('Error creating payment:', error);
+        throw new Error(error.message || 'Erro ao criar pagamento');
+      }
+
+      if (data?.data?.url) {
+        setPaymentUrl(data.data.url);
+        setPaymentCreated(true);
+        setStep(5);
+        toast({
+          title: "Cobrança criada!",
+          description: "Escaneie o QR Code ou acesse o link para pagar.",
+        });
+      } else {
+        throw new Error('URL de pagamento não retornada');
+      }
+    } catch (error) {
+      console.error('Payment error:', error);
+      toast({
+        title: "Erro ao criar pagamento",
+        description: error instanceof Error ? error.message : "Tente novamente mais tarde.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const validateStep = (currentStep: number): boolean => {
+    switch (currentStep) {
+      case 1:
+        return !!(companyData.razaoSocial && companyData.nomeFantasia && companyData.cnpj && 
+          (companyData.isento || companyData.inscricaoEstadual) && companyData.naturezaJuridica);
+      case 2:
+        return !!(addressData.cep && addressData.endereco && addressData.numero && 
+          addressData.bairro && addressData.cidade && addressData.estado);
+      case 3:
+        return !!(contactData.whatsapp && contactData.email);
+      case 4:
+        return !!(responsibleData.nomeCompleto && responsibleData.cpf && responsibleData.cargo);
+      default:
+        return true;
+    }
+  };
+
+  const nextStep = () => {
+    if (validateStep(step)) {
+      setStep(prev => Math.min(prev + 1, 5));
+    } else {
+      toast({
+        title: "Campos obrigatórios",
+        description: "Preencha todos os campos obrigatórios antes de continuar.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const prevStep = () => setStep(prev => Math.max(prev - 1, 1));
+
+  const stepTitles = [
+    { icon: Building2, label: "Dados da Empresa" },
+    { icon: MapPin, label: "Endereço" },
+    { icon: Phone, label: "Contatos" },
+    { icon: User, label: "Responsável" },
+    { icon: QrCode, label: "Pagamento" },
+  ];
+
+  const handleClose = () => {
+    if (paymentCreated) {
+      clearCart();
+    }
+    onOpenChange(false);
+    setStep(1);
+    setPaymentUrl(null);
+    setPaymentCreated(false);
+  };
+
+  return (
+    <Dialog open={open} onOpenChange={handleClose}>
+      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+        <DialogHeader>
+          <DialogTitle className="font-display text-xl text-foreground">
+            Finalizar Pedido
+          </DialogTitle>
+          <DialogDescription>
+            Complete o cadastro da sua empresa para gerar o pagamento via PIX
+          </DialogDescription>
+        </DialogHeader>
+
+        {/* Stepper */}
+        <div className="flex items-center justify-between mb-6 px-2">
+          {stepTitles.map((s, index) => {
+            const StepIcon = s.icon;
+            const isActive = step === index + 1;
+            const isCompleted = step > index + 1;
+            return (
+              <div key={index} className="flex items-center">
+                <div className="flex flex-col items-center">
+                  <div
+                    className={cn(
+                      "w-10 h-10 rounded-full flex items-center justify-center transition-all",
+                      isActive && "bg-primary text-primary-foreground",
+                      isCompleted && "bg-primary/20 text-primary",
+                      !isActive && !isCompleted && "bg-muted text-muted-foreground"
+                    )}
+                  >
+                    {isCompleted ? <CheckCircle className="w-5 h-5" /> : <StepIcon className="w-5 h-5" />}
+                  </div>
+                  <span className={cn(
+                    "text-xs mt-1 text-center hidden sm:block",
+                    isActive ? "text-foreground font-medium" : "text-muted-foreground"
+                  )}>
+                    {s.label}
+                  </span>
+                </div>
+                {index < stepTitles.length - 1 && (
+                  <div className={cn(
+                    "w-8 h-0.5 mx-1",
+                    step > index + 1 ? "bg-primary" : "bg-muted"
+                  )} />
+                )}
+              </div>
+            );
+          })}
+        </div>
+
+        {/* Step 1: Company Data */}
+        {step === 1 && (
+          <div className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="md:col-span-2">
+                <Label htmlFor="razaoSocial">Razão Social *</Label>
+                <Input
+                  id="razaoSocial"
+                  value={companyData.razaoSocial}
+                  onChange={(e) => setCompanyData(prev => ({ ...prev, razaoSocial: e.target.value }))}
+                  placeholder="Razão Social conforme CNPJ"
+                />
+              </div>
+              <div className="md:col-span-2">
+                <Label htmlFor="nomeFantasia">Nome Fantasia *</Label>
+                <Input
+                  id="nomeFantasia"
+                  value={companyData.nomeFantasia}
+                  onChange={(e) => setCompanyData(prev => ({ ...prev, nomeFantasia: e.target.value }))}
+                  placeholder="Nome comercial da empresa"
+                />
+              </div>
+              <div>
+                <Label htmlFor="cnpj">CNPJ *</Label>
+                <Input
+                  id="cnpj"
+                  value={companyData.cnpj}
+                  onChange={(e) => setCompanyData(prev => ({ ...prev, cnpj: formatCNPJ(e.target.value) }))}
+                  placeholder="00.000.000/0000-00"
+                />
+              </div>
+              <div>
+                <Label htmlFor="inscricaoEstadual">Inscrição Estadual {companyData.isento ? "(Isento)" : "*"}</Label>
+                <Input
+                  id="inscricaoEstadual"
+                  value={companyData.inscricaoEstadual}
+                  onChange={(e) => setCompanyData(prev => ({ ...prev, inscricaoEstadual: e.target.value }))}
+                  placeholder="Número da IE"
+                  disabled={companyData.isento}
+                />
+                <div className="flex items-center gap-2 mt-2">
+                  <Checkbox
+                    id="isento"
+                    checked={companyData.isento}
+                    onCheckedChange={(checked) => setCompanyData(prev => ({ 
+                      ...prev, 
+                      isento: checked as boolean,
+                      inscricaoEstadual: checked ? '' : prev.inscricaoEstadual
+                    }))}
+                  />
+                  <label htmlFor="isento" className="text-sm text-muted-foreground">Isento de IE</label>
+                </div>
+              </div>
+              <div>
+                <Label htmlFor="inscricaoMunicipal">Inscrição Municipal</Label>
+                <Input
+                  id="inscricaoMunicipal"
+                  value={companyData.inscricaoMunicipal}
+                  onChange={(e) => setCompanyData(prev => ({ ...prev, inscricaoMunicipal: e.target.value }))}
+                  placeholder="Número da IM (se houver)"
+                />
+              </div>
+              <div>
+                <Label htmlFor="dataAbertura">Data de Abertura</Label>
+                <Input
+                  id="dataAbertura"
+                  type="date"
+                  value={companyData.dataAbertura}
+                  onChange={(e) => setCompanyData(prev => ({ ...prev, dataAbertura: e.target.value }))}
+                />
+              </div>
+              <div>
+                <Label htmlFor="naturezaJuridica">Natureza Jurídica *</Label>
+                <Select 
+                  value={companyData.naturezaJuridica} 
+                  onValueChange={(value) => setCompanyData(prev => ({ ...prev, naturezaJuridica: value }))}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Selecione..." />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="MEI">MEI</SelectItem>
+                    <SelectItem value="ME">ME - Microempresa</SelectItem>
+                    <SelectItem value="EPP">EPP - Empresa de Pequeno Porte</SelectItem>
+                    <SelectItem value="LTDA">LTDA</SelectItem>
+                    <SelectItem value="SA">S/A</SelectItem>
+                    <SelectItem value="EIRELI">EIRELI</SelectItem>
+                    <SelectItem value="SLU">SLU - Sociedade Limitada Unipessoal</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div>
+                <Label htmlFor="cnae">CNAE Principal</Label>
+                <Input
+                  id="cnae"
+                  value={companyData.cnae}
+                  onChange={(e) => setCompanyData(prev => ({ ...prev, cnae: e.target.value }))}
+                  placeholder="Ex: 4789-0/99"
+                />
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Step 2: Address */}
+        {step === 2 && (
+          <div className="space-y-4">
+            <div className="p-3 rounded-lg bg-amber-50 border border-amber-200 text-amber-800 text-sm">
+              <strong>Importante:</strong> Preencha o endereço exatamente como aparece na Receita Federal para evitar rejeição da NF-e.
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div>
+                <Label htmlFor="cep">CEP *</Label>
+                <Input
+                  id="cep"
+                  value={addressData.cep}
+                  onChange={(e) => {
+                    const formatted = formatCEP(e.target.value);
+                    setAddressData(prev => ({ ...prev, cep: formatted }));
+                    fetchAddressByCep(formatted);
+                  }}
+                  placeholder="00000-000"
+                />
+              </div>
+              <div className="md:col-span-2">
+                <Label htmlFor="endereco">Endereço *</Label>
+                <Input
+                  id="endereco"
+                  value={addressData.endereco}
+                  onChange={(e) => setAddressData(prev => ({ ...prev, endereco: e.target.value }))}
+                  placeholder="Rua, Avenida, etc."
+                />
+              </div>
+              <div>
+                <Label htmlFor="numero">Número *</Label>
+                <Input
+                  id="numero"
+                  value={addressData.numero}
+                  onChange={(e) => setAddressData(prev => ({ ...prev, numero: e.target.value }))}
+                  placeholder="123"
+                />
+              </div>
+              <div className="md:col-span-2">
+                <Label htmlFor="complemento">Complemento</Label>
+                <Input
+                  id="complemento"
+                  value={addressData.complemento}
+                  onChange={(e) => setAddressData(prev => ({ ...prev, complemento: e.target.value }))}
+                  placeholder="Sala, Andar, Bloco..."
+                />
+              </div>
+              <div>
+                <Label htmlFor="bairro">Bairro *</Label>
+                <Input
+                  id="bairro"
+                  value={addressData.bairro}
+                  onChange={(e) => setAddressData(prev => ({ ...prev, bairro: e.target.value }))}
+                  placeholder="Bairro"
+                />
+              </div>
+              <div>
+                <Label htmlFor="cidade">Cidade *</Label>
+                <Input
+                  id="cidade"
+                  value={addressData.cidade}
+                  onChange={(e) => setAddressData(prev => ({ ...prev, cidade: e.target.value }))}
+                  placeholder="Cidade"
+                />
+              </div>
+              <div>
+                <Label htmlFor="estado">Estado *</Label>
+                <Select 
+                  value={addressData.estado} 
+                  onValueChange={(value) => setAddressData(prev => ({ ...prev, estado: value }))}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="UF" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {["AC","AL","AP","AM","BA","CE","DF","ES","GO","MA","MT","MS","MG","PA","PB","PR","PE","PI","RJ","RN","RS","RO","RR","SC","SP","SE","TO"].map(uf => (
+                      <SelectItem key={uf} value={uf}>{uf}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Step 3: Contacts */}
+        {step === 3 && (
+          <div className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <Label htmlFor="telefoneFixo">Telefone Fixo</Label>
+                <Input
+                  id="telefoneFixo"
+                  value={contactData.telefoneFixo}
+                  onChange={(e) => setContactData(prev => ({ ...prev, telefoneFixo: formatPhone(e.target.value) }))}
+                  placeholder="(00) 0000-0000"
+                />
+              </div>
+              <div>
+                <Label htmlFor="whatsapp">WhatsApp Comercial *</Label>
+                <Input
+                  id="whatsapp"
+                  value={contactData.whatsapp}
+                  onChange={(e) => setContactData(prev => ({ ...prev, whatsapp: formatPhone(e.target.value) }))}
+                  placeholder="(00) 00000-0000"
+                />
+              </div>
+              <div className="md:col-span-2">
+                <Label htmlFor="email">E-mail para NF-e e Boletos *</Label>
+                <Input
+                  id="email"
+                  type="email"
+                  value={contactData.email}
+                  onChange={(e) => setContactData(prev => ({ ...prev, email: e.target.value }))}
+                  placeholder="financeiro@empresa.com.br"
+                />
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Step 4: Responsible */}
+        {step === 4 && (
+          <div className="space-y-4">
+            <div className="p-3 rounded-lg bg-blue-50 border border-blue-200 text-blue-800 text-sm">
+              Esses dados serão utilizados para análise de crédito em Serasa, Boa Vista e SPC.
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="md:col-span-2">
+                <Label htmlFor="nomeCompleto">Nome Completo *</Label>
+                <Input
+                  id="nomeCompleto"
+                  value={responsibleData.nomeCompleto}
+                  onChange={(e) => setResponsibleData(prev => ({ ...prev, nomeCompleto: e.target.value }))}
+                  placeholder="Nome completo do responsável"
+                />
+              </div>
+              <div>
+                <Label htmlFor="cpf">CPF *</Label>
+                <Input
+                  id="cpf"
+                  value={responsibleData.cpf}
+                  onChange={(e) => setResponsibleData(prev => ({ ...prev, cpf: formatCPF(e.target.value) }))}
+                  placeholder="000.000.000-00"
+                />
+              </div>
+              <div>
+                <Label htmlFor="rg">RG</Label>
+                <Input
+                  id="rg"
+                  value={responsibleData.rg}
+                  onChange={(e) => setResponsibleData(prev => ({ ...prev, rg: e.target.value }))}
+                  placeholder="Número do RG"
+                />
+              </div>
+              <div>
+                <Label htmlFor="cargo">Cargo *</Label>
+                <Select 
+                  value={responsibleData.cargo} 
+                  onValueChange={(value) => setResponsibleData(prev => ({ ...prev, cargo: value }))}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Selecione..." />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="socio">Sócio</SelectItem>
+                    <SelectItem value="administrador">Administrador</SelectItem>
+                    <SelectItem value="diretor">Diretor</SelectItem>
+                    <SelectItem value="procurador">Procurador</SelectItem>
+                    <SelectItem value="outro">Outro</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div>
+                <Label htmlFor="dataNascimento">Data de Nascimento</Label>
+                <Input
+                  id="dataNascimento"
+                  type="date"
+                  value={responsibleData.dataNascimento}
+                  onChange={(e) => setResponsibleData(prev => ({ ...prev, dataNascimento: e.target.value }))}
+                />
+              </div>
+            </div>
+
+            {/* Order Summary */}
+            <div className="mt-6 p-4 rounded-lg bg-secondary/50 border">
+              <h4 className="font-semibold text-foreground mb-3">Resumo do Pedido</h4>
+              <div className="space-y-2 text-sm">
+                {items.map(item => (
+                  <div key={item.product.id} className="flex justify-between">
+                    <span className="text-muted-foreground">
+                      {item.product.name} x {item.quantity}
+                    </span>
+                    <span className="font-medium">{formatPrice(item.product.price * item.quantity)}</span>
+                  </div>
+                ))}
+                <div className="border-t pt-2 mt-2 flex justify-between font-bold">
+                  <span>Total</span>
+                  <span className="text-primary">{formatPrice(getTotal())}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Step 5: Payment */}
+        {step === 5 && paymentUrl && (
+          <div className="text-center space-y-6 py-4">
+            <div className="w-16 h-16 mx-auto bg-primary/10 rounded-full flex items-center justify-center">
+              <QrCode className="w-8 h-8 text-primary" />
+            </div>
+            <div>
+              <h3 className="font-display text-lg font-semibold text-foreground mb-2">
+                Cobrança PIX Gerada!
+              </h3>
+              <p className="text-muted-foreground text-sm">
+                Clique no botão abaixo para acessar a página de pagamento e escanear o QR Code.
+              </p>
+            </div>
+            <div className="p-4 rounded-lg bg-secondary/50 border">
+              <p className="text-sm font-medium text-foreground mb-2">Total a pagar:</p>
+              <p className="text-2xl font-display font-bold text-primary">{formatPrice(getTotal())}</p>
+            </div>
+            <Button 
+              size="lg" 
+              className="w-full gap-2"
+              onClick={() => window.open(paymentUrl, '_blank')}
+            >
+              <QrCode className="w-5 h-5" />
+              Acessar Pagamento PIX
+            </Button>
+            <p className="text-xs text-muted-foreground">
+              Você será redirecionado para a página segura da AbacatePay
+            </p>
+          </div>
+        )}
+
+        {/* Navigation Buttons */}
+        {step < 5 && (
+          <div className="flex justify-between pt-4 border-t">
+            <Button
+              variant="outline"
+              onClick={prevStep}
+              disabled={step === 1}
+              className="gap-2"
+            >
+              <ChevronLeft className="w-4 h-4" />
+              Voltar
+            </Button>
+            
+            {step < 4 ? (
+              <Button onClick={nextStep} className="gap-2">
+                Próximo
+                <ChevronRight className="w-4 h-4" />
+              </Button>
+            ) : (
+              <Button 
+                onClick={handleCreatePayment} 
+                disabled={isLoading || !validateStep(4)}
+                className="gap-2"
+              >
+                {isLoading ? (
+                  <>
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                    Gerando...
+                  </>
+                ) : (
+                  <>
+                    <QrCode className="w-4 h-4" />
+                    Gerar QR Code PIX
+                  </>
+                )}
+              </Button>
+            )}
+          </div>
+        )}
+      </DialogContent>
+    </Dialog>
+  );
+};
