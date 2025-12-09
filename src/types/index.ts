@@ -1,7 +1,7 @@
 export interface Product {
   id: string;
   name: string;
-  description?: string;
+  description: string;
   price: number;
   unit: string;
   minOrder: number;
@@ -9,7 +9,6 @@ export interface Product {
   image: string;
   category: string;
   featured?: boolean;
-  inStock?: boolean;
 }
 
 export interface CartItem {
@@ -17,26 +16,59 @@ export interface CartItem {
   quantity: number;
 }
 
-export interface User {
-  id: string;
-  companyName: string;
+export interface CompanyData {
+  razaoSocial: string;
+  nomeFantasia: string;
+  cnpj: string;
+  inscricaoEstadual: string;
+  isento: boolean;
+  inscricaoMunicipal?: string;
+  dataAbertura: Date | null;
+  naturezaJuridica: string;
+  cnae: string;
+}
+
+export interface AddressData {
+  cep: string;
+  endereco: string;
+  numero: string;
+  complemento?: string;
+  bairro: string;
+  cidade: string;
+  estado: string;
+}
+
+export interface ContactData {
+  telefoneFixo?: string;
+  whatsapp: string;
   email: string;
 }
 
-export interface Order {
-  id: string;
-  userId: string;
-  date: string;
-  items: CartItem[];
-  total: number;
-  status: 'pending' | 'paid' | 'processing' | 'shipped';
-  paymentMethod: 'PIX' | 'CREDIT' | 'DEBIT';
+export interface ResponsibleData {
+  nomeCompleto: string;
+  cpf: string;
+  rg: string;
+  cargo: string;
+  dataNascimento: Date | null;
 }
 
-export enum SignupStep {
-  COMPANY_INFO = 0,
-  ADDRESS = 1,
-  CONTACTS = 2,
-  LEGAL_REP = 3,
-  PASSWORD = 4
+export interface PasswordData {
+  senha: string;
+  confirmarSenha: string;
+  aceitaTermos: boolean;
+}
+
+export interface RegistrationData {
+  company: CompanyData;
+  address: AddressData;
+  contact: ContactData;
+  responsible: ResponsibleData;
+  password: PasswordData;
+}
+
+export interface User {
+  id: string;
+  email: string;
+  companyName: string;
+  cnpj: string;
 }

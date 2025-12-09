@@ -9,10 +9,9 @@ export const products: Product[] = [
     unit: "kg",
     minOrder: 30,
     minOrderUnit: "kg",
-    image: "https://picsum.photos/400/400?random=1",
+    image: "/placeholder.svg",
     category: "Plásticos",
     featured: true,
-    inStock: true
   },
   {
     id: "2",
@@ -22,10 +21,9 @@ export const products: Product[] = [
     unit: "kg",
     minOrder: 30,
     minOrderUnit: "kg",
-    image: "https://picsum.photos/400/400?random=2",
+    image: "/placeholder.svg",
     category: "Plásticos",
     featured: true,
-    inStock: true
   },
   {
     id: "3",
@@ -35,10 +33,9 @@ export const products: Product[] = [
     unit: "unidade",
     minOrder: 20,
     minOrderUnit: "unidades",
-    image: "https://picsum.photos/400/400?random=3",
+    image: "/placeholder.svg",
     category: "Proteção",
     featured: true,
-    inStock: true
   },
   {
     id: "4",
@@ -48,9 +45,8 @@ export const products: Product[] = [
     unit: "unidade",
     minOrder: 10,
     minOrderUnit: "unidades",
-    image: "https://picsum.photos/400/400?random=4",
+    image: "/placeholder.svg",
     category: "Proteção",
-    inStock: false
   },
   {
     id: "5",
@@ -60,9 +56,8 @@ export const products: Product[] = [
     unit: "unidade",
     minOrder: 5,
     minOrderUnit: "unidades",
-    image: "https://picsum.photos/400/400?random=5",
+    image: "/placeholder.svg",
     category: "Limpeza",
-    inStock: true
   },
   {
     id: "6",
@@ -72,10 +67,9 @@ export const products: Product[] = [
     unit: "unidade",
     minOrder: 1,
     minOrderUnit: "unidade",
-    image: "https://picsum.photos/400/400?random=6",
+    image: "/placeholder.svg",
     category: "Papel",
     featured: true,
-    inStock: true
   },
   {
     id: "7",
@@ -85,9 +79,8 @@ export const products: Product[] = [
     unit: "caixa",
     minOrder: 5,
     minOrderUnit: "caixas",
-    image: "https://picsum.photos/400/400?random=7",
+    image: "/placeholder.svg",
     category: "Fitas",
-    inStock: true
   },
   {
     id: "8",
@@ -97,9 +90,8 @@ export const products: Product[] = [
     unit: "unidade",
     minOrder: 5,
     minOrderUnit: "unidades",
-    image: "https://picsum.photos/400/400?random=8",
+    image: "/placeholder.svg",
     category: "Papel",
-    inStock: true
   },
   {
     id: "9",
@@ -109,9 +101,8 @@ export const products: Product[] = [
     unit: "kg",
     minOrder: 1000,
     minOrderUnit: "kg",
-    image: "https://picsum.photos/400/400?random=9",
+    image: "/placeholder.svg",
     category: "Papel",
-    inStock: true
   },
   {
     id: "10",
@@ -121,9 +112,8 @@ export const products: Product[] = [
     unit: "fardo",
     minOrder: 3,
     minOrderUnit: "fardos",
-    image: "https://picsum.photos/400/400?random=10",
+    image: "/placeholder.svg",
     category: "Limpeza",
-    inStock: true
   },
   {
     id: "11",
@@ -133,9 +123,8 @@ export const products: Product[] = [
     unit: "fardo",
     minOrder: 3,
     minOrderUnit: "fardos",
-    image: "https://picsum.photos/400/400?random=11",
+    image: "/placeholder.svg",
     category: "Limpeza",
-    inStock: true
   },
   {
     id: "12",
@@ -145,9 +134,8 @@ export const products: Product[] = [
     unit: "fardo",
     minOrder: 3,
     minOrderUnit: "fardos",
-    image: "https://picsum.photos/400/400?random=12",
+    image: "/placeholder.svg",
     category: "Limpeza",
-    inStock: true
   },
   {
     id: "13",
@@ -157,9 +145,8 @@ export const products: Product[] = [
     unit: "fardo",
     minOrder: 3,
     minOrderUnit: "fardos",
-    image: "https://picsum.photos/400/400?random=13",
+    image: "/placeholder.svg",
     category: "Limpeza",
-    inStock: true
   },
   {
     id: "14",
@@ -169,9 +156,8 @@ export const products: Product[] = [
     unit: "fardo",
     minOrder: 3,
     minOrderUnit: "fardos",
-    image: "https://picsum.photos/400/400?random=14",
+    image: "/placeholder.svg",
     category: "Limpeza",
-    inStock: true
   },
   {
     id: "15",
@@ -181,10 +167,9 @@ export const products: Product[] = [
     unit: "unidade",
     minOrder: 20,
     minOrderUnit: "unidades",
-    image: "https://picsum.photos/400/400?random=15",
+    image: "/placeholder.svg",
     category: "Plásticos",
     featured: true,
-    inStock: true
   },
 ];
 
