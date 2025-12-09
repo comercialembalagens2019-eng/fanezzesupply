@@ -4,6 +4,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { CartProvider } from "@/contexts/CartContext";
+import { AuthProvider } from "@/contexts/AuthContext";
 import Index from "./pages/Index";
 import Produtos from "./pages/Produtos";
 import Carrinho from "./pages/Carrinho";
@@ -13,6 +14,7 @@ import Sobre from "./pages/Sobre";
 import Contato from "./pages/Contato";
 import Checkout from "./pages/Checkout";
 import Pedidos from "./pages/Pedidos";
+import AdminClientes from "./pages/AdminClientes";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -20,24 +22,27 @@ const queryClient = new QueryClient();
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
-      <CartProvider>
-        <Toaster />
-        <Sonner />
-        <BrowserRouter>
-          <Routes>
-            <Route path="/" element={<Index />} />
-            <Route path="/produtos" element={<Produtos />} />
-            <Route path="/carrinho" element={<Carrinho />} />
-            <Route path="/checkout" element={<Checkout />} />
-            <Route path="/pedidos" element={<Pedidos />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/cadastro" element={<Cadastro />} />
-            <Route path="/sobre" element={<Sobre />} />
-            <Route path="/contato" element={<Contato />} />
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </BrowserRouter>
-      </CartProvider>
+      <AuthProvider>
+        <CartProvider>
+          <Toaster />
+          <Sonner />
+          <BrowserRouter>
+            <Routes>
+              <Route path="/" element={<Index />} />
+              <Route path="/produtos" element={<Produtos />} />
+              <Route path="/carrinho" element={<Carrinho />} />
+              <Route path="/checkout" element={<Checkout />} />
+              <Route path="/pedidos" element={<Pedidos />} />
+              <Route path="/login" element={<Login />} />
+              <Route path="/cadastro" element={<Cadastro />} />
+              <Route path="/sobre" element={<Sobre />} />
+              <Route path="/contato" element={<Contato />} />
+              <Route path="/admin/clientes" element={<AdminClientes />} />
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </BrowserRouter>
+        </CartProvider>
+      </AuthProvider>
     </TooltipProvider>
   </QueryClientProvider>
 );
