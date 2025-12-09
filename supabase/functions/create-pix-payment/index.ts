@@ -5,14 +5,6 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
-interface Product {
-  externalId: string;
-  name: string;
-  description: string;
-  quantity: number;
-  price: number; // em centavos
-}
-
 interface Customer {
   name: string;
   cellphone: string;
@@ -21,10 +13,10 @@ interface Customer {
 }
 
 interface CreatePaymentRequest {
-  products: Product[];
+  amount: number; // em centavos
+  description: string;
   customer: Customer;
-  returnUrl: string;
-  completionUrl: string;
+  externalId?: string;
 }
 
 serve(async (req: Request): Promise<Response> => {
@@ -43,26 +35,32 @@ serve(async (req: Request): Promise<Response> => {
 
     const requestData: CreatePaymentRequest = await req.json();
     
-    console.log('Creating billing with AbacatePay:', JSON.stringify(requestData, null, 2));
+    console.log('Creating PIX QR Code with AbacatePay:', JSON.stringify(requestData, null, 2));
 
-    const billingPayload = {
-      frequency: "ONE_TIME",
-      methods: ["PIX"],
-      products: requestData.products,
-      returnUrl: requestData.returnUrl,
-      completionUrl: requestData.completionUrl,
-      customer: requestData.customer,
+    const pixPayload = {
+      amount: requestData.amount,
+      expiresIn: 3600, // 1 hora para expirar
+      description: requestData.description,
+      customer: {
+        name: requestData.customer.name,
+        cellphone: requestData.customer.cellphone,
+        email: requestData.customer.email,
+        taxId: requestData.customer.taxId,
+      },
+      metadata: {
+        externalId: requestData.externalId || Date.now().toString(),
+      },
     };
 
-    console.log('Sending to AbacatePay:', JSON.stringify(billingPayload, null, 2));
+    console.log('Sending to AbacatePay:', JSON.stringify(pixPayload, null, 2));
 
-    const response = await fetch('https://api.abacatepay.com/v1/billing/create', {
+    const response = await fetch('https://api.abacatepay.com/v1/pixQrCode/create', {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${apiKey}`,
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify(billingPayload),
+      body: JSON.stringify(pixPayload),
     });
 
     const responseText = await response.text();
@@ -72,7 +70,7 @@ serve(async (req: Request): Promise<Response> => {
     if (!response.ok) {
       console.error('AbacatePay error:', responseText);
       return new Response(
-        JSON.stringify({ error: 'Failed to create payment', details: responseText }),
+        JSON.stringify({ error: 'Failed to create PIX QR Code', details: responseText }),
         { 
           status: response.status, 
           headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
