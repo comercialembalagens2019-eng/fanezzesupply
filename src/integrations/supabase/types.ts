@@ -14,7 +14,140 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      companies: {
+        Row: {
+          bairro: string
+          cep: string
+          cidade: string
+          cnae: string
+          cnpj: string
+          complemento: string | null
+          created_at: string
+          data_abertura: string | null
+          email: string
+          endereco: string
+          estado: string
+          id: string
+          inscricao_estadual: string | null
+          inscricao_municipal: string | null
+          isento: boolean | null
+          natureza_juridica: string
+          nome_fantasia: string
+          numero: string
+          razao_social: string
+          responsavel_cargo: string
+          responsavel_cpf: string
+          responsavel_nascimento: string | null
+          responsavel_nome: string
+          responsavel_rg: string
+          telefone_fixo: string | null
+          updated_at: string
+          user_id: string | null
+          whatsapp: string
+        }
+        Insert: {
+          bairro: string
+          cep: string
+          cidade: string
+          cnae: string
+          cnpj: string
+          complemento?: string | null
+          created_at?: string
+          data_abertura?: string | null
+          email: string
+          endereco: string
+          estado: string
+          id?: string
+          inscricao_estadual?: string | null
+          inscricao_municipal?: string | null
+          isento?: boolean | null
+          natureza_juridica: string
+          nome_fantasia: string
+          numero: string
+          razao_social: string
+          responsavel_cargo: string
+          responsavel_cpf: string
+          responsavel_nascimento?: string | null
+          responsavel_nome: string
+          responsavel_rg: string
+          telefone_fixo?: string | null
+          updated_at?: string
+          user_id?: string | null
+          whatsapp: string
+        }
+        Update: {
+          bairro?: string
+          cep?: string
+          cidade?: string
+          cnae?: string
+          cnpj?: string
+          complemento?: string | null
+          created_at?: string
+          data_abertura?: string | null
+          email?: string
+          endereco?: string
+          estado?: string
+          id?: string
+          inscricao_estadual?: string | null
+          inscricao_municipal?: string | null
+          isento?: boolean | null
+          natureza_juridica?: string
+          nome_fantasia?: string
+          numero?: string
+          razao_social?: string
+          responsavel_cargo?: string
+          responsavel_cpf?: string
+          responsavel_nascimento?: string | null
+          responsavel_nome?: string
+          responsavel_rg?: string
+          telefone_fixo?: string | null
+          updated_at?: string
+          user_id?: string | null
+          whatsapp?: string
+        }
+        Relationships: []
+      }
+      orders: {
+        Row: {
+          company_id: string | null
+          created_at: string
+          id: string
+          items: Json
+          payment_url: string | null
+          status: string
+          total_amount: number
+          updated_at: string
+        }
+        Insert: {
+          company_id?: string | null
+          created_at?: string
+          id?: string
+          items: Json
+          payment_url?: string | null
+          status?: string
+          total_amount: number
+          updated_at?: string
+        }
+        Update: {
+          company_id?: string | null
+          created_at?: string
+          id?: string
+          items?: Json
+          payment_url?: string | null
+          status?: string
+          total_amount?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "orders_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
