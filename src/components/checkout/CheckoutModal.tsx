@@ -400,8 +400,8 @@ export const CheckoutModal = ({ open, onOpenChange }: CheckoutModalProps) => {
         `${item.product.name} x ${item.quantity} ${item.product.unit}`
       ).join(', ');
 
-      // Calculate total in cents
-      const totalInCents = Math.round(getTotal() * 100);
+      // Calculate total in cents (minimum R$1.00 = 100 cents required by AbacatePay)
+      const totalInCents = Math.max(100, Math.round(getTotal() * 100));
 
       const customer = {
         name: responsibleData.nomeCompleto,
