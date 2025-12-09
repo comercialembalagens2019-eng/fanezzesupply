@@ -5,7 +5,7 @@ export const products: Product[] = [
     id: "0",
     name: "Teste",
     description: "Produto de teste para verificar pagamento.",
-    price: 0.01,
+    price: 1.00,
     unit: "unidade",
     minOrder: 1,
     minOrderUnit: "unidade",
