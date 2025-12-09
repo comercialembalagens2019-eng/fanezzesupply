@@ -12,6 +12,7 @@ import Cadastro from "./pages/Cadastro";
 import Sobre from "./pages/Sobre";
 import Contato from "./pages/Contato";
 import Checkout from "./pages/Checkout";
+import Pedidos from "./pages/Pedidos";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -28,6 +29,7 @@ const App = () => (
             <Route path="/produtos" element={<Produtos />} />
             <Route path="/carrinho" element={<Carrinho />} />
             <Route path="/checkout" element={<Checkout />} />
+            <Route path="/pedidos" element={<Pedidos />} />
             <Route path="/login" element={<Login />} />
             <Route path="/cadastro" element={<Cadastro />} />
             <Route path="/sobre" element={<Sobre />} />
