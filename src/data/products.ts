@@ -2,6 +2,18 @@ import { Product } from "@/types";
 
 export const products: Product[] = [
   {
+    id: "0",
+    name: "Teste",
+    description: "Produto de teste para verificar pagamento.",
+    price: 0.01,
+    unit: "unidade",
+    minOrder: 1,
+    minOrderUnit: "unidade",
+    image: "/placeholder.svg",
+    category: "Teste",
+    featured: true,
+  },
+  {
     id: "1",
     name: "Saco Plástico PP",
     description: "Saco plástico de polipropileno de alta qualidade, ideal para embalagens diversas.",
