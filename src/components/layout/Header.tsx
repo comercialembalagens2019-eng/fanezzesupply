@@ -1,8 +1,9 @@
 import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { Menu, X, ShoppingCart, User, Package, ClipboardList } from "lucide-react";
+import { Menu, X, ShoppingCart, User, Package, LogOut, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useCart } from "@/contexts/CartContext";
+import { useAuth } from "@/contexts/AuthContext";
 import { cn } from "@/lib/utils";
 
 const navLinks = [
@@ -17,7 +18,13 @@ export function Header() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const location = useLocation();
   const { getItemCount } = useCart();
+  const { user, isAdmin, signOut } = useAuth();
   const itemCount = getItemCount();
+
+  const handleSignOut = async () => {
+    await signOut();
+    setIsMobileMenuOpen(false);
+  };
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50 bg-card/95 backdrop-blur-md border-b border-border shadow-sm">
@@ -52,16 +59,41 @@ export function Header() {
                 )}
               </Link>
             ))}
+            {/* Admin link - only visible if logged in as admin */}
+            {isAdmin && (
+              <Link
+                to="/admin/clientes"
+                className={cn(
+                  "font-medium transition-colors relative py-2 flex items-center gap-1",
+                  location.pathname === "/admin/clientes"
+                    ? "text-primary"
+                    : "text-muted-foreground hover:text-foreground"
+                )}
+              >
+                <Users className="w-4 h-4" />
+                Clientes
+                {location.pathname === "/admin/clientes" && (
+                  <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary rounded-full" />
+                )}
+              </Link>
+            )}
           </nav>
 
           {/* Desktop Actions */}
           <div className="hidden md:flex items-center gap-3">
-            <Link to="/login">
-              <Button variant="ghost" size="sm" className="gap-2">
-                <User className="w-4 h-4" />
-                <span>Entrar</span>
+            {user ? (
+              <Button variant="ghost" size="sm" className="gap-2" onClick={handleSignOut}>
+                <LogOut className="w-4 h-4" />
+                <span>Sair</span>
               </Button>
-            </Link>
+            ) : (
+              <Link to="/login">
+                <Button variant="ghost" size="sm" className="gap-2">
+                  <User className="w-4 h-4" />
+                  <span>Entrar</span>
+                </Button>
+              </Link>
+            )}
             <Link to="/carrinho" className="relative">
               <Button variant="secondary" size="icon" className="relative">
                 <ShoppingCart className="w-5 h-5" />
@@ -119,15 +151,41 @@ export function Header() {
                   {link.label}
                 </Link>
               ))}
-              <div className="border-t border-border mt-2 pt-2">
+              {/* Admin link in mobile menu */}
+              {isAdmin && (
                 <Link
-                  to="/login"
+                  to="/admin/clientes"
                   onClick={() => setIsMobileMenuOpen(false)}
-                  className="flex items-center gap-2 px-4 py-3 font-medium text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
+                  className={cn(
+                    "flex items-center gap-2 px-4 py-3 font-medium transition-colors",
+                    location.pathname === "/admin/clientes"
+                      ? "text-primary bg-accent"
+                      : "text-muted-foreground hover:text-foreground hover:bg-muted"
+                  )}
                 >
-                  <User className="w-4 h-4" />
-                  Entrar / Cadastrar
+                  <Users className="w-4 h-4" />
+                  Clientes (Admin)
                 </Link>
+              )}
+              <div className="border-t border-border mt-2 pt-2">
+                {user ? (
+                  <button
+                    onClick={handleSignOut}
+                    className="flex items-center gap-2 px-4 py-3 w-full font-medium text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
+                  >
+                    <LogOut className="w-4 h-4" />
+                    Sair
+                  </button>
+                ) : (
+                  <Link
+                    to="/login"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    className="flex items-center gap-2 px-4 py-3 font-medium text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
+                  >
+                    <User className="w-4 h-4" />
+                    Entrar / Cadastrar
+                  </Link>
+                )}
               </div>
             </nav>
           </div>
