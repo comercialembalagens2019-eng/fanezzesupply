@@ -1,12 +1,14 @@
+import { useState } from "react";
 import { Link } from "react-router-dom";
 import { ShoppingCart, Trash2, Plus, Minus, AlertTriangle, ArrowRight, ArrowLeft } from "lucide-react";
 import { Layout } from "@/components/layout/Layout";
 import { Button } from "@/components/ui/button";
 import { useCart } from "@/contexts/CartContext";
 import { cn } from "@/lib/utils";
-
+import { CheckoutModal } from "@/components/checkout/CheckoutModal";
 const Carrinho = () => {
   const { items, removeFromCart, updateQuantity, getTotal, clearCart, isMinOrderMet, allMinOrdersMet } = useCart();
+  const [checkoutOpen, setCheckoutOpen] = useState(false);
 
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat("pt-BR", {
@@ -189,16 +191,17 @@ const Carrinho = () => {
                   </div>
                 )}
 
-                <Link to={allMinOrdersMet() ? "/checkout" : "#"}>
-                  <Button
-                    size="lg"
-                    className="w-full gap-2"
-                    disabled={!allMinOrdersMet()}
-                  >
-                    Finalizar Pedido
-                    <ArrowRight className="w-4 h-4" />
-                  </Button>
-                </Link>
+                <Button
+                  size="lg"
+                  className="w-full gap-2"
+                  disabled={!allMinOrdersMet()}
+                  onClick={() => setCheckoutOpen(true)}
+                >
+                  Finalizar Pedido
+                  <ArrowRight className="w-4 h-4" />
+                </Button>
+
+                <CheckoutModal open={checkoutOpen} onOpenChange={setCheckoutOpen} />
 
                 <Link to="/produtos">
                   <Button variant="ghost" className="w-full mt-3 gap-2">
