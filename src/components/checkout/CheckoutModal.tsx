@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -6,6 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useCart } from "@/contexts/CartContext";
+import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
 import { Loader2, QrCode, Building2, MapPin, Phone, User, ChevronRight, ChevronLeft, CheckCircle } from "lucide-react";
@@ -88,10 +89,13 @@ const formatCEP = (value: string) => {
 
 export const CheckoutModal = ({ open, onOpenChange }: CheckoutModalProps) => {
   const { items, getTotal, clearCart } = useCart();
+  const { user } = useAuth();
   const [step, setStep] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
+  const [isLoadingCompany, setIsLoadingCompany] = useState(false);
   const [paymentUrl, setPaymentUrl] = useState<string | null>(null);
   const [paymentCreated, setPaymentCreated] = useState(false);
+  const [existingCompanyId, setExistingCompanyId] = useState<string | null>(null);
 
   const [companyData, setCompanyData] = useState<CompanyData>({
     razaoSocial: '',
@@ -129,6 +133,74 @@ export const CheckoutModal = ({ open, onOpenChange }: CheckoutModalProps) => {
     dataNascimento: '',
   });
 
+  // Load existing company data for logged-in users
+  useEffect(() => {
+    const loadUserCompany = async () => {
+      if (!user || !open) return;
+      
+      setIsLoadingCompany(true);
+      try {
+        const { data: company, error } = await supabase
+          .from('companies')
+          .select('*')
+          .eq('user_id', user.id)
+          .maybeSingle();
+
+        if (error) {
+          console.error('Error loading company:', error);
+          return;
+        }
+
+        if (company) {
+          setExistingCompanyId(company.id);
+          setCompanyData({
+            razaoSocial: company.razao_social || '',
+            nomeFantasia: company.nome_fantasia || '',
+            cnpj: formatCNPJ(company.cnpj || ''),
+            inscricaoEstadual: company.inscricao_estadual || '',
+            isento: company.isento || false,
+            inscricaoMunicipal: company.inscricao_municipal || '',
+            dataAbertura: company.data_abertura || '',
+            naturezaJuridica: company.natureza_juridica || '',
+            cnae: company.cnae || '',
+          });
+          setAddressData({
+            cep: formatCEP(company.cep || ''),
+            endereco: company.endereco || '',
+            numero: company.numero || '',
+            complemento: company.complemento || '',
+            bairro: company.bairro || '',
+            cidade: company.cidade || '',
+            estado: company.estado || '',
+          });
+          setContactData({
+            telefoneFixo: company.telefone_fixo || '',
+            whatsapp: company.whatsapp || '',
+            email: company.email || '',
+          });
+          setResponsibleData({
+            nomeCompleto: company.responsavel_nome || '',
+            cpf: formatCPF(company.responsavel_cpf || ''),
+            rg: company.responsavel_rg || '',
+            cargo: company.responsavel_cargo || '',
+            dataNascimento: company.responsavel_nascimento || '',
+          });
+          
+          // Skip to payment step if all data is filled
+          if (company.razao_social && company.cnpj && company.endereco && company.whatsapp && company.responsavel_nome) {
+            setStep(4); // Go to responsible/summary step
+          }
+        }
+      } catch (error) {
+        console.error('Error loading company:', error);
+      } finally {
+        setIsLoadingCompany(false);
+      }
+    };
+
+    loadUserCompany();
+  }, [user, open]);
+
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat("pt-BR", {
       style: "currency",
@@ -158,16 +230,10 @@ export const CheckoutModal = ({ open, onOpenChange }: CheckoutModalProps) => {
   };
 
   const saveCompanyData = async () => {
-    // First check if company with this CNPJ already exists
     const cnpjClean = companyData.cnpj.replace(/\D/g, '');
-    const { data: existingCompany } = await supabase
-      .from('companies')
-      .select('id')
-      .eq('cnpj', cnpjClean)
-      .maybeSingle();
-
-    if (existingCompany) {
-      // Update existing company
+    
+    // If user is logged in and has existing company, update it
+    if (existingCompanyId) {
       const { data, error } = await supabase
         .from('companies')
         .update({
@@ -195,6 +261,57 @@ export const CheckoutModal = ({ open, onOpenChange }: CheckoutModalProps) => {
           responsavel_cargo: responsibleData.cargo,
           responsavel_nascimento: responsibleData.dataNascimento || null,
         })
+        .eq('id', existingCompanyId)
+        .select()
+        .single();
+
+      if (error) throw error;
+      return data;
+    }
+
+    // Check if company with this CNPJ already exists
+    const { data: existingCompany } = await supabase
+      .from('companies')
+      .select('id')
+      .eq('cnpj', cnpjClean)
+      .maybeSingle();
+
+    if (existingCompany) {
+      // Update existing company and link to user if logged in
+      const updateData: Record<string, unknown> = {
+        razao_social: companyData.razaoSocial,
+        nome_fantasia: companyData.nomeFantasia,
+        inscricao_estadual: companyData.isento ? null : companyData.inscricaoEstadual,
+        isento: companyData.isento,
+        inscricao_municipal: companyData.inscricaoMunicipal || null,
+        data_abertura: companyData.dataAbertura || null,
+        natureza_juridica: companyData.naturezaJuridica,
+        cnae: companyData.cnae || '',
+        cep: addressData.cep.replace(/\D/g, ''),
+        endereco: addressData.endereco,
+        numero: addressData.numero,
+        complemento: addressData.complemento || null,
+        bairro: addressData.bairro,
+        cidade: addressData.cidade,
+        estado: addressData.estado,
+        telefone_fixo: contactData.telefoneFixo || null,
+        whatsapp: contactData.whatsapp,
+        email: contactData.email,
+        responsavel_nome: responsibleData.nomeCompleto,
+        responsavel_cpf: responsibleData.cpf.replace(/\D/g, ''),
+        responsavel_rg: responsibleData.rg || '',
+        responsavel_cargo: responsibleData.cargo,
+        responsavel_nascimento: responsibleData.dataNascimento || null,
+      };
+      
+      // Link to user if logged in
+      if (user) {
+        updateData.user_id = user.id;
+      }
+
+      const { data, error } = await supabase
+        .from('companies')
+        .update(updateData)
         .eq('id', existingCompany.id)
         .select()
         .single();
@@ -203,34 +320,41 @@ export const CheckoutModal = ({ open, onOpenChange }: CheckoutModalProps) => {
       return data;
     } else {
       // Insert new company
+      const insertData: Record<string, unknown> = {
+        razao_social: companyData.razaoSocial,
+        nome_fantasia: companyData.nomeFantasia,
+        cnpj: cnpjClean,
+        inscricao_estadual: companyData.isento ? null : companyData.inscricaoEstadual,
+        isento: companyData.isento,
+        inscricao_municipal: companyData.inscricaoMunicipal || null,
+        data_abertura: companyData.dataAbertura || null,
+        natureza_juridica: companyData.naturezaJuridica,
+        cnae: companyData.cnae || '',
+        cep: addressData.cep.replace(/\D/g, ''),
+        endereco: addressData.endereco,
+        numero: addressData.numero,
+        complemento: addressData.complemento || null,
+        bairro: addressData.bairro,
+        cidade: addressData.cidade,
+        estado: addressData.estado,
+        telefone_fixo: contactData.telefoneFixo || null,
+        whatsapp: contactData.whatsapp,
+        email: contactData.email,
+        responsavel_nome: responsibleData.nomeCompleto,
+        responsavel_cpf: responsibleData.cpf.replace(/\D/g, ''),
+        responsavel_rg: responsibleData.rg || '',
+        responsavel_cargo: responsibleData.cargo,
+        responsavel_nascimento: responsibleData.dataNascimento || null,
+      };
+      
+      // Link to user if logged in
+      if (user) {
+        insertData.user_id = user.id;
+      }
+
       const { data, error } = await supabase
         .from('companies')
-        .insert({
-          razao_social: companyData.razaoSocial,
-          nome_fantasia: companyData.nomeFantasia,
-          cnpj: cnpjClean,
-          inscricao_estadual: companyData.isento ? null : companyData.inscricaoEstadual,
-          isento: companyData.isento,
-          inscricao_municipal: companyData.inscricaoMunicipal || null,
-          data_abertura: companyData.dataAbertura || null,
-          natureza_juridica: companyData.naturezaJuridica,
-          cnae: companyData.cnae || '',
-          cep: addressData.cep.replace(/\D/g, ''),
-          endereco: addressData.endereco,
-          numero: addressData.numero,
-          complemento: addressData.complemento || null,
-          bairro: addressData.bairro,
-          cidade: addressData.cidade,
-          estado: addressData.estado,
-          telefone_fixo: contactData.telefoneFixo || null,
-          whatsapp: contactData.whatsapp,
-          email: contactData.email,
-          responsavel_nome: responsibleData.nomeCompleto,
-          responsavel_cpf: responsibleData.cpf.replace(/\D/g, ''),
-          responsavel_rg: responsibleData.rg || '',
-          responsavel_cargo: responsibleData.cargo,
-          responsavel_nascimento: responsibleData.dataNascimento || null,
-        })
+        .insert(insertData as never)
         .select()
         .single();
 
