@@ -157,15 +157,126 @@ export const CheckoutModal = ({ open, onOpenChange }: CheckoutModalProps) => {
     }
   };
 
+  const saveCompanyData = async () => {
+    // First check if company with this CNPJ already exists
+    const cnpjClean = companyData.cnpj.replace(/\D/g, '');
+    const { data: existingCompany } = await supabase
+      .from('companies')
+      .select('id')
+      .eq('cnpj', cnpjClean)
+      .maybeSingle();
+
+    if (existingCompany) {
+      // Update existing company
+      const { data, error } = await supabase
+        .from('companies')
+        .update({
+          razao_social: companyData.razaoSocial,
+          nome_fantasia: companyData.nomeFantasia,
+          inscricao_estadual: companyData.isento ? null : companyData.inscricaoEstadual,
+          isento: companyData.isento,
+          inscricao_municipal: companyData.inscricaoMunicipal || null,
+          data_abertura: companyData.dataAbertura || null,
+          natureza_juridica: companyData.naturezaJuridica,
+          cnae: companyData.cnae || '',
+          cep: addressData.cep.replace(/\D/g, ''),
+          endereco: addressData.endereco,
+          numero: addressData.numero,
+          complemento: addressData.complemento || null,
+          bairro: addressData.bairro,
+          cidade: addressData.cidade,
+          estado: addressData.estado,
+          telefone_fixo: contactData.telefoneFixo || null,
+          whatsapp: contactData.whatsapp,
+          email: contactData.email,
+          responsavel_nome: responsibleData.nomeCompleto,
+          responsavel_cpf: responsibleData.cpf.replace(/\D/g, ''),
+          responsavel_rg: responsibleData.rg || '',
+          responsavel_cargo: responsibleData.cargo,
+          responsavel_nascimento: responsibleData.dataNascimento || null,
+        })
+        .eq('id', existingCompany.id)
+        .select()
+        .single();
+
+      if (error) throw error;
+      return data;
+    } else {
+      // Insert new company
+      const { data, error } = await supabase
+        .from('companies')
+        .insert({
+          razao_social: companyData.razaoSocial,
+          nome_fantasia: companyData.nomeFantasia,
+          cnpj: cnpjClean,
+          inscricao_estadual: companyData.isento ? null : companyData.inscricaoEstadual,
+          isento: companyData.isento,
+          inscricao_municipal: companyData.inscricaoMunicipal || null,
+          data_abertura: companyData.dataAbertura || null,
+          natureza_juridica: companyData.naturezaJuridica,
+          cnae: companyData.cnae || '',
+          cep: addressData.cep.replace(/\D/g, ''),
+          endereco: addressData.endereco,
+          numero: addressData.numero,
+          complemento: addressData.complemento || null,
+          bairro: addressData.bairro,
+          cidade: addressData.cidade,
+          estado: addressData.estado,
+          telefone_fixo: contactData.telefoneFixo || null,
+          whatsapp: contactData.whatsapp,
+          email: contactData.email,
+          responsavel_nome: responsibleData.nomeCompleto,
+          responsavel_cpf: responsibleData.cpf.replace(/\D/g, ''),
+          responsavel_rg: responsibleData.rg || '',
+          responsavel_cargo: responsibleData.cargo,
+          responsavel_nascimento: responsibleData.dataNascimento || null,
+        })
+        .select()
+        .single();
+
+      if (error) throw error;
+      return data;
+    }
+  };
+
+  const saveOrder = async (companyId: string, paymentUrl: string) => {
+    const orderItems = items.map(item => ({
+      productId: item.product.id,
+      productName: item.product.name,
+      quantity: item.quantity,
+      unit: item.product.unit,
+      unitPrice: item.product.price,
+      totalPrice: item.product.price * item.quantity,
+    }));
+
+    const { data, error } = await supabase
+      .from('orders')
+      .insert({
+        company_id: companyId,
+        payment_url: paymentUrl,
+        total_amount: getTotal(),
+        status: 'pending',
+        items: orderItems,
+      })
+      .select()
+      .single();
+
+    if (error) throw error;
+    return data;
+  };
+
   const handleCreatePayment = async () => {
     setIsLoading(true);
     try {
+      // Save company data first
+      const company = await saveCompanyData();
+
       const products = items.map(item => ({
         externalId: item.product.id,
         name: item.product.name,
         description: `${item.quantity} ${item.product.unit}`,
         quantity: item.quantity,
-        price: Math.round(item.product.price * 100), // Converter para centavos
+        price: Math.round(item.product.price * 100),
       }));
 
       const customer = {
@@ -185,17 +296,19 @@ export const CheckoutModal = ({ open, onOpenChange }: CheckoutModalProps) => {
       });
 
       if (error) {
-        console.error('Error creating payment:', error);
         throw new Error(error.message || 'Erro ao criar pagamento');
       }
 
       if (data?.data?.url) {
+        // Save order with payment URL
+        await saveOrder(company.id, data.data.url);
+        
         setPaymentUrl(data.data.url);
         setPaymentCreated(true);
         setStep(5);
         toast({
-          title: "Cobrança criada!",
-          description: "Escaneie o QR Code ou acesse o link para pagar.",
+          title: "Pedido registrado!",
+          description: "Seus dados foram salvos. Escaneie o QR Code para pagar.",
         });
       } else {
         throw new Error('URL de pagamento não retornada');
@@ -203,7 +316,7 @@ export const CheckoutModal = ({ open, onOpenChange }: CheckoutModalProps) => {
     } catch (error) {
       console.error('Payment error:', error);
       toast({
-        title: "Erro ao criar pagamento",
+        title: "Erro ao processar pedido",
         description: error instanceof Error ? error.message : "Tente novamente mais tarde.",
         variant: "destructive",
       });
