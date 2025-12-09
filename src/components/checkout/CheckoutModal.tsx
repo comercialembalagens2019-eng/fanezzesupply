@@ -271,13 +271,13 @@ export const CheckoutModal = ({ open, onOpenChange }: CheckoutModalProps) => {
       // Save company data first
       const company = await saveCompanyData();
 
-      const products = items.map(item => ({
-        externalId: item.product.id,
-        name: item.product.name,
-        description: `${item.quantity} ${item.product.unit}`,
-        quantity: item.quantity,
-        price: Math.round(item.product.price * 100),
-      }));
+      // Build description from items
+      const description = items.map(item => 
+        `${item.product.name} x ${item.quantity} ${item.product.unit}`
+      ).join(', ');
+
+      // Calculate total in cents
+      const totalInCents = Math.round(getTotal() * 100);
 
       const customer = {
         name: responsibleData.nomeCompleto,
@@ -288,10 +288,10 @@ export const CheckoutModal = ({ open, onOpenChange }: CheckoutModalProps) => {
 
       const { data, error } = await supabase.functions.invoke('create-pix-payment', {
         body: {
-          products,
+          amount: totalInCents,
+          description: description.slice(0, 200), // Limit description length
           customer,
-          returnUrl: `${window.location.origin}/carrinho`,
-          completionUrl: `${window.location.origin}/checkout/sucesso`,
+          externalId: company.id,
         },
       });
 
@@ -299,19 +299,37 @@ export const CheckoutModal = ({ open, onOpenChange }: CheckoutModalProps) => {
         throw new Error(error.message || 'Erro ao criar pagamento');
       }
 
-      if (data?.data?.url) {
-        // Save order with payment URL
-        await saveOrder(company.id, data.data.url);
+      console.log('AbacatePay response:', data);
+
+      // The response should contain the QR code data
+      if (data?.data) {
+        const paymentData = data.data;
+        const paymentUrl = paymentData.qrCodeUrl || paymentData.brcode || paymentData.url;
         
-        setPaymentUrl(data.data.url);
-        setPaymentCreated(true);
-        setStep(5);
-        toast({
-          title: "Pedido registrado!",
-          description: "Seus dados foram salvos. Escaneie o QR Code para pagar.",
-        });
+        if (paymentUrl) {
+          // Save order with payment URL/brcode
+          await saveOrder(company.id, paymentUrl);
+          
+          setPaymentUrl(paymentUrl);
+          setPaymentCreated(true);
+          setStep(5);
+          toast({
+            title: "Pedido registrado!",
+            description: "Seus dados foram salvos. Escaneie o QR Code para pagar.",
+          });
+        } else {
+          // If we have brcode, we can still proceed
+          await saveOrder(company.id, JSON.stringify(paymentData));
+          setPaymentUrl(JSON.stringify(paymentData));
+          setPaymentCreated(true);
+          setStep(5);
+          toast({
+            title: "Pedido registrado!",
+            description: "QR Code PIX gerado com sucesso.",
+          });
+        }
       } else {
-        throw new Error('URL de pagamento não retornada');
+        throw new Error('Resposta de pagamento inválida');
       }
     } catch (error) {
       console.error('Payment error:', error);
