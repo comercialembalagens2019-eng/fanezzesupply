@@ -141,7 +141,8 @@ export const CheckoutModal = ({ open, onOpenChange }: CheckoutModalProps) => {
   // Load existing company data for logged-in users
   useEffect(() => {
     const loadUserCompany = async () => {
-      if (!user || !open) return;
+      // Don't load/change step if payment was already created
+      if (!user || !open || paymentCreated) return;
       
       setIsLoadingCompany(true);
       try {
@@ -204,7 +205,7 @@ export const CheckoutModal = ({ open, onOpenChange }: CheckoutModalProps) => {
     };
 
     loadUserCompany();
-  }, [user, open]);
+  }, [user, open, paymentCreated]);
 
   // Listen for payment confirmation via Realtime
   useEffect(() => {
