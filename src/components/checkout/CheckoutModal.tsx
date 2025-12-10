@@ -485,6 +485,9 @@ export const CheckoutModal = ({ open, onOpenChange }: CheckoutModalProps) => {
       if (data?.data) {
         const paymentData = data.data;
         
+        // Save company ID for Realtime subscription
+        setExistingCompanyId(company.id);
+        
         // Save order with brCode for reference
         await saveOrder(company.id, paymentData.brCode || paymentData.id);
         
