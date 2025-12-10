@@ -21,7 +21,9 @@ export function Footer() {
             </p>
             <div className="flex items-center gap-3">
               <a
-                href="#"
+                href="https://www.instagram.com/fanezzeembalagens?igsh=aTNmMXpreTYwMHJ5"
+                target="_blank"
+                rel="noopener noreferrer"
                 className="w-9 h-9 rounded-lg bg-beige/10 hover:bg-beige/20 flex items-center justify-center transition-colors"
               >
                 <Instagram className="w-4 h-4" />
@@ -83,8 +85,8 @@ export function Footer() {
               <li className="flex items-start gap-3 text-sm">
                 <MapPin className="w-4 h-4 text-beige/60 mt-0.5" />
                 <span className="text-beige/80">
-                  Rua das Embalagens, 123<br />
-                  São Paulo - SP
+                  Avenida Antonio Ramos Alvin, 1084<br />
+                  Joinville - SC
                 </span>
               </li>
             </ul>
