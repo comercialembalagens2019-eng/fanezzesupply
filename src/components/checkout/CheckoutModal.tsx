@@ -9,7 +9,7 @@ import { useCart } from "@/contexts/CartContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
-import { Loader2, QrCode, Building2, MapPin, Phone, User, ChevronRight, ChevronLeft, CheckCircle } from "lucide-react";
+import { Loader2, QrCode, Building2, MapPin, Phone, User, ChevronRight, ChevronLeft, CheckCircle, Copy, Check } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface CheckoutModalProps {
@@ -94,6 +94,8 @@ export const CheckoutModal = ({ open, onOpenChange }: CheckoutModalProps) => {
   const [isLoading, setIsLoading] = useState(false);
   const [isLoadingCompany, setIsLoadingCompany] = useState(false);
   const [paymentUrl, setPaymentUrl] = useState<string | null>(null);
+  const [qrCodeImage, setQrCodeImage] = useState<string | null>(null);
+  const [brCode, setBrCode] = useState<string | null>(null);
   const [paymentCreated, setPaymentCreated] = useState(false);
   const [existingCompanyId, setExistingCompanyId] = useState<string | null>(null);
 
@@ -440,30 +442,25 @@ export const CheckoutModal = ({ open, onOpenChange }: CheckoutModalProps) => {
       // The response should contain the QR code data
       if (data?.data) {
         const paymentData = data.data;
-        const paymentUrl = paymentData.qrCodeUrl || paymentData.brcode || paymentData.url;
         
-        if (paymentUrl) {
-          // Save order with payment URL/brcode
-          await saveOrder(company.id, paymentUrl);
-          
-          setPaymentUrl(paymentUrl);
-          setPaymentCreated(true);
-          setStep(5);
-          toast({
-            title: "Pedido registrado!",
-            description: "Seus dados foram salvos. Escaneie o QR Code para pagar.",
-          });
-        } else {
-          // If we have brcode, we can still proceed
-          await saveOrder(company.id, JSON.stringify(paymentData));
-          setPaymentUrl(JSON.stringify(paymentData));
-          setPaymentCreated(true);
-          setStep(5);
-          toast({
-            title: "Pedido registrado!",
-            description: "QR Code PIX gerado com sucesso.",
-          });
+        // Save order with brCode for reference
+        await saveOrder(company.id, paymentData.brCode || paymentData.id);
+        
+        // Set QR Code image (base64) and brCode for copy
+        if (paymentData.brCodeBase64) {
+          setQrCodeImage(paymentData.brCodeBase64);
         }
+        if (paymentData.brCode) {
+          setBrCode(paymentData.brCode);
+        }
+        
+        setPaymentUrl(paymentData.url || null);
+        setPaymentCreated(true);
+        setStep(5);
+        toast({
+          title: "Pedido registrado!",
+          description: "Escaneie o QR Code ou copie o código PIX para pagar.",
+        });
       } else {
         throw new Error('Resposta de pagamento inválida');
       }
@@ -525,6 +522,8 @@ export const CheckoutModal = ({ open, onOpenChange }: CheckoutModalProps) => {
     onOpenChange(false);
     setStep(1);
     setPaymentUrl(null);
+    setQrCodeImage(null);
+    setBrCode(null);
     setPaymentCreated(false);
   };
 
@@ -890,31 +889,70 @@ export const CheckoutModal = ({ open, onOpenChange }: CheckoutModalProps) => {
         {step === 5 && paymentUrl && (
           <div className="text-center space-y-6 py-4">
             <div className="w-16 h-16 mx-auto bg-primary/10 rounded-full flex items-center justify-center">
-              <QrCode className="w-8 h-8 text-primary" />
+              <CheckCircle className="w-8 h-8 text-primary" />
             </div>
             <div>
               <h3 className="font-display text-lg font-semibold text-foreground mb-2">
                 Cobrança PIX Gerada!
               </h3>
               <p className="text-muted-foreground text-sm">
-                Clique no botão abaixo para acessar a página de pagamento e escanear o QR Code.
+                Escaneie o QR Code abaixo ou copie o código PIX para pagar.
               </p>
             </div>
+            
+            {/* QR Code Image */}
+            {qrCodeImage && (
+              <div className="flex justify-center">
+                <div className="p-4 bg-white rounded-lg border-2 border-primary/20 shadow-lg">
+                  <img 
+                    src={qrCodeImage} 
+                    alt="QR Code PIX" 
+                    className="w-48 h-48 object-contain"
+                  />
+                </div>
+              </div>
+            )}
+            
             <div className="p-4 rounded-lg bg-secondary/50 border">
               <p className="text-sm font-medium text-foreground mb-2">Total a pagar:</p>
               <p className="text-2xl font-display font-bold text-primary">{formatPrice(getTotal())}</p>
             </div>
+            
+            {/* Copy PIX Code Button */}
+            {brCode && (
+              <div className="space-y-2">
+                <p className="text-xs text-muted-foreground">Ou copie o código PIX:</p>
+                <div className="flex gap-2">
+                  <Input 
+                    value={brCode} 
+                    readOnly 
+                    className="text-xs font-mono"
+                  />
+                  <Button
+                    variant="outline"
+                    size="icon"
+                    onClick={() => {
+                      navigator.clipboard.writeText(brCode);
+                      toast({
+                        title: "Código copiado!",
+                        description: "Cole no seu app de banco para pagar.",
+                      });
+                    }}
+                  >
+                    <Copy className="w-4 h-4" />
+                  </Button>
+                </div>
+              </div>
+            )}
+            
             <Button 
+              variant="outline"
               size="lg" 
               className="w-full gap-2"
-              onClick={() => window.open(paymentUrl, '_blank')}
+              onClick={handleClose}
             >
-              <QrCode className="w-5 h-5" />
-              Acessar Pagamento PIX
+              Fechar
             </Button>
-            <p className="text-xs text-muted-foreground">
-              Você será redirecionado para a página segura da AbacatePay
-            </p>
           </div>
         )}
 
