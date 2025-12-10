@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "@/hooks/use-toast";
-import { Search, Package, Clock, CheckCircle, XCircle, ExternalLink, Loader2, Building2 } from "lucide-react";
+import { Search, Package, Clock, CheckCircle, XCircle, ExternalLink, Loader2, Building2, PartyPopper } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface OrderItem {
@@ -89,6 +89,9 @@ export default function Pedidos() {
       .slice(0, 18);
   };
 
+  // Track recently paid orders for animation
+  const [recentlyPaidOrders, setRecentlyPaidOrders] = useState<Set<string>>(new Set());
+
   // Realtime subscription for order status updates
   useEffect(() => {
     if (!companyId) return;
@@ -118,12 +121,24 @@ export default function Pedidos() {
             )
           );
           
-          // Show toast when payment is confirmed
+          // Show toast and trigger animation when payment is confirmed
           if (updatedOrder.status === 'paid') {
+            // Add to recently paid set for animation
+            setRecentlyPaidOrders(prev => new Set(prev).add(updatedOrder.id));
+            
             toast({
-              title: "Pagamento confirmado!",
-              description: `Pedido #${updatedOrder.id.slice(0, 8).toUpperCase()} foi pago.`,
+              title: "🎉 Pagamento confirmado!",
+              description: `Pedido #${updatedOrder.id.slice(0, 8).toUpperCase()} foi pago com sucesso.`,
             });
+            
+            // Remove from animation set after animation completes
+            setTimeout(() => {
+              setRecentlyPaidOrders(prev => {
+                const newSet = new Set(prev);
+                newSet.delete(updatedOrder.id);
+                return newSet;
+              });
+            }, 3000);
           }
         }
       )
@@ -285,12 +300,36 @@ export default function Pedidos() {
                     const StatusIcon = statusConfig.icon;
                     const items = order.items as OrderItem[];
 
+                    const isRecentlyPaid = recentlyPaidOrders.has(order.id);
+
                     return (
-                      <Card key={order.id} className="overflow-hidden">
-                        <CardHeader className="bg-muted/50 py-4">
+                      <Card 
+                        key={order.id} 
+                        className={cn(
+                          "overflow-hidden transition-all duration-500 relative",
+                          isRecentlyPaid && "ring-2 ring-green-500 ring-offset-2 animate-scale-in"
+                        )}
+                      >
+                        {/* Payment Confirmed Overlay */}
+                        {isRecentlyPaid && (
+                          <div className="absolute inset-0 bg-green-500/10 pointer-events-none animate-fade-in z-10 flex items-center justify-center">
+                            <div className="bg-green-500 text-white px-4 py-2 rounded-full flex items-center gap-2 animate-scale-in shadow-lg">
+                              <PartyPopper className="w-5 h-5" />
+                              <span className="font-semibold">Pagamento Confirmado!</span>
+                            </div>
+                          </div>
+                        )}
+                        
+                        <CardHeader className={cn(
+                          "bg-muted/50 py-4 transition-colors duration-500",
+                          isRecentlyPaid && "bg-green-100"
+                        )}>
                           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                             <div className="flex items-center gap-3">
-                              <Package className="w-5 h-5 text-primary" />
+                              <Package className={cn(
+                                "w-5 h-5 text-primary transition-colors duration-500",
+                                isRecentlyPaid && "text-green-600"
+                              )} />
                               <div>
                                 <p className="font-mono text-sm text-muted-foreground">
                                   Pedido #{order.id.slice(0, 8).toUpperCase()}
@@ -301,8 +340,13 @@ export default function Pedidos() {
                               </div>
                             </div>
                             <div className="flex items-center gap-3">
-                              <Badge className={cn("gap-1", statusConfig.color)}>
-                                <StatusIcon className="w-3 h-3" />
+                              <Badge className={cn(
+                                "gap-1 transition-all duration-500",
+                                isRecentlyPaid 
+                                  ? "bg-green-500 text-white border-green-500 scale-110" 
+                                  : statusConfig.color
+                              )}>
+                                <StatusIcon className={cn("w-3 h-3", isRecentlyPaid && "animate-pulse")} />
                                 {statusConfig.label}
                               </Badge>
                               <span className="font-display font-bold text-primary">
