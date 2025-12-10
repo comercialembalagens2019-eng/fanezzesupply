@@ -207,43 +207,54 @@ export const CheckoutModal = ({ open, onOpenChange }: CheckoutModalProps) => {
     loadUserCompany();
   }, [user, open, paymentCreated]);
 
-  // Listen for payment confirmation via Realtime
+  // Listen for payment confirmation via Polling (every 5 seconds)
   useEffect(() => {
-    if (!paymentCreated || !existingCompanyId) return;
+    if (!paymentCreated || !existingCompanyId || paymentConfirmed) return;
 
-    const channel = supabase
-      .channel('checkout-payment-status')
-      .on(
-        'postgres_changes',
-        {
-          event: 'UPDATE',
-          schema: 'public',
-          table: 'orders',
-          filter: `company_id=eq.${existingCompanyId}`,
-        },
-        (payload) => {
-          if (payload.new.status === 'paid') {
-            setPaymentConfirmed(true);
-            toast({
-              title: "🎉 Pagamento Confirmado!",
-              description: "Seu pedido foi pago com sucesso.",
-            });
-            
-            // Auto close and redirect after 4 seconds
-            setTimeout(() => {
-              clearCart();
-              onOpenChange(false);
-              navigate('/pedidos');
-            }, 4000);
-          }
+    const checkPaymentStatus = async () => {
+      try {
+        const { data: order, error } = await supabase
+          .from('orders')
+          .select('status')
+          .eq('company_id', existingCompanyId)
+          .order('created_at', { ascending: false })
+          .limit(1)
+          .maybeSingle();
+
+        if (error) {
+          console.error('Error checking payment status:', error);
+          return;
         }
-      )
-      .subscribe();
+
+        if (order?.status === 'paid') {
+          setPaymentConfirmed(true);
+          toast({
+            title: "🎉 Pagamento Confirmado!",
+            description: "Seu pedido foi pago com sucesso.",
+          });
+          
+          // Auto close and redirect after 4 seconds
+          setTimeout(() => {
+            clearCart();
+            onOpenChange(false);
+            navigate('/pedidos');
+          }, 4000);
+        }
+      } catch (error) {
+        console.error('Error in payment polling:', error);
+      }
+    };
+
+    // Check immediately
+    checkPaymentStatus();
+
+    // Then poll every 5 seconds
+    const intervalId = setInterval(checkPaymentStatus, 5000);
 
     return () => {
-      supabase.removeChannel(channel);
+      clearInterval(intervalId);
     };
-  }, [paymentCreated, existingCompanyId, clearCart, onOpenChange, navigate]);
+  }, [paymentCreated, existingCompanyId, paymentConfirmed, clearCart, onOpenChange, navigate]);
 
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat("pt-BR", {
