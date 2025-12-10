@@ -887,7 +887,7 @@ export const CheckoutModal = ({ open, onOpenChange }: CheckoutModalProps) => {
         )}
 
         {/* Step 5: Payment */}
-        {step === 5 && paymentUrl && (
+        {step === 5 && paymentCreated && (
           <div className="text-center space-y-6 py-4">
             <div className="w-16 h-16 mx-auto bg-primary/10 rounded-full flex items-center justify-center">
               <CheckCircle className="w-8 h-8 text-primary" />
