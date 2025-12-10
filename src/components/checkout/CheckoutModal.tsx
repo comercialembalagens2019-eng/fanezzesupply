@@ -9,7 +9,7 @@ import { useCart } from "@/contexts/CartContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
-import { Loader2, QrCode, Building2, MapPin, Phone, User, ChevronRight, ChevronLeft, CheckCircle, Copy, Home, ShoppingBag, PartyPopper } from "lucide-react";
+import { Loader2, QrCode, Building2, MapPin, Phone, User, ChevronRight, ChevronLeft, CheckCircle, Copy, Home, ShoppingBag, PartyPopper, CreditCard } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
 
@@ -101,6 +101,7 @@ export const CheckoutModal = ({ open, onOpenChange }: CheckoutModalProps) => {
   const [paymentConfirmed, setPaymentConfirmed] = useState(false);
   const [existingCompanyId, setExistingCompanyId] = useState<string | null>(null);
   const [currentOrderId, setCurrentOrderId] = useState<string | null>(null);
+  const [paymentMethod, setPaymentMethod] = useState<'pix' | 'card'>('pix');
   const navigate = useNavigate();
 
   const [companyData, setCompanyData] = useState<CompanyData>({
@@ -539,6 +540,62 @@ export const CheckoutModal = ({ open, onOpenChange }: CheckoutModalProps) => {
     }
   };
 
+  const handleStripeCheckout = async () => {
+    setIsLoading(true);
+    try {
+      // Save company data first
+      const company = await saveCompanyData();
+      setExistingCompanyId(company.id);
+
+      // Build cart items for Stripe
+      const cartItems = items.map(item => ({
+        productId: item.product.id,
+        productName: item.product.name,
+        quantity: item.quantity,
+        unit: item.product.unit,
+        unitPrice: item.product.price,
+      }));
+
+      const { data, error } = await supabase.functions.invoke('create-stripe-checkout', {
+        body: {
+          items: cartItems,
+          companyId: company.id,
+          customerEmail: contactData.email,
+          customerName: responsibleData.nomeCompleto,
+        },
+      });
+
+      if (error) {
+        throw new Error(error.message || 'Erro ao criar checkout');
+      }
+
+      if (data?.url) {
+        // Open Stripe checkout in a new tab
+        window.open(data.url, '_blank');
+        
+        toast({
+          title: "Checkout Stripe aberto!",
+          description: "Complete o pagamento na nova aba. Após o pagamento, você será redirecionado.",
+        });
+
+        // Close modal and clear cart
+        clearCart();
+        onOpenChange(false);
+      } else {
+        throw new Error('URL de checkout não retornada');
+      }
+    } catch (error) {
+      console.error('Stripe checkout error:', error);
+      toast({
+        title: "Erro ao processar pagamento",
+        description: error instanceof Error ? error.message : "Tente novamente mais tarde.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const validateStep = (currentStep: number): boolean => {
     switch (currentStep) {
       case 1:
@@ -947,6 +1004,41 @@ export const CheckoutModal = ({ open, onOpenChange }: CheckoutModalProps) => {
                 </div>
               </div>
             </div>
+
+            {/* Payment Method Selection */}
+            <div className="mt-6">
+              <h4 className="font-semibold text-foreground mb-3">Forma de Pagamento</h4>
+              <div className="grid grid-cols-2 gap-3">
+                <button
+                  type="button"
+                  onClick={() => setPaymentMethod('pix')}
+                  className={cn(
+                    "flex flex-col items-center gap-2 p-4 rounded-lg border-2 transition-all",
+                    paymentMethod === 'pix'
+                      ? "border-primary bg-primary/5"
+                      : "border-muted hover:border-primary/50"
+                  )}
+                >
+                  <QrCode className={cn("w-8 h-8", paymentMethod === 'pix' ? "text-primary" : "text-muted-foreground")} />
+                  <span className={cn("font-medium", paymentMethod === 'pix' ? "text-primary" : "text-foreground")}>PIX</span>
+                  <span className="text-xs text-muted-foreground">Pagamento instantâneo</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setPaymentMethod('card')}
+                  className={cn(
+                    "flex flex-col items-center gap-2 p-4 rounded-lg border-2 transition-all",
+                    paymentMethod === 'card'
+                      ? "border-primary bg-primary/5"
+                      : "border-muted hover:border-primary/50"
+                  )}
+                >
+                  <CreditCard className={cn("w-8 h-8", paymentMethod === 'card' ? "text-primary" : "text-muted-foreground")} />
+                  <span className={cn("font-medium", paymentMethod === 'card' ? "text-primary" : "text-foreground")}>Cartão</span>
+                  <span className="text-xs text-muted-foreground">Crédito ou Débito</span>
+                </button>
+              </div>
+            </div>
           </div>
         )}
 
@@ -1082,19 +1174,24 @@ export const CheckoutModal = ({ open, onOpenChange }: CheckoutModalProps) => {
               </Button>
             ) : (
               <Button 
-                onClick={handleCreatePayment} 
+                onClick={paymentMethod === 'pix' ? handleCreatePayment : handleStripeCheckout} 
                 disabled={isLoading || !validateStep(4)}
                 className="gap-2"
               >
                 {isLoading ? (
                   <>
                     <Loader2 className="w-4 h-4 animate-spin" />
-                    Gerando...
+                    Processando...
                   </>
-                ) : (
+                ) : paymentMethod === 'pix' ? (
                   <>
                     <QrCode className="w-4 h-4" />
                     Gerar QR Code PIX
+                  </>
+                ) : (
+                  <>
+                    <CreditCard className="w-4 h-4" />
+                    Pagar com Cartão
                   </>
                 )}
               </Button>
