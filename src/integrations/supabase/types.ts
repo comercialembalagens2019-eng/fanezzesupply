@@ -42,7 +42,7 @@ export type Database = {
           responsavel_rg: string
           telefone_fixo: string | null
           updated_at: string
-          user_id: string | null
+          user_id: string
           whatsapp: string
         }
         Insert: {
@@ -72,7 +72,7 @@ export type Database = {
           responsavel_rg: string
           telefone_fixo?: string | null
           updated_at?: string
-          user_id?: string | null
+          user_id: string
           whatsapp: string
         }
         Update: {
@@ -102,7 +102,7 @@ export type Database = {
           responsavel_rg?: string
           telefone_fixo?: string | null
           updated_at?: string
-          user_id?: string | null
+          user_id?: string
           whatsapp?: string
         }
         Relationships: []
