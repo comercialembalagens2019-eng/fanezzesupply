@@ -2,7 +2,7 @@ import { Layout } from "@/components/layout/Layout";
 import { Users, Target, Award, TrendingUp } from "lucide-react";
 
 const stats = [
-  { label: "Anos de Mercado", value: "15+" },
+  { label: "Anos de Mercado", value: "40+" },
   { label: "Clientes Ativos", value: "500+" },
   { label: "Produtos no Catálogo", value: "200+" },
   { label: "Taxa de Satisfação", value: "98%" },
@@ -42,7 +42,7 @@ const Sobre = () => {
               Sobre a Fanezze Supply
             </h1>
             <p className="text-lg text-beige/80">
-              Há mais de 15 anos no mercado, somos especialistas em distribuição de embalagens para empresas de todos os portes.
+              Há mais de 40 anos no mercado, somos especialistas em distribuição de embalagens para empresas de todos os portes.
             </p>
           </div>
         </div>
@@ -73,7 +73,7 @@ const Sobre = () => {
             </h2>
             <div className="prose prose-lg text-muted-foreground">
               <p>
-                A Fanezze Supply nasceu da necessidade de oferecer um serviço diferenciado no mercado de embalagens. Fundada em São Paulo, começamos atendendo pequenos comerciantes locais e, ao longo dos anos, expandimos nossa atuação para atender empresas de diversos segmentos.
+                A Fanezze Supply nasceu da necessidade de oferecer um serviço diferenciado no mercado de embalagens. Fundada em Joinville, começamos atendendo pequenos comerciantes locais e, ao longo de mais de 40 anos, expandimos nossa atuação para atender empresas de diversos segmentos.
               </p>
               <p>
                 Nossa trajetória foi construída com base em valores sólidos: compromisso com a qualidade, preços justos e um atendimento personalizado que entende as necessidades específicas de cada cliente.
