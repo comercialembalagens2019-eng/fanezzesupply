@@ -9,7 +9,7 @@ import { useCart } from "@/contexts/CartContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
-import { Loader2, QrCode, Building2, MapPin, Phone, User, ChevronRight, ChevronLeft, CheckCircle, Copy, Check, Home, ShoppingBag } from "lucide-react";
+import { Loader2, QrCode, Building2, MapPin, Phone, User, ChevronRight, ChevronLeft, CheckCircle, Copy, Home, ShoppingBag, PartyPopper } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
 
@@ -98,7 +98,9 @@ export const CheckoutModal = ({ open, onOpenChange }: CheckoutModalProps) => {
   const [qrCodeImage, setQrCodeImage] = useState<string | null>(null);
   const [brCode, setBrCode] = useState<string | null>(null);
   const [paymentCreated, setPaymentCreated] = useState(false);
+  const [paymentConfirmed, setPaymentConfirmed] = useState(false);
   const [existingCompanyId, setExistingCompanyId] = useState<string | null>(null);
+  const navigate = useNavigate();
 
   const [companyData, setCompanyData] = useState<CompanyData>({
     razaoSocial: '',
@@ -189,9 +191,9 @@ export const CheckoutModal = ({ open, onOpenChange }: CheckoutModalProps) => {
             dataNascimento: company.responsavel_nascimento || '',
           });
           
-          // Skip to payment step if all data is filled
-          if (company.razao_social && company.cnpj && company.endereco && company.whatsapp && company.responsavel_nome) {
-            setStep(4); // Go to responsible/summary step
+          // Skip directly to step 4 (summary) if all required data is filled
+          if (company.razao_social && company.cnpj && company.endereco && company.whatsapp && company.responsavel_nome && company.responsavel_cpf) {
+            setStep(4);
           }
         }
       } catch (error) {
@@ -203,6 +205,44 @@ export const CheckoutModal = ({ open, onOpenChange }: CheckoutModalProps) => {
 
     loadUserCompany();
   }, [user, open]);
+
+  // Listen for payment confirmation via Realtime
+  useEffect(() => {
+    if (!paymentCreated || !existingCompanyId) return;
+
+    const channel = supabase
+      .channel('checkout-payment-status')
+      .on(
+        'postgres_changes',
+        {
+          event: 'UPDATE',
+          schema: 'public',
+          table: 'orders',
+          filter: `company_id=eq.${existingCompanyId}`,
+        },
+        (payload) => {
+          if (payload.new.status === 'paid') {
+            setPaymentConfirmed(true);
+            toast({
+              title: "🎉 Pagamento Confirmado!",
+              description: "Seu pedido foi pago com sucesso.",
+            });
+            
+            // Auto close and redirect after 4 seconds
+            setTimeout(() => {
+              clearCart();
+              onOpenChange(false);
+              navigate('/pedidos');
+            }, 4000);
+          }
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [paymentCreated, existingCompanyId, clearCart, onOpenChange, navigate]);
 
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat("pt-BR", {
@@ -517,7 +557,7 @@ export const CheckoutModal = ({ open, onOpenChange }: CheckoutModalProps) => {
   ];
 
   const handleClose = () => {
-    if (paymentCreated) {
+    if (paymentCreated || paymentConfirmed) {
       clearCart();
     }
     onOpenChange(false);
@@ -526,6 +566,7 @@ export const CheckoutModal = ({ open, onOpenChange }: CheckoutModalProps) => {
     setQrCodeImage(null);
     setBrCode(null);
     setPaymentCreated(false);
+    setPaymentConfirmed(false);
   };
 
   return (
@@ -889,88 +930,112 @@ export const CheckoutModal = ({ open, onOpenChange }: CheckoutModalProps) => {
         {/* Step 5: Payment */}
         {step === 5 && paymentCreated && (
           <div className="text-center space-y-6 py-4">
-            <div className="w-16 h-16 mx-auto bg-primary/10 rounded-full flex items-center justify-center">
-              <CheckCircle className="w-8 h-8 text-primary" />
-            </div>
-            <div>
-              <h3 className="font-display text-lg font-semibold text-foreground mb-2">
-                Cobrança PIX Gerada!
-              </h3>
-              <p className="text-muted-foreground text-sm">
-                Escaneie o QR Code abaixo ou copie o código PIX para pagar.
-              </p>
-            </div>
-            
-            {/* QR Code Image */}
-            {qrCodeImage && (
-              <div className="flex justify-center">
-                <div className="p-4 bg-white rounded-lg border-2 border-primary/20 shadow-lg">
-                  <img 
-                    src={qrCodeImage} 
-                    alt="QR Code PIX" 
-                    className="w-48 h-48 object-contain"
-                  />
+            {/* Payment Confirmed Animation */}
+            {paymentConfirmed ? (
+              <div className="animate-scale-in">
+                <div className="w-24 h-24 mx-auto bg-green-500/20 rounded-full flex items-center justify-center mb-4 animate-pulse">
+                  <PartyPopper className="w-12 h-12 text-green-500" />
+                </div>
+                <h3 className="font-display text-2xl font-bold text-green-600 mb-2">
+                  Pagamento Confirmado!
+                </h3>
+                <p className="text-muted-foreground">
+                  Obrigado pela compra! Redirecionando para seus pedidos...
+                </p>
+                <div className="mt-4 flex justify-center">
+                  <div className="w-8 h-8 border-4 border-green-500 border-t-transparent rounded-full animate-spin" />
                 </div>
               </div>
-            )}
-            
-            <div className="p-4 rounded-lg bg-secondary/50 border">
-              <p className="text-sm font-medium text-foreground mb-2">Total a pagar:</p>
-              <p className="text-2xl font-display font-bold text-primary">{formatPrice(getTotal())}</p>
-            </div>
-            
-            {/* Copy PIX Code Button */}
-            {brCode && (
-              <div className="space-y-2">
-                <p className="text-xs text-muted-foreground">Ou copie o código PIX:</p>
-                <div className="flex gap-2">
-                  <Input 
-                    value={brCode} 
-                    readOnly 
-                    className="text-xs font-mono"
-                  />
-                  <Button
+            ) : (
+              <>
+                <div className="w-16 h-16 mx-auto bg-primary/10 rounded-full flex items-center justify-center">
+                  <CheckCircle className="w-8 h-8 text-primary" />
+                </div>
+                <div>
+                  <h3 className="font-display text-lg font-semibold text-foreground mb-2">
+                    Cobrança PIX Gerada!
+                  </h3>
+                  <p className="text-muted-foreground text-sm">
+                    Escaneie o QR Code abaixo ou copie o código PIX para pagar.
+                  </p>
+                </div>
+                
+                {/* QR Code Image */}
+                {qrCodeImage && (
+                  <div className="flex justify-center">
+                    <div className="p-4 bg-white rounded-lg border-2 border-primary/20 shadow-lg">
+                      <img 
+                        src={qrCodeImage} 
+                        alt="QR Code PIX" 
+                        className="w-48 h-48 object-contain"
+                      />
+                    </div>
+                  </div>
+                )}
+                
+                <div className="p-4 rounded-lg bg-secondary/50 border">
+                  <p className="text-sm font-medium text-foreground mb-2">Total a pagar:</p>
+                  <p className="text-2xl font-display font-bold text-primary">{formatPrice(getTotal())}</p>
+                </div>
+                
+                {/* Copy PIX Code Button */}
+                {brCode && (
+                  <div className="space-y-2">
+                    <p className="text-xs text-muted-foreground">Ou copie o código PIX:</p>
+                    <div className="flex gap-2">
+                      <Input 
+                        value={brCode} 
+                        readOnly 
+                        className="text-xs font-mono"
+                      />
+                      <Button
+                        variant="outline"
+                        size="icon"
+                        onClick={() => {
+                          navigator.clipboard.writeText(brCode);
+                          toast({
+                            title: "Código copiado!",
+                            description: "Cole no seu app de banco para pagar.",
+                          });
+                        }}
+                      >
+                        <Copy className="w-4 h-4" />
+                      </Button>
+                    </div>
+                  </div>
+                )}
+                
+                <div className="text-xs text-muted-foreground animate-pulse">
+                  Aguardando confirmação do pagamento...
+                </div>
+                
+                <div className="flex flex-col sm:flex-row gap-3 pt-4">
+                  <Button 
                     variant="outline"
-                    size="icon"
+                    size="lg" 
+                    className="flex-1 gap-2"
                     onClick={() => {
-                      navigator.clipboard.writeText(brCode);
-                      toast({
-                        title: "Código copiado!",
-                        description: "Cole no seu app de banco para pagar.",
-                      });
+                      handleClose();
+                      navigate('/');
                     }}
                   >
-                    <Copy className="w-4 h-4" />
+                    <Home className="w-4 h-4" />
+                    Voltar ao Início
+                  </Button>
+                  <Button 
+                    size="lg" 
+                    className="flex-1 gap-2"
+                    onClick={() => {
+                      handleClose();
+                      navigate('/pedidos');
+                    }}
+                  >
+                    <ShoppingBag className="w-4 h-4" />
+                    Ver Meus Pedidos
                   </Button>
                 </div>
-              </div>
+              </>
             )}
-            
-            <div className="flex flex-col sm:flex-row gap-3 pt-4">
-              <Button 
-                variant="outline"
-                size="lg" 
-                className="flex-1 gap-2"
-                onClick={() => {
-                  handleClose();
-                  window.location.href = '/';
-                }}
-              >
-                <Home className="w-4 h-4" />
-                Voltar ao Início
-              </Button>
-              <Button 
-                size="lg" 
-                className="flex-1 gap-2"
-                onClick={() => {
-                  handleClose();
-                  window.location.href = '/pedidos';
-                }}
-              >
-                <ShoppingBag className="w-4 h-4" />
-                Ver Meus Pedidos
-              </Button>
-            </div>
           </div>
         )}
 
