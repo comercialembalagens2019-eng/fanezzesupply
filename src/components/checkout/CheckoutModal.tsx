@@ -554,6 +554,7 @@ export const CheckoutModal = ({ open, onOpenChange }: CheckoutModalProps) => {
         quantity: item.quantity,
         unit: item.product.unit,
         unitPrice: item.product.price,
+        stripePriceId: item.product.stripePriceId,
       }));
 
       const { data, error } = await supabase.functions.invoke('create-stripe-checkout', {

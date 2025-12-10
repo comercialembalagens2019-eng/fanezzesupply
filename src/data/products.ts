@@ -12,6 +12,7 @@ export const products: Product[] = [
     image: "/placeholder.svg",
     category: "Teste",
     featured: true,
+    stripePriceId: "price_1ScwlpAndfpC5YIBBTcfvzdl",
   },
   {
     id: "1",
@@ -24,6 +25,7 @@ export const products: Product[] = [
     image: "/placeholder.svg",
     category: "Plásticos",
     featured: true,
+    stripePriceId: "price_1ScwuDAndfpC5YIBpp9VoACm",
   },
   {
     id: "2",
@@ -36,6 +38,7 @@ export const products: Product[] = [
     image: "/placeholder.svg",
     category: "Plásticos",
     featured: true,
+    stripePriceId: "price_1ScwuKAndfpC5YIBr26jz3UX",
   },
   {
     id: "3",
@@ -48,6 +51,7 @@ export const products: Product[] = [
     image: "/placeholder.svg",
     category: "Proteção",
     featured: true,
+    stripePriceId: "price_1ScwuLAndfpC5YIBgg1A9Qhz",
   },
   {
     id: "4",
@@ -59,6 +63,7 @@ export const products: Product[] = [
     minOrderUnit: "unidades",
     image: "/placeholder.svg",
     category: "Proteção",
+    stripePriceId: "price_1ScwuMAndfpC5YIB5vdKBZRg",
   },
   {
     id: "5",
@@ -70,6 +75,7 @@ export const products: Product[] = [
     minOrderUnit: "unidades",
     image: "/placeholder.svg",
     category: "Limpeza",
+    stripePriceId: "price_1ScwuNAndfpC5YIBA15X71Lu",
   },
   {
     id: "6",
@@ -82,6 +88,7 @@ export const products: Product[] = [
     image: "/placeholder.svg",
     category: "Papel",
     featured: true,
+    stripePriceId: "price_1ScwuOAndfpC5YIB5kvSLv46",
   },
   {
     id: "7",
@@ -93,6 +100,7 @@ export const products: Product[] = [
     minOrderUnit: "caixas",
     image: "/placeholder.svg",
     category: "Fitas",
+    stripePriceId: "price_1ScwuQAndfpC5YIBkUwYWJWd",
   },
   {
     id: "8",
@@ -104,6 +112,7 @@ export const products: Product[] = [
     minOrderUnit: "unidades",
     image: "/placeholder.svg",
     category: "Papel",
+    stripePriceId: "price_1ScwuRAndfpC5YIBiqDuZ8xx",
   },
   {
     id: "9",
@@ -115,6 +124,7 @@ export const products: Product[] = [
     minOrderUnit: "kg",
     image: "/placeholder.svg",
     category: "Papel",
+    stripePriceId: "price_1ScwuSAndfpC5YIB6Xh3nzjy",
   },
   {
     id: "10",
@@ -126,6 +136,7 @@ export const products: Product[] = [
     minOrderUnit: "fardos",
     image: "/placeholder.svg",
     category: "Limpeza",
+    stripePriceId: "price_1ScwuTAndfpC5YIB4wytsXff",
   },
   {
     id: "11",
@@ -137,6 +148,7 @@ export const products: Product[] = [
     minOrderUnit: "fardos",
     image: "/placeholder.svg",
     category: "Limpeza",
+    stripePriceId: "price_1ScwuUAndfpC5YIBPQU4ASpI",
   },
   {
     id: "12",
@@ -148,6 +160,7 @@ export const products: Product[] = [
     minOrderUnit: "fardos",
     image: "/placeholder.svg",
     category: "Limpeza",
+    stripePriceId: "price_1ScwuVAndfpC5YIBzRjvVLcN",
   },
   {
     id: "13",
@@ -159,6 +172,7 @@ export const products: Product[] = [
     minOrderUnit: "fardos",
     image: "/placeholder.svg",
     category: "Limpeza",
+    stripePriceId: "price_1ScwuWAndfpC5YIBJfpishZc",
   },
   {
     id: "14",
@@ -170,6 +184,7 @@ export const products: Product[] = [
     minOrderUnit: "fardos",
     image: "/placeholder.svg",
     category: "Limpeza",
+    stripePriceId: "price_1ScwuXAndfpC5YIBBDl7gfK3",
   },
   {
     id: "15",
@@ -182,6 +197,7 @@ export const products: Product[] = [
     image: "/placeholder.svg",
     category: "Plásticos",
     featured: true,
+    stripePriceId: "price_1ScwuYAndfpC5YIBxv99FeiT",
   },
 ];
 
