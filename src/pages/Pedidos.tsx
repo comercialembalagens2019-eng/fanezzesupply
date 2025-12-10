@@ -77,6 +77,7 @@ export default function Pedidos() {
   const [orders, setOrders] = useState<Order[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [hasSearched, setHasSearched] = useState(false);
+  const [companyId, setCompanyId] = useState<string | null>(null);
 
   const formatCNPJInput = (value: string) => {
     return value
@@ -87,6 +88,51 @@ export default function Pedidos() {
       .replace(/(\d{4})(\d)/, '$1-$2')
       .slice(0, 18);
   };
+
+  // Realtime subscription for order status updates
+  useEffect(() => {
+    if (!companyId) return;
+
+    const channel = supabase
+      .channel('orders-status-updates')
+      .on(
+        'postgres_changes',
+        {
+          event: 'UPDATE',
+          schema: 'public',
+          table: 'orders',
+          filter: `company_id=eq.${companyId}`
+        },
+        (payload) => {
+          const updatedOrder = payload.new as any;
+          setOrders(prevOrders => 
+            prevOrders.map(order => 
+              order.id === updatedOrder.id 
+                ? { 
+                    ...order, 
+                    status: updatedOrder.status,
+                    payment_url: updatedOrder.payment_url,
+                    updated_at: updatedOrder.updated_at
+                  }
+                : order
+            )
+          );
+          
+          // Show toast when payment is confirmed
+          if (updatedOrder.status === 'paid') {
+            toast({
+              title: "Pagamento confirmado!",
+              description: `Pedido #${updatedOrder.id.slice(0, 8).toUpperCase()} foi pago.`,
+            });
+          }
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [companyId]);
 
   const searchOrders = async () => {
     const cleanCnpj = cnpj.replace(/\D/g, '');
@@ -115,8 +161,11 @@ export default function Pedidos() {
 
       if (!company) {
         setOrders([]);
+        setCompanyId(null);
         return;
       }
+
+      setCompanyId(company.id);
 
       // Then fetch orders for this company
       const { data: ordersData, error: ordersError } = await supabase
