@@ -8,6 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { toast } from "@/hooks/use-toast";
 import { Search, Package, Clock, CheckCircle, XCircle, ExternalLink, Loader2, Building2, PartyPopper } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useAuth } from "@/contexts/AuthContext";
 
 interface OrderItem {
   productId: string;
@@ -73,6 +74,7 @@ const getStatusConfig = (status: string) => {
 };
 
 export default function Pedidos() {
+  const { user, isLoading: authLoading } = useAuth();
   const [cnpj, setCnpj] = useState("");
   const [orders, setOrders] = useState<Order[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -91,6 +93,72 @@ export default function Pedidos() {
 
   // Track recently paid orders for animation
   const [recentlyPaidOrders, setRecentlyPaidOrders] = useState<Set<string>>(new Set());
+
+  // Auto-fetch orders for logged-in users
+  useEffect(() => {
+    if (authLoading) return;
+    
+    if (user) {
+      fetchUserOrders();
+    }
+  }, [user, authLoading]);
+
+  const fetchUserOrders = async () => {
+    setIsLoading(true);
+    setHasSearched(true);
+
+    try {
+      // Find company associated with this user
+      const { data: company, error: companyError } = await supabase
+        .from('companies')
+        .select('id')
+        .eq('user_id', user!.id)
+        .maybeSingle();
+
+      if (companyError) throw companyError;
+
+      if (!company) {
+        setOrders([]);
+        setCompanyId(null);
+        setIsLoading(false);
+        return;
+      }
+
+      setCompanyId(company.id);
+
+      // Fetch orders for this company
+      const { data: ordersData, error: ordersError } = await supabase
+        .from('orders')
+        .select(`
+          *,
+          companies (
+            nome_fantasia,
+            cnpj
+          )
+        `)
+        .eq('company_id', company.id)
+        .order('created_at', { ascending: false });
+
+      if (ordersError) throw ordersError;
+
+      // Parse items JSON properly
+      const parsedOrders = (ordersData || []).map(order => ({
+        ...order,
+        items: (typeof order.items === 'string' ? JSON.parse(order.items) : order.items) as OrderItem[]
+      })) as Order[];
+
+      setOrders(parsedOrders);
+    } catch (error) {
+      console.error('Error fetching user orders:', error);
+      toast({
+        title: "Erro ao buscar pedidos",
+        description: "Tente novamente mais tarde.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   // Realtime subscription for order status updates
   useEffect(() => {
@@ -139,6 +207,53 @@ export default function Pedidos() {
                 return newSet;
               });
             }, 3000);
+          }
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [companyId]);
+
+  // Also subscribe for new orders (INSERT) when user is logged in
+  useEffect(() => {
+    if (!companyId) return;
+
+    const channel = supabase
+      .channel('orders-new-orders')
+      .on(
+        'postgres_changes',
+        {
+          event: 'INSERT',
+          schema: 'public',
+          table: 'orders',
+          filter: `company_id=eq.${companyId}`
+        },
+        async (payload) => {
+          const newOrder = payload.new as any;
+          
+          // Fetch the complete order with company data
+          const { data: orderData, error } = await supabase
+            .from('orders')
+            .select(`
+              *,
+              companies (
+                nome_fantasia,
+                cnpj
+              )
+            `)
+            .eq('id', newOrder.id)
+            .maybeSingle();
+
+          if (!error && orderData) {
+            const parsedOrder = {
+              ...orderData,
+              items: (typeof orderData.items === 'string' ? JSON.parse(orderData.items) : orderData.items) as OrderItem[]
+            } as Order;
+
+            setOrders(prevOrders => [parsedOrder, ...prevOrders]);
           }
         }
       )
@@ -222,6 +337,17 @@ export default function Pedidos() {
     }
   };
 
+  // Show loading state while checking auth
+  if (authLoading) {
+    return (
+      <Layout>
+        <div className="min-h-screen bg-background pt-24 pb-16 flex items-center justify-center">
+          <Loader2 className="w-8 h-8 animate-spin text-primary" />
+        </div>
+      </Layout>
+    );
+  }
+
   return (
     <Layout>
       <div className="min-h-screen bg-background pt-24 pb-16">
@@ -229,41 +355,53 @@ export default function Pedidos() {
           {/* Header */}
           <div className="text-center mb-12">
             <h1 className="font-display text-3xl md:text-4xl font-bold text-foreground mb-4">
-              Histórico de Pedidos
+              {user ? "Meus Pedidos" : "Histórico de Pedidos"}
             </h1>
             <p className="text-muted-foreground max-w-xl mx-auto">
-              Consulte seus pedidos anteriores informando o CNPJ da sua empresa.
+              {user 
+                ? "Acompanhe todos os seus pedidos realizados."
+                : "Consulte seus pedidos anteriores informando o CNPJ da sua empresa."
+              }
             </p>
           </div>
 
-          {/* Search */}
-          <div className="max-w-md mx-auto mb-12">
-            <div className="flex gap-2">
-              <div className="flex-1">
-                <Input
-                  placeholder="Digite o CNPJ da empresa"
-                  value={cnpj}
-                  onChange={(e) => setCnpj(formatCNPJInput(e.target.value))}
-                  onKeyPress={handleKeyPress}
-                  className="h-12"
-                />
+          {/* Search - Only show for non-logged users */}
+          {!user && (
+            <div className="max-w-md mx-auto mb-12">
+              <div className="flex gap-2">
+                <div className="flex-1">
+                  <Input
+                    placeholder="Digite o CNPJ da empresa"
+                    value={cnpj}
+                    onChange={(e) => setCnpj(formatCNPJInput(e.target.value))}
+                    onKeyPress={handleKeyPress}
+                    className="h-12"
+                  />
+                </div>
+                <Button 
+                  onClick={searchOrders} 
+                  disabled={isLoading}
+                  className="h-12 px-6"
+                >
+                  {isLoading ? (
+                    <Loader2 className="w-5 h-5 animate-spin" />
+                  ) : (
+                    <Search className="w-5 h-5" />
+                  )}
+                </Button>
               </div>
-              <Button 
-                onClick={searchOrders} 
-                disabled={isLoading}
-                className="h-12 px-6"
-              >
-                {isLoading ? (
-                  <Loader2 className="w-5 h-5 animate-spin" />
-                ) : (
-                  <Search className="w-5 h-5" />
-                )}
-              </Button>
             </div>
-          </div>
+          )}
+
+          {/* Loading state for logged users */}
+          {user && isLoading && (
+            <div className="flex items-center justify-center py-12">
+              <Loader2 className="w-8 h-8 animate-spin text-primary" />
+            </div>
+          )}
 
           {/* Results */}
-          {hasSearched && (
+          {hasSearched && !isLoading && (
             <div className="max-w-4xl mx-auto">
               {orders.length === 0 ? (
                 <Card className="text-center py-12">
@@ -273,7 +411,10 @@ export default function Pedidos() {
                       Nenhum pedido encontrado
                     </h3>
                     <p className="text-muted-foreground">
-                      Não encontramos pedidos para este CNPJ. Verifique se o número está correto.
+                      {user 
+                        ? "Você ainda não realizou nenhum pedido."
+                        : "Não encontramos pedidos para este CNPJ. Verifique se o número está correto."
+                      }
                     </p>
                   </CardContent>
                 </Card>
