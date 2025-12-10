@@ -403,11 +403,23 @@ export const CheckoutModal = ({ open, onOpenChange }: CheckoutModalProps) => {
       // Calculate total in cents (minimum R$1.00 = 100 cents required by AbacatePay)
       const totalInCents = Math.max(100, Math.round(getTotal() * 100));
 
+      // Format phone number for AbacatePay (expects format like "(11) 4002-8922")
+      const formatPhoneForApi = (phone: string) => {
+        const digits = phone.replace(/\D/g, '');
+        if (digits.length === 11) {
+          return `(${digits.slice(0, 2)}) ${digits.slice(2, 7)}-${digits.slice(7)}`;
+        } else if (digits.length === 10) {
+          return `(${digits.slice(0, 2)}) ${digits.slice(2, 6)}-${digits.slice(6)}`;
+        }
+        return phone;
+      };
+
+      // Use CPF with formatting for AbacatePay (expects format like "123.456.789-01")
       const customer = {
         name: responsibleData.nomeCompleto,
-        cellphone: contactData.whatsapp,
+        cellphone: formatPhoneForApi(contactData.whatsapp),
         email: contactData.email,
-        taxId: companyData.cnpj.replace(/\D/g, ''),
+        taxId: responsibleData.cpf, // CPF already formatted from form
       };
 
       const { data, error } = await supabase.functions.invoke('create-pix-payment', {
