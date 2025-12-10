@@ -100,6 +100,7 @@ export const CheckoutModal = ({ open, onOpenChange }: CheckoutModalProps) => {
   const [paymentCreated, setPaymentCreated] = useState(false);
   const [paymentConfirmed, setPaymentConfirmed] = useState(false);
   const [existingCompanyId, setExistingCompanyId] = useState<string | null>(null);
+  const [currentOrderId, setCurrentOrderId] = useState<string | null>(null);
   const navigate = useNavigate();
 
   const [companyData, setCompanyData] = useState<CompanyData>({
@@ -209,17 +210,20 @@ export const CheckoutModal = ({ open, onOpenChange }: CheckoutModalProps) => {
 
   // Listen for payment confirmation via Polling (every 5 seconds)
   useEffect(() => {
-    if (!paymentCreated || !existingCompanyId || paymentConfirmed) return;
+    if (!paymentCreated || !currentOrderId || paymentConfirmed) return;
+
+    console.log('Starting payment polling for order:', currentOrderId);
 
     const checkPaymentStatus = async () => {
       try {
+        console.log('Checking payment status for order:', currentOrderId);
         const { data: order, error } = await supabase
           .from('orders')
           .select('status')
-          .eq('company_id', existingCompanyId)
-          .order('created_at', { ascending: false })
-          .limit(1)
+          .eq('id', currentOrderId)
           .maybeSingle();
+
+        console.log('Order status check result:', { order, error });
 
         if (error) {
           console.error('Error checking payment status:', error);
@@ -227,6 +231,7 @@ export const CheckoutModal = ({ open, onOpenChange }: CheckoutModalProps) => {
         }
 
         if (order?.status === 'paid') {
+          console.log('Payment confirmed!');
           setPaymentConfirmed(true);
           toast({
             title: "🎉 Pagamento Confirmado!",
@@ -254,7 +259,7 @@ export const CheckoutModal = ({ open, onOpenChange }: CheckoutModalProps) => {
     return () => {
       clearInterval(intervalId);
     };
-  }, [paymentCreated, existingCompanyId, paymentConfirmed, clearCart, onOpenChange, navigate]);
+  }, [paymentCreated, currentOrderId, paymentConfirmed, clearCart, onOpenChange, navigate]);
 
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat("pt-BR", {
@@ -496,11 +501,13 @@ export const CheckoutModal = ({ open, onOpenChange }: CheckoutModalProps) => {
       if (data?.data) {
         const paymentData = data.data;
         
-        // Save company ID for Realtime subscription
+        // Save company ID
         setExistingCompanyId(company.id);
         
-        // Save order with brCode for reference
-        await saveOrder(company.id, paymentData.brCode || paymentData.id);
+        // Save order with brCode for reference and get order ID
+        const savedOrder = await saveOrder(company.id, paymentData.brCode || paymentData.id);
+        console.log('Saved order:', savedOrder);
+        setCurrentOrderId(savedOrder.id);
         
         // Set QR Code image (base64) and brCode for copy
         if (paymentData.brCodeBase64) {
@@ -582,6 +589,7 @@ export const CheckoutModal = ({ open, onOpenChange }: CheckoutModalProps) => {
     setBrCode(null);
     setPaymentCreated(false);
     setPaymentConfirmed(false);
+    setCurrentOrderId(null);
   };
 
   return (
