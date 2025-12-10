@@ -9,7 +9,8 @@ import { useCart } from "@/contexts/CartContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
-import { Loader2, QrCode, Building2, MapPin, Phone, User, ChevronRight, ChevronLeft, CheckCircle, Copy, Check } from "lucide-react";
+import { Loader2, QrCode, Building2, MapPin, Phone, User, ChevronRight, ChevronLeft, CheckCircle, Copy, Check, Home, ShoppingBag } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
 
 interface CheckoutModalProps {
@@ -945,14 +946,31 @@ export const CheckoutModal = ({ open, onOpenChange }: CheckoutModalProps) => {
               </div>
             )}
             
-            <Button 
-              variant="outline"
-              size="lg" 
-              className="w-full gap-2"
-              onClick={handleClose}
-            >
-              Fechar
-            </Button>
+            <div className="flex flex-col sm:flex-row gap-3 pt-4">
+              <Button 
+                variant="outline"
+                size="lg" 
+                className="flex-1 gap-2"
+                onClick={() => {
+                  handleClose();
+                  window.location.href = '/';
+                }}
+              >
+                <Home className="w-4 h-4" />
+                Voltar ao Início
+              </Button>
+              <Button 
+                size="lg" 
+                className="flex-1 gap-2"
+                onClick={() => {
+                  handleClose();
+                  window.location.href = '/pedidos';
+                }}
+              >
+                <ShoppingBag className="w-4 h-4" />
+                Ver Meus Pedidos
+              </Button>
+            </div>
           </div>
         )}
 
