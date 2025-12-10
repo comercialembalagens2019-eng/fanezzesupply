@@ -9,6 +9,7 @@ export interface Product {
   image: string;
   category: string;
   featured?: boolean;
+  stripePriceId?: string;
 }
 
 export interface CartItem {

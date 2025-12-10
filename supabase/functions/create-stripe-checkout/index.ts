@@ -13,6 +13,7 @@ interface CartItem {
   quantity: number;
   unit: string;
   unitPrice: number;
+  stripePriceId?: string;
 }
 
 interface CheckoutRequest {
@@ -72,23 +73,34 @@ serve(async (req) => {
       }
     }
 
-    // Build line items with price_data for dynamic pricing
-    const lineItems = items.map((item) => ({
-      price_data: {
-        currency: "brl",
-        product_data: {
-          name: item.productName,
-          description: `${item.quantity} ${item.unit}`,
-        },
-        unit_amount: Math.round(item.unitPrice * 100), // Convert to cents
-      },
-      quantity: item.quantity,
-    }));
+    // Build line items using Stripe price IDs
+    const lineItems = items.map((item) => {
+      if (item.stripePriceId) {
+        // Use the actual Stripe price ID
+        return {
+          price: item.stripePriceId,
+          quantity: item.quantity,
+        };
+      } else {
+        // Fallback to price_data for products without Stripe price ID
+        return {
+          price_data: {
+            currency: "brl",
+            product_data: {
+              name: item.productName,
+              description: `${item.quantity} ${item.unit}`,
+            },
+            unit_amount: Math.round(item.unitPrice * 100),
+          },
+          quantity: item.quantity,
+        };
+      }
+    });
 
     // Calculate total for order
     const totalAmount = items.reduce((sum, item) => sum + (item.unitPrice * item.quantity), 0);
 
-    // Create the order in database first
+    // Create order items for database
     const orderItems = items.map(item => ({
       productId: item.productId,
       productName: item.productName,
