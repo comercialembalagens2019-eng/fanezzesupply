@@ -13,15 +13,6 @@ const steps = [
   { id: 5, title: "Senha", icon: Lock },
 ];
 
-const naturezasJuridicas = [
-  "MEI - Microempreendedor Individual",
-  "ME - Microempresa",
-  "EPP - Empresa de Pequeno Porte",
-  "LTDA - Sociedade Limitada",
-  "S/A - Sociedade Anônima",
-  "EIRELI",
-  "Outro",
-];
 
 const estados = [
   "AC", "AL", "AP", "AM", "BA", "CE", "DF", "ES", "GO", "MA",
@@ -43,8 +34,6 @@ const Cadastro = () => {
   const [isento, setIsento] = useState(false);
   const [inscricaoMunicipal, setInscricaoMunicipal] = useState("");
   const [dataAbertura, setDataAbertura] = useState("");
-  const [naturezaJuridica, setNaturezaJuridica] = useState("");
-  const [cnae, setCnae] = useState("");
 
   // Step 2 - Address
   const [cep, setCep] = useState("");
@@ -336,32 +325,6 @@ const Cadastro = () => {
                       />
                     </div>
 
-                    <div>
-                      <label className="text-sm font-medium text-foreground">Natureza Jurídica *</label>
-                      <select
-                        value={naturezaJuridica}
-                        onChange={(e) => setNaturezaJuridica(e.target.value)}
-                        className="w-full h-11 px-4 mt-1.5 rounded-lg border border-border bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
-                        required
-                      >
-                        <option value="">Selecione</option>
-                        {naturezasJuridicas.map((n) => (
-                          <option key={n} value={n}>{n}</option>
-                        ))}
-                      </select>
-                    </div>
-
-                    <div>
-                      <label className="text-sm font-medium text-foreground">CNAE Principal *</label>
-                      <input
-                        type="text"
-                        value={cnae}
-                        onChange={(e) => setCnae(e.target.value)}
-                        placeholder="Ex: 4789-0/99"
-                        className="w-full h-11 px-4 mt-1.5 rounded-lg border border-border bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
-                        required
-                      />
-                    </div>
                   </div>
                 </div>
               )}
