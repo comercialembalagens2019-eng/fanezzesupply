@@ -9,7 +9,7 @@ import { useCart } from "@/contexts/CartContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
-import { Loader2, QrCode, Building2, MapPin, Phone, ChevronRight, ChevronLeft, CheckCircle, Copy, Home, ShoppingBag, PartyPopper, CreditCard, LogIn } from "lucide-react";
+import { Loader2, QrCode, Building2, MapPin, Phone, ChevronRight, ChevronLeft, CheckCircle, Copy, Home, ShoppingBag, PartyPopper, CreditCard, LogIn, FileText, ExternalLink } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
@@ -86,7 +86,8 @@ export const CheckoutModal = ({ open, onOpenChange }: CheckoutModalProps) => {
   const [existingCompanyId, setExistingCompanyId] = useState<string | null>(null);
   const [currentOrderId, setCurrentOrderId] = useState<string | null>(null);
   const [currentPixId, setCurrentPixId] = useState<string | null>(null);
-  const [paymentMethod, setPaymentMethod] = useState<'pix' | 'card'>('pix');
+  const [paymentMethod, setPaymentMethod] = useState<'pix' | 'card' | 'boleto'>('pix');
+  const [boletoUrl, setBoletoUrl] = useState<string | null>(null);
   const navigate = useNavigate();
 
   const [companyData, setCompanyData] = useState<CompanyData>({
@@ -633,6 +634,73 @@ export const CheckoutModal = ({ open, onOpenChange }: CheckoutModalProps) => {
     }
   };
 
+  const handleBoletoPayment = async () => {
+    setIsLoading(true);
+    try {
+      // Save company data first
+      const company = await saveCompanyData();
+      setExistingCompanyId(company.id);
+
+      // Calculate total in cents (minimum R$5.00 for boleto)
+      const totalInCents = Math.max(500, Math.round(getTotal() * 100));
+
+      // Save order first
+      const savedOrder = await saveOrder(company.id, 'boleto-pending');
+      setCurrentOrderId(savedOrder.id);
+
+      const { data, error } = await supabase.functions.invoke('create-boleto-payment', {
+        body: {
+          amount: totalInCents,
+          customer_email: contactData.email,
+          customer_name: companyData.nomeFantasia || companyData.razaoSocial,
+          order_id: savedOrder.id,
+        },
+      });
+
+      if (error) {
+        throw new Error(error.message || 'Erro ao criar boleto');
+      }
+
+      if (data?.boleto_url) {
+        setBoletoUrl(data.boleto_url);
+        setPaymentCreated(true);
+        setStep(5);
+        
+        // Update order with payment intent ID
+        await supabase
+          .from('orders')
+          .update({ payment_url: data.boleto_url })
+          .eq('id', savedOrder.id);
+
+        toast({
+          title: "Boleto gerado!",
+          description: "Clique para abrir e pagar o boleto.",
+        });
+      } else {
+        // Boleto might need confirmation step - open Stripe page
+        if (data?.client_secret) {
+          toast({
+            title: "Boleto em processamento",
+            description: "O boleto será disponibilizado em breve.",
+          });
+          setPaymentCreated(true);
+          setStep(5);
+        } else {
+          throw new Error('Resposta de boleto inválida');
+        }
+      }
+    } catch (error) {
+      console.error('Boleto payment error:', error);
+      toast({
+        title: "Erro ao gerar boleto",
+        description: error instanceof Error ? error.message : "Tente novamente mais tarde.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const validateStep = (currentStep: number): boolean => {
     switch (currentStep) {
       case 1:
@@ -680,6 +748,7 @@ export const CheckoutModal = ({ open, onOpenChange }: CheckoutModalProps) => {
     setPaymentUrl(null);
     setQrCodeImage(null);
     setBrCode(null);
+    setBoletoUrl(null);
     setPaymentCreated(false);
     setPaymentConfirmed(false);
     setCurrentOrderId(null);
@@ -1013,10 +1082,9 @@ export const CheckoutModal = ({ open, onOpenChange }: CheckoutModalProps) => {
               </div>
             </div>
 
-            {/* Payment Method Selection */}
             <div>
               <h4 className="font-semibold text-foreground mb-3">Forma de Pagamento</h4>
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-3 gap-3">
                 <button
                   type="button"
                   onClick={() => setPaymentMethod('pix')}
@@ -1028,8 +1096,22 @@ export const CheckoutModal = ({ open, onOpenChange }: CheckoutModalProps) => {
                   )}
                 >
                   <QrCode className={cn("w-8 h-8", paymentMethod === 'pix' ? "text-primary" : "text-muted-foreground")} />
-                  <span className={cn("font-medium", paymentMethod === 'pix' ? "text-primary" : "text-foreground")}>PIX</span>
-                  <span className="text-xs text-muted-foreground">Pagamento instantâneo</span>
+                  <span className={cn("font-medium text-sm", paymentMethod === 'pix' ? "text-primary" : "text-foreground")}>PIX</span>
+                  <span className="text-xs text-muted-foreground text-center">Instantâneo</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setPaymentMethod('boleto')}
+                  className={cn(
+                    "flex flex-col items-center gap-2 p-4 rounded-lg border-2 transition-all",
+                    paymentMethod === 'boleto'
+                      ? "border-primary bg-primary/5"
+                      : "border-muted hover:border-primary/50"
+                  )}
+                >
+                  <FileText className={cn("w-8 h-8", paymentMethod === 'boleto' ? "text-primary" : "text-muted-foreground")} />
+                  <span className={cn("font-medium text-sm", paymentMethod === 'boleto' ? "text-primary" : "text-foreground")}>Boleto</span>
+                  <span className="text-xs text-muted-foreground text-center">3 dias úteis</span>
                 </button>
                 <button
                   type="button"
@@ -1042,8 +1124,8 @@ export const CheckoutModal = ({ open, onOpenChange }: CheckoutModalProps) => {
                   )}
                 >
                   <CreditCard className={cn("w-8 h-8", paymentMethod === 'card' ? "text-primary" : "text-muted-foreground")} />
-                  <span className={cn("font-medium", paymentMethod === 'card' ? "text-primary" : "text-foreground")}>Cartão</span>
-                  <span className="text-xs text-muted-foreground">Crédito ou Débito</span>
+                  <span className={cn("font-medium text-sm", paymentMethod === 'card' ? "text-primary" : "text-foreground")}>Cartão</span>
+                  <span className="text-xs text-muted-foreground text-center">Crédito/Débito</span>
                 </button>
               </div>
             </div>
@@ -1162,6 +1244,88 @@ export const CheckoutModal = ({ open, onOpenChange }: CheckoutModalProps) => {
           </div>
         )}
 
+        {/* Step 5: Payment - Boleto */}
+        {step === 5 && paymentCreated && paymentMethod === 'boleto' && (
+          <div className="text-center space-y-6 py-4">
+            {paymentConfirmed ? (
+              <div className="animate-scale-in">
+                <div className="w-24 h-24 mx-auto bg-green-500/20 rounded-full flex items-center justify-center mb-4 animate-pulse">
+                  <PartyPopper className="w-12 h-12 text-green-500" />
+                </div>
+                <h3 className="font-display text-2xl font-bold text-green-600 mb-2">
+                  Pagamento Confirmado!
+                </h3>
+                <p className="text-muted-foreground">
+                  Obrigado pela compra! Redirecionando para seus pedidos...
+                </p>
+                <div className="mt-4 flex justify-center">
+                  <div className="w-8 h-8 border-4 border-green-500 border-t-transparent rounded-full animate-spin" />
+                </div>
+              </div>
+            ) : (
+              <>
+                <div className="w-16 h-16 mx-auto bg-primary/10 rounded-full flex items-center justify-center">
+                  <FileText className="w-8 h-8 text-primary" />
+                </div>
+                <div>
+                  <h3 className="font-display text-lg font-semibold text-foreground mb-2">
+                    Boleto Gerado!
+                  </h3>
+                  <p className="text-muted-foreground text-sm">
+                    Clique no botão abaixo para abrir e pagar o boleto.
+                  </p>
+                </div>
+                
+                <div className="p-4 rounded-lg bg-secondary/50 border">
+                  <p className="text-sm font-medium text-foreground mb-2">Total a pagar:</p>
+                  <p className="text-2xl font-display font-bold text-primary">{formatPrice(getTotal())}</p>
+                </div>
+
+                <div className="p-3 rounded-lg bg-amber-50 border border-amber-200 text-amber-800 text-sm">
+                  <strong>Importante:</strong> O boleto vence em 3 dias úteis. Após o pagamento, pode levar até 3 dias úteis para compensação.
+                </div>
+                
+                {boletoUrl && (
+                  <Button
+                    size="lg"
+                    className="gap-2 w-full"
+                    onClick={() => window.open(boletoUrl, '_blank')}
+                  >
+                    <ExternalLink className="w-4 h-4" />
+                    Abrir Boleto
+                  </Button>
+                )}
+                
+                <div className="flex flex-col sm:flex-row gap-3 pt-4">
+                  <Button 
+                    variant="outline"
+                    size="lg" 
+                    className="flex-1 gap-2"
+                    onClick={() => {
+                      handleClose();
+                      navigate('/');
+                    }}
+                  >
+                    <Home className="w-4 h-4" />
+                    Voltar ao Início
+                  </Button>
+                  <Button 
+                    variant="outline"
+                    size="lg" 
+                    className="flex-1 gap-2"
+                    onClick={() => {
+                      handleClose();
+                      navigate('/pedidos');
+                    }}
+                  >
+                    <ShoppingBag className="w-4 h-4" />
+                    Ver Meus Pedidos
+                  </Button>
+                </div>
+              </>
+            )}
+          </div>
+        )}
 
         {/* Navigation Buttons */}
         {step < 5 && !paymentCreated && (
@@ -1183,7 +1347,13 @@ export const CheckoutModal = ({ open, onOpenChange }: CheckoutModalProps) => {
               </Button>
             ) : (
               <Button 
-                onClick={paymentMethod === 'pix' ? handleCreatePayment : handleStripeCheckout} 
+                onClick={
+                  paymentMethod === 'pix' 
+                    ? handleCreatePayment 
+                    : paymentMethod === 'boleto' 
+                      ? handleBoletoPayment 
+                      : handleStripeCheckout
+                } 
                 disabled={isLoading}
                 className="gap-2"
               >
@@ -1196,6 +1366,11 @@ export const CheckoutModal = ({ open, onOpenChange }: CheckoutModalProps) => {
                   <>
                     <QrCode className="w-4 h-4" />
                     Gerar QR Code PIX
+                  </>
+                ) : paymentMethod === 'boleto' ? (
+                  <>
+                    <FileText className="w-4 h-4" />
+                    Gerar Boleto
                   </>
                 ) : (
                   <>
