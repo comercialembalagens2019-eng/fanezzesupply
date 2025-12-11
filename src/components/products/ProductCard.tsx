@@ -88,65 +88,73 @@ export function ProductCard({ product }: ProductCardProps) {
             </p>
           </div>
 
-          {/* Quantity Selector - Only show for products without variations */}
-          {!product.hasVariations && (
-            <div className="space-y-3">
-              <div className="flex items-center gap-3">
-                <Button
-                  variant="outline"
-                  size="icon"
-                  onClick={() => handleQuantityChange(-1)}
-                  disabled={quantity <= 1}
-                  className="h-10 w-10"
-                >
-                  <Minus className="w-4 h-4" />
-                </Button>
-                <input
-                  type="number"
-                  value={quantity}
-                  onChange={(e) =>
-                    setQuantity(Math.max(1, parseInt(e.target.value) || 1))
-                  }
-                  className="w-20 h-10 text-center border border-border rounded-lg bg-background text-foreground font-semibold"
-                />
-                <Button
-                  variant="outline"
-                  size="icon"
-                  onClick={() => handleQuantityChange(1)}
-                  className="h-10 w-10"
-                >
-                  <Plus className="w-4 h-4" />
-                </Button>
-              </div>
-
-              {/* Min Order Warning */}
-              {!isMinMet && (
-                <div className="flex items-center gap-2 text-destructive text-xs">
-                  <AlertCircle className="w-4 h-4" />
-                  <span>
-                    Pedido mínimo: {product.minOrder} {product.minOrderUnit}
-                  </span>
+          {/* Actions Container - Fixed height to align buttons */}
+          <div className="mt-auto">
+            {/* Quantity Selector - Only show for products without variations */}
+            {!product.hasVariations ? (
+              <div className="space-y-3">
+                <div className="flex items-center gap-3">
+                  <Button
+                    variant="outline"
+                    size="icon"
+                    onClick={() => handleQuantityChange(-1)}
+                    disabled={quantity <= 1}
+                    className="h-10 w-10"
+                  >
+                    <Minus className="w-4 h-4" />
+                  </Button>
+                  <input
+                    type="number"
+                    value={quantity}
+                    onChange={(e) =>
+                      setQuantity(Math.max(1, parseInt(e.target.value) || 1))
+                    }
+                    className="w-20 h-10 text-center border border-border rounded-lg bg-background text-foreground font-semibold"
+                  />
+                  <Button
+                    variant="outline"
+                    size="icon"
+                    onClick={() => handleQuantityChange(1)}
+                    className="h-10 w-10"
+                  >
+                    <Plus className="w-4 h-4" />
+                  </Button>
                 </div>
-              )}
-            </div>
-          )}
 
-          {/* Add to Cart Button */}
-          <Button
-            onClick={handleAddToCart}
-            disabled={!product.hasVariations && !isMinMet}
-            className={cn(
-              "w-full gap-2 mt-3",
-              !product.hasVariations && isMinMet
-                ? "bg-primary hover:bg-navy-light"
-                : product.hasVariations
-                ? "bg-primary hover:bg-navy-light"
-                : "opacity-50"
+                {/* Min Order Warning */}
+                <div className="h-5">
+                  {!isMinMet && (
+                    <div className="flex items-center gap-2 text-destructive text-xs">
+                      <AlertCircle className="w-4 h-4" />
+                      <span>
+                        Pedido mínimo: {product.minOrder} {product.minOrderUnit}
+                      </span>
+                    </div>
+                  )}
+                </div>
+              </div>
+            ) : (
+              /* Spacer for products with variations to align buttons */
+              <div className="h-[68px]" />
             )}
-          >
-            <ShoppingCart className="w-4 h-4" />
-            {product.hasVariations ? "Selecionar Tamanho" : "Adicionar ao Carrinho"}
-          </Button>
+
+            {/* Add to Cart Button */}
+            <Button
+              onClick={handleAddToCart}
+              disabled={!product.hasVariations && !isMinMet}
+              className={cn(
+                "w-full gap-2 mt-3",
+                !product.hasVariations && isMinMet
+                  ? "bg-primary hover:bg-navy-light"
+                  : product.hasVariations
+                  ? "bg-primary hover:bg-navy-light"
+                  : "opacity-50"
+              )}
+            >
+              <ShoppingCart className="w-4 h-4" />
+              {product.hasVariations ? "Selecionar Tamanho" : "Adicionar ao Carrinho"}
+            </Button>
+          </div>
         </div>
       </div>
 
