@@ -7,6 +7,7 @@ import onduladoImg from "@/assets/ondulado.webp";
 import plasticoBolhaImg from "@/assets/plastico_bolha.webp";
 import semiKraftImg from "@/assets/semi_kraft.webp";
 import fitaAdesivaImg from "@/assets/fita_adesiva.webp";
+import desinfetanteImg from "@/assets/desinfetante.webp";
 
 export const products: Product[] = [
   {
@@ -85,7 +86,7 @@ export const products: Product[] = [
     unit: "unidade",
     minOrder: 5,
     minOrderUnit: "unidades",
-    image: "/placeholder.svg",
+    image: desinfetanteImg,
     category: "Limpeza",
     stripePriceId: "price_1ScwuNAndfpC5YIBA15X71Lu",
   },
