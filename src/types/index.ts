@@ -1,3 +1,8 @@
+export interface SizeVariation {
+  thickness: string;
+  sizes: string[];
+}
+
 export interface Product {
   id: string;
   name: string;
@@ -10,11 +15,14 @@ export interface Product {
   category: string;
   featured?: boolean;
   stripePriceId?: string;
+  hasVariations?: boolean;
+  variations?: SizeVariation[];
 }
 
 export interface CartItem {
   product: Product;
   quantity: number;
+  selectedVariation?: string; // e.g., "20x30x0,07"
 }
 
 export interface CompanyData {
