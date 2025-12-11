@@ -135,7 +135,7 @@ export function ProductCard({ product }: ProductCardProps) {
               </div>
             ) : (
               /* Spacer for products with variations to align buttons */
-              <div className="h-[68px]" />
+              <div className="h-[72px]" />
             )}
 
             {/* Add to Cart Button */}
