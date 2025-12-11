@@ -97,11 +97,12 @@ serve(async (req) => {
       }
     }
 
-    // Handle payment_intent.succeeded event (backup)
+    // Handle payment_intent.succeeded event (backup for card/boleto)
     if (event.type === "payment_intent.succeeded") {
       const paymentIntent = event.data.object as Stripe.PaymentIntent;
       
       console.log("[STRIPE-WEBHOOK] Payment intent succeeded:", paymentIntent.id);
+      console.log("[STRIPE-WEBHOOK] Payment method types:", paymentIntent.payment_method_types);
       console.log("[STRIPE-WEBHOOK] Metadata:", paymentIntent.metadata);
 
       const orderId = paymentIntent.metadata?.order_id;
@@ -123,6 +124,59 @@ serve(async (req) => {
           console.error("[STRIPE-WEBHOOK] Error updating order:", error);
         } else {
           console.log("[STRIPE-WEBHOOK] Order updated successfully:", data.id);
+        }
+      }
+    }
+
+    // Handle payment_intent.payment_failed (boleto expired or failed)
+    if (event.type === "payment_intent.payment_failed") {
+      const paymentIntent = event.data.object as Stripe.PaymentIntent;
+      
+      console.log("[STRIPE-WEBHOOK] Payment failed:", paymentIntent.id);
+      console.log("[STRIPE-WEBHOOK] Failure reason:", paymentIntent.last_payment_error?.message);
+
+      const orderId = paymentIntent.metadata?.order_id;
+
+      if (orderId) {
+        console.log("[STRIPE-WEBHOOK] Marking order as failed:", orderId);
+
+        const { error } = await supabaseClient
+          .from("orders")
+          .update({ 
+            status: "failed",
+            updated_at: new Date().toISOString(),
+          })
+          .eq("id", orderId);
+
+        if (error) {
+          console.error("[STRIPE-WEBHOOK] Error updating order:", error);
+        } else {
+          console.log("[STRIPE-WEBHOOK] Order marked as failed");
+        }
+      }
+    }
+
+    // Handle payment_intent.processing (boleto awaiting payment)
+    if (event.type === "payment_intent.processing") {
+      const paymentIntent = event.data.object as Stripe.PaymentIntent;
+      
+      console.log("[STRIPE-WEBHOOK] Payment processing:", paymentIntent.id);
+
+      const orderId = paymentIntent.metadata?.order_id;
+
+      if (orderId) {
+        const { error } = await supabaseClient
+          .from("orders")
+          .update({ 
+            status: "processing",
+            updated_at: new Date().toISOString(),
+          })
+          .eq("id", orderId);
+
+        if (error) {
+          console.error("[STRIPE-WEBHOOK] Error updating order:", error);
+        } else {
+          console.log("[STRIPE-WEBHOOK] Order marked as processing");
         }
       }
     }
