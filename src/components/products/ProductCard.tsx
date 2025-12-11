@@ -66,14 +66,15 @@ export function ProductCard({ product }: ProductCardProps) {
 
         {/* Content */}
         <div className="p-5 flex-1 flex flex-col">
-          <div className="flex-1">
+          {/* Fixed height content area */}
+          <div>
             <span className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
               {product.category}
             </span>
-            <h3 className="font-display font-semibold text-foreground mt-1 mb-2 line-clamp-2">
+            <h3 className="font-display font-semibold text-foreground mt-1 mb-2 h-12 line-clamp-2">
               {product.name}
             </h3>
-            <p className="text-sm text-muted-foreground line-clamp-2 mb-4">
+            <p className="text-sm text-muted-foreground h-10 line-clamp-2 mb-4">
               {product.description}
             </p>
           </div>
