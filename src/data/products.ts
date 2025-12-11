@@ -3,6 +3,7 @@ import { ppVariations, peVariations } from "./productVariations";
 import sacoLixoImg from "@/assets/saco_de_lixo.webp";
 import sacoPlasticoImg from "@/assets/saco_plastico.webp";
 import stretchImg from "@/assets/stretch.webp";
+import onduladoImg from "@/assets/ondulado.webp";
 
 export const products: Product[] = [
   {
@@ -118,7 +119,7 @@ export const products: Product[] = [
     unit: "unidade",
     minOrder: 5,
     minOrderUnit: "unidades",
-    image: "/placeholder.svg",
+    image: onduladoImg,
     category: "Papel",
     stripePriceId: "price_1ScwuRAndfpC5YIBiqDuZ8xx",
   },
@@ -130,7 +131,7 @@ export const products: Product[] = [
     unit: "kg",
     minOrder: 1000,
     minOrderUnit: "kg",
-    image: "/placeholder.svg",
+    image: onduladoImg,
     category: "Papel",
     stripePriceId: "price_1ScwuSAndfpC5YIB6Xh3nzjy",
   },
