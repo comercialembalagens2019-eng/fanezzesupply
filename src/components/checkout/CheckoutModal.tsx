@@ -665,6 +665,13 @@ export const CheckoutModal = ({ open, onOpenChange }: CheckoutModalProps) => {
           customer_name: companyData.nomeFantasia || companyData.razaoSocial,
           customer_cpf: boletoCpf.replace(/\D/g, ''),
           order_id: savedOrder.id,
+          address: {
+            line1: `${addressData.endereco}, ${addressData.numero}`,
+            line2: addressData.complemento || undefined,
+            city: addressData.cidade,
+            state: addressData.estado,
+            postal_code: addressData.cep.replace(/\D/g, ''),
+          },
         },
       });
 
