@@ -14,3 +14,6 @@ verify_jwt = false
 
 [functions.check-pix-status]
 verify_jwt = true
+
+[functions.create-boleto-payment]
+verify_jwt = true
