@@ -18,6 +18,24 @@ const maskEmail = (email: string): string => {
   return `${local.slice(0, 2)}***@${domain?.slice(0, 3)}***`;
 };
 
+// Validate CPF check digits
+const isValidCPF = (cpf: string): boolean => {
+  const digits = cpf.replace(/\D/g, '');
+  if (digits.length !== 11 || /^(\d)\1+$/.test(digits)) return false;
+  
+  let sum = 0;
+  for (let i = 0; i < 9; i++) sum += parseInt(digits[i]) * (10 - i);
+  let remainder = (sum * 10) % 11;
+  if (remainder === 10 || remainder === 11) remainder = 0;
+  if (remainder !== parseInt(digits[9])) return false;
+  
+  sum = 0;
+  for (let i = 0; i < 10; i++) sum += parseInt(digits[i]) * (11 - i);
+  remainder = (sum * 10) % 11;
+  if (remainder === 10 || remainder === 11) remainder = 0;
+  return remainder === parseInt(digits[10]);
+};
+
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
@@ -51,7 +69,7 @@ serve(async (req) => {
     console.log("[BOLETO] User authenticated:", userData.user.id.slice(0, 8) + "***");
 
     const body = await req.json();
-    const { amount, customer_email, customer_name, order_id } = body;
+    const { amount, customer_email, customer_name, customer_cpf, order_id } = body;
 
     // Validate inputs
     if (!amount || typeof amount !== "number") {
@@ -70,6 +88,16 @@ serve(async (req) => {
       throw new Error("Valid customer email is required");
     }
 
+    if (!customer_name || customer_name.trim().length < 2) {
+      throw new Error("Customer name is required");
+    }
+
+    // Validate CPF for Boleto (required by Stripe)
+    const cpfDigits = (customer_cpf || "").replace(/\D/g, "");
+    if (!cpfDigits || !isValidCPF(cpfDigits)) {
+      throw new Error("CPF válido é obrigatório para pagamento via Boleto");
+    }
+
     console.log("[BOLETO] Creating payment:", { 
       amount, 
       email: maskEmail(customer_email),
@@ -80,7 +108,7 @@ serve(async (req) => {
       apiVersion: "2025-08-27.basil",
     });
 
-    // Create PaymentIntent with boleto
+    // Create and confirm PaymentIntent with boleto in one step
     const paymentIntent = await stripe.paymentIntents.create({
       amount: amount,
       currency: "brl",
@@ -91,21 +119,41 @@ serve(async (req) => {
         order_id: order_id || "",
         user_id: userData.user.id,
       },
+      // Provide payment method data to confirm immediately
+      payment_method_data: {
+        type: "boleto",
+        boleto: {
+          tax_id: cpfDigits,
+        },
+        billing_details: {
+          name: customer_name,
+          email: customer_email,
+        },
+      },
+      confirm: true, // Confirm immediately to generate boleto
     });
 
-    console.log("[BOLETO] PaymentIntent created:", paymentIntent.id);
+    console.log("[BOLETO] PaymentIntent created and confirmed:", paymentIntent.id);
+    console.log("[BOLETO] Status:", paymentIntent.status);
+    console.log("[BOLETO] Next action type:", paymentIntent.next_action?.type);
 
-    // Get boleto details if available
+    // Get boleto details from next_action
     const boletoDetails = paymentIntent.next_action?.boleto_display_details;
+    
+    if (!boletoDetails?.hosted_voucher_url) {
+      console.error("[BOLETO] No boleto URL in response:", JSON.stringify(paymentIntent.next_action));
+      throw new Error("Não foi possível gerar o boleto. Tente novamente.");
+    }
+
+    console.log("[BOLETO] Boleto URL generated successfully");
 
     return new Response(
       JSON.stringify({
         success: true,
         payment_intent_id: paymentIntent.id,
-        client_secret: paymentIntent.client_secret,
-        boleto_url: boletoDetails?.hosted_voucher_url || null,
-        pdf: boletoDetails?.pdf || null,
-        expires_at: boletoDetails?.expires_at || null,
+        boleto_url: boletoDetails.hosted_voucher_url,
+        number: boletoDetails.number || null,
+        expires_at: boletoDetails.expires_at || null,
       }),
       {
         status: 200,
