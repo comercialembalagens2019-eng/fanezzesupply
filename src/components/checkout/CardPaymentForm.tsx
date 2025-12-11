@@ -1,8 +1,8 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
-import { MetallicCard } from "./MetallicCard";
+import { MetallicCard, detectCardBrand, CardBrand } from "./MetallicCard";
 import { CreditCard, Lock, Loader2 } from "lucide-react";
 
 interface CardPaymentFormProps {
@@ -18,6 +18,7 @@ export const CardPaymentForm = ({ onSubmit, isLoading, total }: CardPaymentFormP
   const [cardCvv, setCardCvv] = useState("");
   const [isFlipped, setIsFlipped] = useState(false);
   const [displayNumber, setDisplayNumber] = useState("");
+  const [cardBrand, setCardBrand] = useState<CardBrand>('unknown');
 
   // Format card number with spaces
   const formatCardNumber = (value: string) => {
@@ -43,6 +44,7 @@ export const CardPaymentForm = ({ onSubmit, isLoading, total }: CardPaymentFormP
     const formatted = formatCardNumber(raw);
     setCardNumber(raw);
     setDisplayNumber(formatted);
+    setCardBrand(detectCardBrand(raw));
   };
 
   const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -63,6 +65,19 @@ export const CardPaymentForm = ({ onSubmit, isLoading, total }: CardPaymentFormP
 
   const isFormValid = cardNumber.length >= 13 && cardName.length >= 3 && cardExpiry.length === 5 && cardCvv.length >= 3;
 
+  const getBrandName = (brand: CardBrand): string => {
+    const names: Record<CardBrand, string> = {
+      visa: 'Visa',
+      mastercard: 'Mastercard',
+      amex: 'American Express',
+      elo: 'Elo',
+      hipercard: 'Hipercard',
+      discover: 'Discover',
+      unknown: ''
+    };
+    return names[brand];
+  };
+
   return (
     <div className="space-y-6">
       {/* 3D Card Preview */}
@@ -73,7 +88,16 @@ export const CardPaymentForm = ({ onSubmit, isLoading, total }: CardPaymentFormP
           cardExpiry={cardExpiry}
           isFlipped={isFlipped}
           cvv={cardCvv || "•••"}
+          brand={cardBrand}
         />
+        {/* Brand Detection Indicator */}
+        {cardBrand !== 'unknown' && (
+          <div className="text-center mt-3">
+            <span className="text-sm text-muted-foreground">
+              Cartão detectado: <span className="font-semibold text-foreground">{getBrandName(cardBrand)}</span>
+            </span>
+          </div>
+        )}
       </div>
 
       {/* Card Form */}

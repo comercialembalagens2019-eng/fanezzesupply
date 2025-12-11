@@ -1,19 +1,102 @@
 import { cn } from "@/lib/utils";
 
+export type CardBrand = 'visa' | 'mastercard' | 'amex' | 'elo' | 'hipercard' | 'discover' | 'unknown';
+
+export const detectCardBrand = (cardNumber: string): CardBrand => {
+  const num = cardNumber.replace(/\D/g, '');
+  
+  if (!num) return 'unknown';
+  
+  // Visa: starts with 4
+  if (/^4/.test(num)) return 'visa';
+  
+  // Mastercard: starts with 51-55 or 2221-2720
+  if (/^5[1-5]/.test(num) || /^2(2[2-9][1-9]|2[3-9]\d|[3-6]\d{2}|7[01]\d|720)/.test(num)) return 'mastercard';
+  
+  // American Express: starts with 34 or 37
+  if (/^3[47]/.test(num)) return 'amex';
+  
+  // Elo: Brazilian card
+  if (/^(636368|636369|438935|504175|451416|636297|5067|4576|4011|506699)/.test(num)) return 'elo';
+  
+  // Hipercard: starts with 606282 or 3841
+  if (/^(606282|3841)/.test(num)) return 'hipercard';
+  
+  // Discover: starts with 6011, 644-649, 65
+  if (/^(6011|64[4-9]|65)/.test(num)) return 'discover';
+  
+  return 'unknown';
+};
+
 interface MetallicCardProps {
   cardNumber: string;
   cardName: string;
   cardExpiry: string;
   isFlipped?: boolean;
   cvv?: string;
+  brand?: CardBrand;
 }
+
+const CardBrandLogo = ({ brand }: { brand: CardBrand }) => {
+  switch (brand) {
+    case 'visa':
+      return (
+        <svg viewBox="0 0 48 32" className="w-16 h-10">
+          <rect fill="#1A1F71" width="48" height="32" rx="4"/>
+          <path fill="#fff" d="M19.5 21h-2.9l1.8-11h2.9l-1.8 11zm12.1-10.7c-.6-.2-1.5-.5-2.6-.5-2.9 0-4.9 1.5-4.9 3.7 0 1.6 1.5 2.5 2.6 3.1 1.1.6 1.5 1 1.5 1.5 0 .8-1 1.2-1.9 1.2-1.2 0-1.9-.2-2.9-.6l-.4-.2-.4 2.6c.7.3 2.1.6 3.5.6 3.1 0 5.1-1.5 5.1-3.8 0-1.3-.8-2.3-2.5-3.1-1-.5-1.6-.9-1.6-1.4 0-.5.5-1 1.7-1 1 0 1.7.2 2.2.4l.3.1.4-2.6zm7.5-.3h-2.3c-.7 0-1.2.2-1.5.9l-4.3 10.1h3.1l.6-1.7h3.7l.4 1.7h2.7l-2.4-11zm-3.6 7.1l1.2-3.2c0 0 .2-.7.4-1.1l.2 1 .7 3.3h-2.5zm-17.4-7.1l-2.8 7.5-.3-1.5c-.5-1.8-2.2-3.7-4-4.6l2.6 9.6h3.1l4.6-11h-3.2z"/>
+          <path fill="#F7B600" d="M13.5 10h-4.7l-.1.3c3.7.9 6.1 3.2 7.1 5.9l-1-5.2c-.2-.7-.7-.9-1.3-1z"/>
+        </svg>
+      );
+    case 'mastercard':
+      return (
+        <div className="flex items-center">
+          <div className="w-8 h-8 rounded-full bg-red-500" />
+          <div className="w-8 h-8 rounded-full bg-yellow-500 -ml-3" />
+        </div>
+      );
+    case 'amex':
+      return (
+        <svg viewBox="0 0 48 32" className="w-16 h-10">
+          <rect fill="#016FD0" width="48" height="32" rx="4"/>
+          <path fill="#fff" d="M24 8l-8 8 8 8 8-8-8-8zm-2 4h4v2h-4v-2zm0 3h4v2h-4v-2z"/>
+          <text x="24" y="26" textAnchor="middle" fill="#fff" fontSize="6" fontWeight="bold">AMEX</text>
+        </svg>
+      );
+    case 'elo':
+      return (
+        <div className="bg-slate-900 rounded px-2 py-1">
+          <span className="text-yellow-400 font-bold text-sm tracking-wider">elo</span>
+        </div>
+      );
+    case 'hipercard':
+      return (
+        <div className="bg-red-600 rounded px-2 py-1">
+          <span className="text-white font-bold text-xs">HIPERCARD</span>
+        </div>
+      );
+    case 'discover':
+      return (
+        <div className="bg-orange-500 rounded px-2 py-1">
+          <span className="text-white font-bold text-xs">DISCOVER</span>
+        </div>
+      );
+    default:
+      return (
+        <div className="flex items-center gap-1 opacity-30">
+          <div className="w-6 h-6 rounded-full bg-slate-400" />
+          <div className="w-6 h-6 rounded-full bg-slate-500 -ml-2" />
+        </div>
+      );
+  }
+};
 
 export const MetallicCard = ({ 
   cardNumber, 
   cardName, 
   cardExpiry, 
   isFlipped = false,
-  cvv = "•••"
+  cvv = "•••",
+  brand = 'unknown'
 }: MetallicCardProps) => {
   return (
     <div className="perspective-1000 w-full max-w-[340px] mx-auto">
@@ -66,7 +149,7 @@ export const MetallicCard = ({
           {/* Card Chip */}
           <div className="absolute top-6 left-6">
             <div 
-              className="w-12 h-9 rounded-md"
+              className="w-12 h-9 rounded-md relative overflow-hidden"
               style={{
                 background: `
                   linear-gradient(135deg, 
@@ -93,17 +176,21 @@ export const MetallicCard = ({
           </div>
 
           {/* Contactless Icon */}
-          <div className="absolute top-6 right-6">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" className="text-slate-400">
-              <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8z" fill="currentColor" opacity="0.3"/>
+          <div className="absolute top-6 left-20">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" className="text-slate-400">
               <path d="M8.65 8.65a5.5 5.5 0 0 1 7.78 0" stroke="currentColor" strokeWidth="1.5" fill="none" strokeLinecap="round"/>
               <path d="M6.5 6.5a8 8 0 0 1 11.31 0" stroke="currentColor" strokeWidth="1.5" fill="none" strokeLinecap="round"/>
               <path d="M10.88 10.88a3 3 0 0 1 4.24 0" stroke="currentColor" strokeWidth="1.5" fill="none" strokeLinecap="round"/>
             </svg>
           </div>
 
+          {/* Brand Logo - Top Right */}
+          <div className="absolute top-5 right-5">
+            <CardBrandLogo brand={brand} />
+          </div>
+
           {/* Card Number */}
-          <div className="absolute top-[85px] left-6 right-6">
+          <div className="absolute top-[90px] left-6 right-6">
             <p 
               className="text-xl tracking-[0.2em] font-mono text-slate-100"
               style={{ 
@@ -135,14 +222,6 @@ export const MetallicCard = ({
             >
               {cardExpiry || "MM/AA"}
             </p>
-          </div>
-
-          {/* Brand Logo Area */}
-          <div className="absolute top-6 left-1/2 transform -translate-x-1/2">
-            <div className="flex items-center gap-1">
-              <div className="w-8 h-8 rounded-full bg-red-500/80" />
-              <div className="w-8 h-8 rounded-full bg-yellow-500/80 -ml-4" />
-            </div>
           </div>
         </div>
 
