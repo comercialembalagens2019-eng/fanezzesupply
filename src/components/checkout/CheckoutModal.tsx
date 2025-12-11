@@ -209,22 +209,59 @@ export const CheckoutModal = ({ open, onOpenChange }: CheckoutModalProps) => {
     loadUserCompany();
   }, [user, open, paymentCreated]);
 
-  // Listen for payment confirmation via Polling (every 5 seconds)
+  // Handle payment confirmation
+  const handlePaymentConfirmed = () => {
+    console.log('Payment confirmed!');
+    setPaymentConfirmed(true);
+    toast({
+      title: "🎉 Pagamento Confirmado!",
+      description: "Seu pedido foi pago com sucesso. Redirecionando...",
+    });
+    
+    // Auto close and redirect after 4 seconds
+    setTimeout(() => {
+      clearCart();
+      onOpenChange(false);
+      navigate('/pedidos');
+    }, 4000);
+  };
+
+  // Listen for payment confirmation via Realtime + Polling fallback
   useEffect(() => {
     if (!paymentCreated || !currentOrderId || paymentConfirmed) return;
 
-    console.log('Starting payment polling for order:', currentOrderId);
+    console.log('Starting realtime subscription and polling for order:', currentOrderId);
 
+    // Setup Supabase Realtime subscription for instant updates
+    const channel = supabase
+      .channel(`order-${currentOrderId}`)
+      .on(
+        'postgres_changes',
+        {
+          event: 'UPDATE',
+          schema: 'public',
+          table: 'orders',
+          filter: `id=eq.${currentOrderId}`,
+        },
+        (payload) => {
+          console.log('Realtime update received:', payload);
+          if (payload.new && (payload.new as { status: string }).status === 'paid') {
+            handlePaymentConfirmed();
+          }
+        }
+      )
+      .subscribe((status) => {
+        console.log('Realtime subscription status:', status);
+      });
+
+    // Polling fallback (every 10 seconds) in case realtime misses something
     const checkPaymentStatus = async () => {
       try {
-        console.log('Checking payment status for order:', currentOrderId);
         const { data: order, error } = await supabase
           .from('orders')
           .select('status')
           .eq('id', currentOrderId)
           .maybeSingle();
-
-        console.log('Order status check result:', { order, error });
 
         if (error) {
           console.error('Error checking payment status:', error);
@@ -232,19 +269,7 @@ export const CheckoutModal = ({ open, onOpenChange }: CheckoutModalProps) => {
         }
 
         if (order?.status === 'paid') {
-          console.log('Payment confirmed!');
-          setPaymentConfirmed(true);
-          toast({
-            title: "🎉 Pagamento Confirmado!",
-            description: "Seu pedido foi pago com sucesso.",
-          });
-          
-          // Auto close and redirect after 4 seconds
-          setTimeout(() => {
-            clearCart();
-            onOpenChange(false);
-            navigate('/pedidos');
-          }, 4000);
+          handlePaymentConfirmed();
         }
       } catch (error) {
         console.error('Error in payment polling:', error);
@@ -254,10 +279,12 @@ export const CheckoutModal = ({ open, onOpenChange }: CheckoutModalProps) => {
     // Check immediately
     checkPaymentStatus();
 
-    // Then poll every 5 seconds
-    const intervalId = setInterval(checkPaymentStatus, 5000);
+    // Poll every 10 seconds as fallback
+    const intervalId = setInterval(checkPaymentStatus, 10000);
 
     return () => {
+      console.log('Cleaning up realtime subscription');
+      supabase.removeChannel(channel);
       clearInterval(intervalId);
     };
   }, [paymentCreated, currentOrderId, paymentConfirmed, clearCart, onOpenChange, navigate]);
