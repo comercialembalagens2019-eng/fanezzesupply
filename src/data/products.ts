@@ -4,6 +4,7 @@ import sacoLixoImg from "@/assets/saco_de_lixo.webp";
 import sacoPlasticoImg from "@/assets/saco_plastico.webp";
 import stretchImg from "@/assets/stretch.webp";
 import onduladoImg from "@/assets/ondulado.webp";
+import plasticoBolhaImg from "@/assets/plastico_bolha.webp";
 
 export const products: Product[] = [
   {
@@ -57,7 +58,7 @@ export const products: Product[] = [
     unit: "unidade",
     minOrder: 20,
     minOrderUnit: "unidades",
-    image: "/placeholder.svg",
+    image: plasticoBolhaImg,
     category: "Proteção",
     featured: true,
     stripePriceId: "price_1ScwuLAndfpC5YIBgg1A9Qhz",
@@ -70,7 +71,7 @@ export const products: Product[] = [
     unit: "unidade",
     minOrder: 10,
     minOrderUnit: "unidades",
-    image: "/placeholder.svg",
+    image: plasticoBolhaImg,
     category: "Proteção",
     stripePriceId: "price_1ScwuMAndfpC5YIB5vdKBZRg",
   },
