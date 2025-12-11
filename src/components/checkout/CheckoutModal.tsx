@@ -88,7 +88,17 @@ export const CheckoutModal = ({ open, onOpenChange }: CheckoutModalProps) => {
   const [currentPixId, setCurrentPixId] = useState<string | null>(null);
   const [paymentMethod, setPaymentMethod] = useState<'pix' | 'card' | 'boleto'>('pix');
   const [boletoUrl, setBoletoUrl] = useState<string | null>(null);
+  const [boletoCpf, setBoletoCpf] = useState('');
   const navigate = useNavigate();
+
+  const formatCPF = (value: string) => {
+    return value
+      .replace(/\D/g, '')
+      .replace(/(\d{3})(\d)/, '$1.$2')
+      .replace(/(\d{3})(\d)/, '$1.$2')
+      .replace(/(\d{3})(\d{1,2})/, '$1-$2')
+      .slice(0, 14);
+  };
 
   const [companyData, setCompanyData] = useState<CompanyData>({
     razaoSocial: '',
@@ -653,6 +663,7 @@ export const CheckoutModal = ({ open, onOpenChange }: CheckoutModalProps) => {
           amount: totalInCents,
           customer_email: contactData.email,
           customer_name: companyData.nomeFantasia || companyData.razaoSocial,
+          customer_cpf: boletoCpf.replace(/\D/g, ''),
           order_id: savedOrder.id,
         },
       });
@@ -712,7 +723,12 @@ export const CheckoutModal = ({ open, onOpenChange }: CheckoutModalProps) => {
       case 3:
         return !!(contactData.whatsapp && contactData.email);
       case 4:
-        return true; // Payment step - just needs payment method selection
+        // For boleto, require CPF
+        if (paymentMethod === 'boleto') {
+          const cpfDigits = boletoCpf.replace(/\D/g, '');
+          return cpfDigits.length === 11;
+        }
+        return true;
       default:
         return true;
     }
@@ -749,6 +765,7 @@ export const CheckoutModal = ({ open, onOpenChange }: CheckoutModalProps) => {
     setQrCodeImage(null);
     setBrCode(null);
     setBoletoUrl(null);
+    setBoletoCpf('');
     setPaymentCreated(false);
     setPaymentConfirmed(false);
     setCurrentOrderId(null);
@@ -1129,6 +1146,23 @@ export const CheckoutModal = ({ open, onOpenChange }: CheckoutModalProps) => {
                 </button>
               </div>
             </div>
+
+            {/* CPF field for Boleto */}
+            {paymentMethod === 'boleto' && (
+              <div className="mt-4">
+                <Label htmlFor="boletoCpf">CPF do Responsável *</Label>
+                <Input
+                  id="boletoCpf"
+                  value={boletoCpf}
+                  onChange={(e) => setBoletoCpf(formatCPF(e.target.value))}
+                  placeholder="000.000.000-00"
+                  className="mt-1"
+                />
+                <p className="text-xs text-muted-foreground mt-1">
+                  O CPF é obrigatório para emissão do boleto bancário.
+                </p>
+              </div>
+            )}
           </div>
         )}
 
@@ -1354,7 +1388,7 @@ export const CheckoutModal = ({ open, onOpenChange }: CheckoutModalProps) => {
                       ? handleBoletoPayment 
                       : handleStripeCheckout
                 } 
-                disabled={isLoading}
+                disabled={isLoading || (paymentMethod === 'boleto' && boletoCpf.replace(/\D/g, '').length !== 11)}
                 className="gap-2"
               >
                 {isLoading ? (
