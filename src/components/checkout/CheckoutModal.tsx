@@ -12,7 +12,6 @@ import { toast } from "@/hooks/use-toast";
 import { Loader2, QrCode, Building2, MapPin, Phone, User, ChevronRight, ChevronLeft, CheckCircle, Copy, Home, ShoppingBag, PartyPopper, CreditCard } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
-import { CardPaymentForm } from "./CardPaymentForm";
 
 interface CheckoutModalProps {
   open: boolean;
@@ -1156,16 +1155,6 @@ export const CheckoutModal = ({ open, onOpenChange }: CheckoutModalProps) => {
           </div>
         )}
 
-        {/* Step 5: Payment - Card Form */}
-        {step === 5 && paymentMethod === 'card' && !paymentCreated && (
-          <div className="py-2">
-            <CardPaymentForm
-              onSubmit={handleStripeCheckout}
-              isLoading={isLoading}
-              total={formatPrice(getTotal())}
-            />
-          </div>
-        )}
 
         {/* Navigation Buttons */}
         {step < 5 && (
@@ -1187,7 +1176,7 @@ export const CheckoutModal = ({ open, onOpenChange }: CheckoutModalProps) => {
               </Button>
             ) : (
               <Button 
-                onClick={paymentMethod === 'pix' ? handleCreatePayment : () => setStep(5)} 
+                onClick={paymentMethod === 'pix' ? handleCreatePayment : handleStripeCheckout} 
                 disabled={isLoading || !validateStep(4)}
                 className="gap-2"
               >
@@ -1212,19 +1201,6 @@ export const CheckoutModal = ({ open, onOpenChange }: CheckoutModalProps) => {
           </div>
         )}
 
-        {/* Back button for Card Payment Form */}
-        {step === 5 && paymentMethod === 'card' && !paymentCreated && (
-          <div className="pt-4 border-t">
-            <Button
-              variant="outline"
-              onClick={() => setStep(4)}
-              className="gap-2"
-            >
-              <ChevronLeft className="w-4 h-4" />
-              Voltar
-            </Button>
-          </div>
-        )}
       </DialogContent>
     </Dialog>
   );
