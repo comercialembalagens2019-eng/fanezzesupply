@@ -9,7 +9,8 @@ import { useCart } from "@/contexts/CartContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
-import { Loader2, QrCode, Building2, MapPin, Phone, ChevronRight, ChevronLeft, CheckCircle, Copy, Home, ShoppingBag, PartyPopper, CreditCard } from "lucide-react";
+import { Loader2, QrCode, Building2, MapPin, Phone, ChevronRight, ChevronLeft, CheckCircle, Copy, Home, ShoppingBag, PartyPopper, CreditCard, LogIn } from "lucide-react";
+import { Link } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
 
@@ -692,10 +693,42 @@ export const CheckoutModal = ({ open, onOpenChange }: CheckoutModalProps) => {
             Finalizar Pedido
           </DialogTitle>
           <DialogDescription>
-            {user ? "Confirme os dados e escolha a forma de pagamento" : "Complete o cadastro da sua empresa para gerar o pagamento"}
+            {user ? "Confirme os dados e escolha a forma de pagamento" : "Faça login para continuar com o pedido"}
           </DialogDescription>
         </DialogHeader>
 
+        {/* Login Required Screen */}
+        {!user && (
+          <div className="flex flex-col items-center justify-center py-8 space-y-6">
+            <div className="w-20 h-20 rounded-full bg-primary/10 flex items-center justify-center">
+              <LogIn className="w-10 h-10 text-primary" />
+            </div>
+            <div className="text-center space-y-2">
+              <h3 className="text-lg font-semibold">Login Necessário</h3>
+              <p className="text-muted-foreground max-w-sm">
+                Para finalizar seu pedido, é necessário estar logado em sua conta. 
+                Se ainda não possui uma conta, você pode criar uma gratuitamente.
+              </p>
+            </div>
+            <div className="flex flex-col sm:flex-row gap-3 w-full max-w-sm">
+              <Button asChild className="flex-1">
+                <Link to="/login" onClick={() => onOpenChange(false)}>
+                  <LogIn className="w-4 h-4 mr-2" />
+                  Fazer Login
+                </Link>
+              </Button>
+              <Button asChild variant="outline" className="flex-1">
+                <Link to="/cadastro" onClick={() => onOpenChange(false)}>
+                  Criar Conta
+                </Link>
+              </Button>
+            </div>
+          </div>
+        )}
+
+        {/* Authenticated User Content */}
+        {user && (
+          <>
         {/* Stepper */}
         <div className="flex items-center justify-between mb-6 px-2">
           {stepTitles.map((s, index) => {
@@ -1173,6 +1206,8 @@ export const CheckoutModal = ({ open, onOpenChange }: CheckoutModalProps) => {
               </Button>
             )}
           </div>
+        )}
+          </>
         )}
 
       </DialogContent>
