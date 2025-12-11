@@ -130,7 +130,7 @@ export const products: Product[] = [
     description: "Papelão ondulado vendido por quilo, ideal para grandes quantidades.",
     price: 7.99,
     unit: "kg",
-    minOrder: 1000,
+    minOrder: 250,
     minOrderUnit: "kg",
     image: onduladoImg,
     category: "Papel",
