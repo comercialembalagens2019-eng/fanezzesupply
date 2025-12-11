@@ -1,4 +1,5 @@
 import { Product } from "@/types";
+import { ppVariations, peVariations } from "./productVariations";
 
 export const products: Product[] = [
   {
@@ -17,7 +18,7 @@ export const products: Product[] = [
   {
     id: "1",
     name: "Saco Plástico PP",
-    description: "Saco plástico de polipropileno de alta qualidade, ideal para embalagens diversas.",
+    description: "Saco plástico de polipropileno de alta qualidade, ideal para embalagens diversas. Disponível em diversos tamanhos e espessuras.",
     price: 32.90,
     unit: "kg",
     minOrder: 30,
@@ -26,11 +27,13 @@ export const products: Product[] = [
     category: "Plásticos",
     featured: true,
     stripePriceId: "price_1ScwuDAndfpC5YIBpp9VoACm",
+    hasVariations: true,
+    variations: ppVariations,
   },
   {
     id: "2",
     name: "Saco Plástico PE",
-    description: "Saco plástico de polietileno, resistente e versátil para múltiplas aplicações.",
+    description: "Saco plástico de polietileno, resistente e versátil para múltiplas aplicações. Disponível em diversos tamanhos e espessuras.",
     price: 32.90,
     unit: "kg",
     minOrder: 30,
@@ -39,6 +42,8 @@ export const products: Product[] = [
     category: "Plásticos",
     featured: true,
     stripePriceId: "price_1ScwuKAndfpC5YIBr26jz3UX",
+    hasVariations: true,
+    variations: peVariations,
   },
   {
     id: "3",
