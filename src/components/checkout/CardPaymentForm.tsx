@@ -21,6 +21,7 @@ export const CardPaymentForm = ({ onSubmit, isLoading, total }: CardPaymentFormP
   const [displayNumber, setDisplayNumber] = useState("");
   const [cardBrand, setCardBrand] = useState<CardBrand>('unknown');
   const [isCardValid, setIsCardValid] = useState<boolean | null>(null);
+  const [isExpiryValid, setIsExpiryValid] = useState<boolean | null>(null);
 
   // Format card number with spaces
   const formatCardNumber = (value: string) => {
@@ -39,6 +40,29 @@ export const CardPaymentForm = ({ onSubmit, isLoading, total }: CardPaymentFormP
       return v.slice(0, 2) + "/" + v.slice(2, 4);
     }
     return v;
+  };
+
+  // Validate expiry date (MM/YY format, must be in the future)
+  const validateExpiry = (expiry: string): boolean => {
+    if (expiry.length !== 5) return false;
+    
+    const [monthStr, yearStr] = expiry.split('/');
+    const month = parseInt(monthStr, 10);
+    const year = parseInt(yearStr, 10);
+    
+    // Validate month is 01-12
+    if (month < 1 || month > 12) return false;
+    
+    // Get current date
+    const now = new Date();
+    const currentMonth = now.getMonth() + 1; // getMonth() is 0-indexed
+    const currentYear = now.getFullYear() % 100; // Get last 2 digits
+    
+    // Check if the expiry date is in the future
+    if (year < currentYear) return false;
+    if (year === currentYear && month < currentMonth) return false;
+    
+    return true;
   };
 
   const handleCardNumberChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -64,6 +88,13 @@ export const CardPaymentForm = ({ onSubmit, isLoading, total }: CardPaymentFormP
     const formatted = formatExpiry(e.target.value);
     if (formatted.length <= 5) {
       setCardExpiry(formatted);
+      
+      // Validate when complete
+      if (formatted.length === 5) {
+        setIsExpiryValid(validateExpiry(formatted));
+      } else {
+        setIsExpiryValid(null);
+      }
     }
   };
 
@@ -72,7 +103,7 @@ export const CardPaymentForm = ({ onSubmit, isLoading, total }: CardPaymentFormP
     setCardCvv(v);
   };
 
-  const isFormValid = cardNumber.length >= 13 && isCardValid === true && cardName.length >= 3 && cardExpiry.length === 5 && cardCvv.length >= 3;
+  const isFormValid = cardNumber.length >= 13 && isCardValid === true && cardName.length >= 3 && cardExpiry.length === 5 && isExpiryValid === true && cardCvv.length >= 3;
 
   const getBrandName = (brand: CardBrand): string => {
     const names: Record<CardBrand, string> = {
@@ -163,14 +194,31 @@ export const CardPaymentForm = ({ onSubmit, isLoading, total }: CardPaymentFormP
         <div className="grid grid-cols-2 gap-4">
           <div>
             <Label htmlFor="cardExpiry">Validade</Label>
-            <Input
-              id="cardExpiry"
-              value={cardExpiry}
-              onChange={handleExpiryChange}
-              placeholder="MM/AA"
-              className="font-mono"
-              maxLength={5}
-            />
+            <div className="relative">
+              <Input
+                id="cardExpiry"
+                value={cardExpiry}
+                onChange={handleExpiryChange}
+                placeholder="MM/AA"
+                className={cn(
+                  "font-mono pr-10",
+                  isExpiryValid === true && "border-green-500 focus-visible:ring-green-500",
+                  isExpiryValid === false && "border-red-500 focus-visible:ring-red-500"
+                )}
+                maxLength={5}
+              />
+              <div className="absolute right-3 top-1/2 -translate-y-1/2">
+                {isExpiryValid === true && (
+                  <CheckCircle className="w-4 h-4 text-green-500" />
+                )}
+                {isExpiryValid === false && (
+                  <XCircle className="w-4 h-4 text-red-500" />
+                )}
+              </div>
+            </div>
+            {isExpiryValid === false && (
+              <p className="text-xs text-red-500 mt-1">Data expirada</p>
+            )}
           </div>
           <div>
             <Label htmlFor="cardCvv">CVV</Label>
