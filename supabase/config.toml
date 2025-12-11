@@ -1,13 +1,16 @@
 project_id = "stzsmhpaixxjgdrrqvmi"
 
 [functions.create-pix-payment]
-verify_jwt = false
+verify_jwt = true
 
 [functions.payment-webhook]
 verify_jwt = false
 
 [functions.create-stripe-checkout]
-verify_jwt = false
+verify_jwt = true
 
 [functions.stripe-webhook]
 verify_jwt = false
+
+[functions.check-pix-status]
+verify_jwt = true
