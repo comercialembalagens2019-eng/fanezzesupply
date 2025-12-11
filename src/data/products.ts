@@ -6,6 +6,7 @@ import stretchImg from "@/assets/stretch.webp";
 import onduladoImg from "@/assets/ondulado.webp";
 import plasticoBolhaImg from "@/assets/plastico_bolha.webp";
 import semiKraftImg from "@/assets/semi_kraft.webp";
+import fitaAdesivaImg from "@/assets/fita_adesiva.webp";
 
 export const products: Product[] = [
   {
@@ -109,7 +110,7 @@ export const products: Product[] = [
     unit: "caixa",
     minOrder: 5,
     minOrderUnit: "caixas",
-    image: "/placeholder.svg",
+    image: fitaAdesivaImg,
     category: "Fitas",
     stripePriceId: "price_1ScwuQAndfpC5YIBkUwYWJWd",
   },
