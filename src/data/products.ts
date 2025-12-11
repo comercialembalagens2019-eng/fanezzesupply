@@ -1,5 +1,6 @@
 import { Product } from "@/types";
 import { ppVariations, peVariations } from "./productVariations";
+import sacoLixoImg from "@/assets/saco_de_lixo.webp";
 
 export const products: Product[] = [
   {
@@ -139,7 +140,7 @@ export const products: Product[] = [
     unit: "fardo",
     minOrder: 3,
     minOrderUnit: "fardos",
-    image: "/placeholder.svg",
+    image: sacoLixoImg,
     category: "Limpeza",
     stripePriceId: "price_1ScwuTAndfpC5YIB4wytsXff",
   },
@@ -151,7 +152,7 @@ export const products: Product[] = [
     unit: "fardo",
     minOrder: 3,
     minOrderUnit: "fardos",
-    image: "/placeholder.svg",
+    image: sacoLixoImg,
     category: "Limpeza",
     stripePriceId: "price_1ScwuUAndfpC5YIBPQU4ASpI",
   },
@@ -163,7 +164,7 @@ export const products: Product[] = [
     unit: "fardo",
     minOrder: 3,
     minOrderUnit: "fardos",
-    image: "/placeholder.svg",
+    image: sacoLixoImg,
     category: "Limpeza",
     stripePriceId: "price_1ScwuVAndfpC5YIBzRjvVLcN",
   },
@@ -175,7 +176,7 @@ export const products: Product[] = [
     unit: "fardo",
     minOrder: 3,
     minOrderUnit: "fardos",
-    image: "/placeholder.svg",
+    image: sacoLixoImg,
     category: "Limpeza",
     stripePriceId: "price_1ScwuWAndfpC5YIBJfpishZc",
   },
@@ -187,7 +188,7 @@ export const products: Product[] = [
     unit: "fardo",
     minOrder: 3,
     minOrderUnit: "fardos",
-    image: "/placeholder.svg",
+    image: sacoLixoImg,
     category: "Limpeza",
     stripePriceId: "price_1ScwuXAndfpC5YIBBDl7gfK3",
   },
