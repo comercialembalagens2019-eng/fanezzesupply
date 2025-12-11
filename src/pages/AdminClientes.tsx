@@ -126,11 +126,12 @@ export default function AdminClientes() {
 
       if (companiesError) throw companiesError;
 
-      // Fetch orders for all companies
+      // Fetch orders for all companies (increased limit)
       const { data: ordersData, error: ordersError } = await supabase
         .from('orders')
         .select('*')
-        .order('created_at', { ascending: false });
+        .order('created_at', { ascending: false })
+        .limit(5000);
 
       if (ordersError) throw ordersError;
 
