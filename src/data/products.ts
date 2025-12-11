@@ -1,6 +1,7 @@
 import { Product } from "@/types";
 import { ppVariations, peVariations } from "./productVariations";
 import sacoLixoImg from "@/assets/saco_de_lixo.webp";
+import sacoPlasticoImg from "@/assets/saco_plastico.webp";
 
 export const products: Product[] = [
   {
@@ -24,7 +25,7 @@ export const products: Product[] = [
     unit: "kg",
     minOrder: 30,
     minOrderUnit: "kg",
-    image: "/placeholder.svg",
+    image: sacoPlasticoImg,
     category: "Plásticos",
     featured: true,
     stripePriceId: "price_1ScwuDAndfpC5YIBpp9VoACm",
@@ -39,7 +40,7 @@ export const products: Product[] = [
     unit: "kg",
     minOrder: 30,
     minOrderUnit: "kg",
-    image: "/placeholder.svg",
+    image: sacoPlasticoImg,
     category: "Plásticos",
     featured: true,
     stripePriceId: "price_1ScwuKAndfpC5YIBr26jz3UX",
