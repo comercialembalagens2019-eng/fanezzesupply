@@ -5,6 +5,7 @@ import sacoPlasticoImg from "@/assets/saco_plastico.webp";
 import stretchImg from "@/assets/stretch.webp";
 import onduladoImg from "@/assets/ondulado.webp";
 import plasticoBolhaImg from "@/assets/plastico_bolha.webp";
+import semiKraftImg from "@/assets/semi_kraft.webp";
 
 export const products: Product[] = [
   {
@@ -95,7 +96,7 @@ export const products: Product[] = [
     unit: "unidade",
     minOrder: 1,
     minOrderUnit: "unidade",
-    image: "/placeholder.svg",
+    image: semiKraftImg,
     category: "Papel",
     featured: true,
     stripePriceId: "price_1ScwuOAndfpC5YIB5kvSLv46",
