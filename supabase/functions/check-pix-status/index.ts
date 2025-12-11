@@ -9,6 +9,13 @@ interface CheckPixRequest {
   pixId: string;
 }
 
+// Validate pixId format (basic alphanumeric check)
+function isValidPixId(pixId: string): boolean {
+  if (!pixId || typeof pixId !== 'string') return false;
+  // AbacatePay IDs are typically alphanumeric
+  return /^[a-zA-Z0-9_-]{5,100}$/.test(pixId);
+}
+
 serve(async (req: Request): Promise<Response> => {
   // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
@@ -19,7 +26,7 @@ serve(async (req: Request): Promise<Response> => {
     const apiKey = Deno.env.get('ABACATEPAY_API_KEY');
     
     if (!apiKey) {
-      console.error('ABACATEPAY_API_KEY not configured');
+      console.error('[PIX-STATUS] API key not configured');
       throw new Error('API key not configured');
     }
 
@@ -32,9 +39,16 @@ serve(async (req: Request): Promise<Response> => {
       );
     }
 
-    console.log('Checking PIX status for:', pixId);
+    if (!isValidPixId(pixId)) {
+      return new Response(
+        JSON.stringify({ error: 'Invalid pixId format' }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
 
-    const response = await fetch(`https://api.abacatepay.com/v1/pixQrCode/check?id=${pixId}`, {
+    console.log('[PIX-STATUS] Checking status for pixId:', pixId.substring(0, 8) + '...');
+
+    const response = await fetch(`https://api.abacatepay.com/v1/pixQrCode/check?id=${encodeURIComponent(pixId)}`, {
       method: 'GET',
       headers: {
         'Authorization': `Bearer ${apiKey}`,
@@ -42,13 +56,12 @@ serve(async (req: Request): Promise<Response> => {
     });
 
     const responseText = await response.text();
-    console.log('AbacatePay check response status:', response.status);
-    console.log('AbacatePay check response:', responseText);
+    console.log('[PIX-STATUS] Response status:', response.status);
 
     if (!response.ok) {
-      console.error('AbacatePay check error:', responseText);
+      console.error('[PIX-STATUS] API error, status:', response.status);
       return new Response(
-        JSON.stringify({ error: 'Failed to check PIX status', details: responseText }),
+        JSON.stringify({ error: 'Failed to check PIX status' }),
         { 
           status: response.status, 
           headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
@@ -57,13 +70,14 @@ serve(async (req: Request): Promise<Response> => {
     }
 
     const data = JSON.parse(responseText);
+    console.log('[PIX-STATUS] Status retrieved:', data?.data?.status);
     
     return new Response(JSON.stringify(data), {
       status: 200,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
   } catch (error: unknown) {
-    console.error('Error in check-pix-status function:', error);
+    console.error('[PIX-STATUS] Error:', error instanceof Error ? error.message : 'Unknown error');
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
     return new Response(
       JSON.stringify({ error: errorMessage }),

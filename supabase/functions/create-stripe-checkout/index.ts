@@ -23,6 +23,82 @@ interface CheckoutRequest {
   customerName: string;
 }
 
+interface ValidationError {
+  field: string;
+  message: string;
+}
+
+// Validate email format
+function isValidEmail(email: string): boolean {
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  return emailRegex.test(email);
+}
+
+// Validate UUID format
+function isValidUUID(uuid: string): boolean {
+  const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+  return uuidRegex.test(uuid);
+}
+
+// Validate the checkout request
+function validateCheckoutRequest(data: CheckoutRequest): ValidationError[] {
+  const errors: ValidationError[] = [];
+
+  // Items validation
+  if (!data.items || !Array.isArray(data.items) || data.items.length === 0) {
+    errors.push({ field: 'items', message: 'Cart is empty' });
+    return errors;
+  }
+
+  if (data.items.length > 50) {
+    errors.push({ field: 'items', message: 'Too many items in cart' });
+  }
+
+  // Validate each item
+  for (let i = 0; i < data.items.length; i++) {
+    const item = data.items[i];
+    
+    if (!item.productId || item.productId.length > 100) {
+      errors.push({ field: `items[${i}].productId`, message: 'Invalid product ID' });
+    }
+    
+    if (!item.productName || item.productName.length > 200) {
+      errors.push({ field: `items[${i}].productName`, message: 'Invalid product name' });
+    }
+    
+    if (!item.quantity || item.quantity < 1 || item.quantity > 10000) {
+      errors.push({ field: `items[${i}].quantity`, message: 'Invalid quantity' });
+    }
+    
+    if (!item.unitPrice || item.unitPrice < 0 || item.unitPrice > 1000000) {
+      errors.push({ field: `items[${i}].unitPrice`, message: 'Invalid price' });
+    }
+  }
+
+  // Company ID validation
+  if (!data.companyId) {
+    errors.push({ field: 'companyId', message: 'Company ID is required' });
+  } else if (!isValidUUID(data.companyId)) {
+    errors.push({ field: 'companyId', message: 'Invalid company ID format' });
+  }
+
+  // Customer email validation
+  if (!data.customerEmail) {
+    errors.push({ field: 'customerEmail', message: 'Customer email is required' });
+  } else if (!isValidEmail(data.customerEmail)) {
+    errors.push({ field: 'customerEmail', message: 'Invalid email format' });
+  }
+
+  // Customer name validation
+  if (!data.customerName || data.customerName.trim().length < 2) {
+    errors.push({ field: 'customerName', message: 'Customer name is required' });
+  } else if (data.customerName.length > 100) {
+    errors.push({ field: 'customerName', message: 'Customer name too long' });
+  }
+
+  return errors;
+}
+
 serve(async (req) => {
   // Handle CORS preflight requests
   if (req.method === "OPTIONS") {
@@ -30,7 +106,7 @@ serve(async (req) => {
   }
 
   try {
-    console.log("[CREATE-STRIPE-CHECKOUT] Function started");
+    console.log("[STRIPE] Checkout function started");
 
     const stripeKey = Deno.env.get("STRIPE_SECRET_KEY");
     if (!stripeKey) {
@@ -51,13 +127,21 @@ serve(async (req) => {
       user = data.user;
     }
 
-    const { items, companyId, customerEmail, customerName }: CheckoutRequest = await req.json();
+    const requestData: CheckoutRequest = await req.json();
 
-    if (!items || items.length === 0) {
-      throw new Error("Cart is empty");
+    // Validate request
+    const validationErrors = validateCheckoutRequest(requestData);
+    if (validationErrors.length > 0) {
+      console.log("[STRIPE] Validation failed:", validationErrors.map(e => e.field).join(', '));
+      return new Response(
+        JSON.stringify({ error: 'Validation failed', details: validationErrors }),
+        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
     }
 
-    console.log("[CREATE-STRIPE-CHECKOUT] Processing checkout for", items.length, "items");
+    const { items, companyId, customerEmail, customerName } = requestData;
+
+    console.log("[STRIPE] Processing checkout, items:", items.length, "companyId:", companyId.substring(0, 8) + '...');
 
     const stripe = new Stripe(stripeKey, {
       apiVersion: "2025-08-27.basil",
@@ -69,20 +153,18 @@ serve(async (req) => {
       const customers = await stripe.customers.list({ email: customerEmail, limit: 1 });
       if (customers.data.length > 0) {
         customerId = customers.data[0].id;
-        console.log("[CREATE-STRIPE-CHECKOUT] Found existing customer:", customerId);
+        console.log("[STRIPE] Found existing customer");
       }
     }
 
     // Build line items using Stripe price IDs
     const lineItems = items.map((item) => {
       if (item.stripePriceId) {
-        // Use the actual Stripe price ID
         return {
           price: item.stripePriceId,
           quantity: item.quantity,
         };
       } else {
-        // Fallback to price_data for products without Stripe price ID
         return {
           price_data: {
             currency: "brl",
@@ -129,11 +211,11 @@ serve(async (req) => {
       .single();
 
     if (orderError) {
-      console.error("[CREATE-STRIPE-CHECKOUT] Order creation error:", orderError);
+      console.error("[STRIPE] Order creation failed");
       throw new Error("Failed to create order");
     }
 
-    console.log("[CREATE-STRIPE-CHECKOUT] Order created:", order.id);
+    console.log("[STRIPE] Order created:", order.id);
 
     const origin = req.headers.get("origin") || "https://stzsmhpaixxjgdrrqvmi.lovable.app";
 
@@ -158,7 +240,7 @@ serve(async (req) => {
       },
     });
 
-    console.log("[CREATE-STRIPE-CHECKOUT] Checkout session created:", session.id);
+    console.log("[STRIPE] Checkout session created:", session.id);
 
     // Update order with payment session info
     await supabaseServiceClient
@@ -179,7 +261,7 @@ serve(async (req) => {
     );
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error);
-    console.error("[CREATE-STRIPE-CHECKOUT] Error:", errorMessage);
+    console.error("[STRIPE] Error:", errorMessage);
     return new Response(
       JSON.stringify({ error: errorMessage }),
       {
