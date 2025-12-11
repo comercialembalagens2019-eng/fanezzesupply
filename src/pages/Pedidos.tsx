@@ -65,9 +65,14 @@ const getStatusConfig = (status: string) => {
       return { label: 'Pago', icon: CheckCircle, color: 'bg-green-100 text-green-800 border-green-200' };
     case 'pending':
       return { label: 'Pendente', icon: Clock, color: 'bg-amber-100 text-amber-800 border-amber-200' };
+    case 'processing':
+      return { label: 'Processando', icon: Loader2, color: 'bg-blue-100 text-blue-800 border-blue-200' };
     case 'cancelled':
-    case 'failed':
       return { label: 'Cancelado', icon: XCircle, color: 'bg-red-100 text-red-800 border-red-200' };
+    case 'failed':
+      return { label: 'Falhou', icon: XCircle, color: 'bg-red-100 text-red-800 border-red-200' };
+    case 'expired':
+      return { label: 'Expirado', icon: Clock, color: 'bg-gray-100 text-gray-800 border-gray-200' };
     default:
       return { label: status, icon: Package, color: 'bg-muted text-muted-foreground border-border' };
   }
