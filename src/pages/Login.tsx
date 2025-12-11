@@ -11,8 +11,7 @@ const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [isSignUp, setIsSignUp] = useState(false);
-  const { signIn, signUp, user, isAdmin } = useAuth();
+  const { signIn, user, isAdmin } = useAuth();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -30,42 +29,22 @@ const Login = () => {
     setIsLoading(true);
 
     try {
-      if (isSignUp) {
-        const { error } = await signUp(email, password);
-        if (error) {
-          if (error.message.includes('already registered')) {
-            toast({
-              title: "Email já cadastrado",
-              description: "Este email já está registrado. Tente fazer login.",
-              variant: "destructive",
-            });
-          } else {
-            throw error;
-          }
-        } else {
+      const { error } = await signIn(email, password);
+      if (error) {
+        if (error.message.includes('Invalid login credentials')) {
           toast({
-            title: "Conta criada!",
-            description: "Sua conta foi criada com sucesso.",
+            title: "Credenciais inválidas",
+            description: "Email ou senha incorretos.",
+            variant: "destructive",
           });
+        } else {
+          throw error;
         }
       } else {
-        const { error } = await signIn(email, password);
-        if (error) {
-          if (error.message.includes('Invalid login credentials')) {
-            toast({
-              title: "Credenciais inválidas",
-              description: "Email ou senha incorretos.",
-              variant: "destructive",
-            });
-          } else {
-            throw error;
-          }
-        } else {
-          toast({
-            title: "Login realizado!",
-            description: "Bem-vindo de volta.",
-          });
-        }
+        toast({
+          title: "Login realizado!",
+          description: "Bem-vindo de volta.",
+        });
       }
     } catch (error) {
       console.error('Auth error:', error);
@@ -99,13 +78,10 @@ const Login = () => {
           </Link>
 
           <h1 className="font-display text-4xl lg:text-5xl font-bold text-beige mb-6">
-            {isSignUp ? "Crie sua conta" : "Bem-vindo de volta"}
+            Bem-vindo de volta
           </h1>
           <p className="text-lg text-beige/80 max-w-md">
-            {isSignUp 
-              ? "Cadastre-se para acessar nossa plataforma e gerenciar seus pedidos."
-              : "Acesse sua conta e continue comprando as melhores embalagens para sua empresa."
-            }
+            Acesse sua conta e continue comprando as melhores embalagens para sua empresa.
           </p>
         </div>
       </div>
@@ -125,10 +101,10 @@ const Login = () => {
 
           <div className="text-center lg:text-left mb-8">
             <h2 className="font-display text-2xl font-bold text-foreground mb-2">
-              {isSignUp ? "Criar nova conta" : "Entrar na sua conta"}
+              Entrar na sua conta
             </h2>
             <p className="text-muted-foreground">
-              {isSignUp ? "Preencha os dados para se cadastrar" : "Digite seu email e senha para acessar"}
+              Digite seu email e senha para acessar
             </p>
           </div>
 
@@ -157,14 +133,12 @@ const Login = () => {
                 <label className="text-sm font-medium text-foreground">
                   Senha
                 </label>
-                {!isSignUp && (
-                  <Link
-                    to="/esqueci-senha"
-                    className="text-sm text-primary hover:underline"
-                  >
-                    Esqueci minha senha
-                  </Link>
-                )}
+                <Link
+                  to="/esqueci-senha"
+                  className="text-sm text-primary hover:underline"
+                >
+                  Esqueci minha senha
+                </Link>
               </div>
               <div className="relative">
                 <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
@@ -191,44 +165,42 @@ const Login = () => {
               </div>
             </div>
 
-            {/* Remember Me (only for login) */}
-            {!isSignUp && (
-              <div className="flex items-center gap-2">
-                <input
-                  type="checkbox"
-                  id="remember"
-                  checked={rememberMe}
-                  onChange={(e) => setRememberMe(e.target.checked)}
-                  className="w-4 h-4 rounded border-border text-primary focus:ring-primary"
-                />
-                <label htmlFor="remember" className="text-sm text-muted-foreground">
-                  Lembrar-me
-                </label>
-              </div>
-            )}
+            {/* Remember Me */}
+            <div className="flex items-center gap-2">
+              <input
+                type="checkbox"
+                id="remember"
+                checked={rememberMe}
+                onChange={(e) => setRememberMe(e.target.checked)}
+                className="w-4 h-4 rounded border-border text-primary focus:ring-primary"
+              />
+              <label htmlFor="remember" className="text-sm text-muted-foreground">
+                Lembrar-me
+              </label>
+            </div>
 
             {/* Submit */}
             <Button type="submit" size="lg" className="w-full" disabled={isLoading}>
               {isLoading ? (
                 <>
                   <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                  {isSignUp ? "Criando conta..." : "Entrando..."}
+                  Entrando...
                 </>
               ) : (
-                isSignUp ? "Criar conta" : "Entrar"
+                "Entrar"
               )}
             </Button>
           </form>
 
-          {/* Toggle Sign Up / Login */}
+          {/* Link to full registration */}
           <p className="text-center mt-8 text-muted-foreground">
-            {isSignUp ? "Já tem uma conta?" : "Ainda não tem conta?"}{" "}
-            <button 
-              onClick={() => setIsSignUp(!isSignUp)}
+            Ainda não tem conta?{" "}
+            <Link 
+              to="/cadastro"
               className="text-primary font-medium hover:underline"
             >
-              {isSignUp ? "Entrar" : "Cadastre-se"}
-            </button>
+              Cadastre-se
+            </Link>
           </p>
         </div>
       </div>
