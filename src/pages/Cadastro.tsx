@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { Package, Building2, MapPin, Phone, User, Lock, Check, ArrowLeft, ArrowRight, AlertCircle } from "lucide-react";
+import { Package, Building2, MapPin, Phone, Lock, Check, ArrowLeft, ArrowRight, AlertCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { toast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
@@ -9,18 +9,14 @@ const steps = [
   { id: 1, title: "Dados da Empresa", icon: Building2 },
   { id: 2, title: "Endereço", icon: MapPin },
   { id: 3, title: "Contatos", icon: Phone },
-  { id: 4, title: "Responsável", icon: User },
-  { id: 5, title: "Senha", icon: Lock },
+  { id: 4, title: "Senha", icon: Lock },
 ];
-
 
 const estados = [
   "AC", "AL", "AP", "AM", "BA", "CE", "DF", "ES", "GO", "MA",
   "MT", "MS", "MG", "PA", "PB", "PR", "PE", "PI", "RJ", "RN",
   "RS", "RO", "RR", "SC", "SP", "SE", "TO",
 ];
-
-const cargos = ["Sócio", "Administrador", "Diretor", "Gerente", "Outro"];
 
 const Cadastro = () => {
   const [currentStep, setCurrentStep] = useState(1);
@@ -49,14 +45,7 @@ const Cadastro = () => {
   const [whatsapp, setWhatsapp] = useState("");
   const [email, setEmail] = useState("");
 
-  // Step 4 - Responsible
-  const [nomeCompleto, setNomeCompleto] = useState("");
-  const [cpf, setCpf] = useState("");
-  const [rg, setRg] = useState("");
-  const [cargo, setCargo] = useState("");
-  const [dataNascimento, setDataNascimento] = useState("");
-
-  // Step 5 - Password
+  // Step 4 - Password
   const [senha, setSenha] = useState("");
   const [confirmarSenha, setConfirmarSenha] = useState("");
   const [aceitaTermos, setAceitaTermos] = useState(false);
@@ -70,15 +59,6 @@ const Cadastro = () => {
       .replace(/\.(\d{3})(\d)/, ".$1/$2")
       .replace(/(\d{4})(\d)/, "$1-$2")
       .slice(0, 18);
-  };
-
-  const maskCPF = (value: string) => {
-    return value
-      .replace(/\D/g, "")
-      .replace(/(\d{3})(\d)/, "$1.$2")
-      .replace(/(\d{3})(\d)/, "$1.$2")
-      .replace(/(\d{3})(\d{1,2})/, "$1-$2")
-      .slice(0, 14);
   };
 
   const maskPhone = (value: string) => {
@@ -115,7 +95,7 @@ const Cadastro = () => {
   };
 
   const handleNext = () => {
-    if (currentStep < 5) {
+    if (currentStep < 4) {
       setCurrentStep(currentStep + 1);
     }
   };
@@ -324,7 +304,6 @@ const Cadastro = () => {
                         required
                       />
                     </div>
-
                   </div>
                 </div>
               )}
@@ -478,86 +457,8 @@ const Cadastro = () => {
                 </div>
               )}
 
-              {/* Step 4 - Responsible */}
+              {/* Step 4 - Password */}
               {currentStep === 4 && (
-                <div className="space-y-5 animate-fade-in">
-                  <h2 className="font-display font-semibold text-lg text-foreground mb-4">
-                    Dados do Responsável Legal
-                  </h2>
-
-                  <div className="p-4 rounded-lg bg-accent/50 border border-accent flex items-start gap-3">
-                    <AlertCircle className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
-                    <p className="text-sm text-foreground">
-                      Esses dados serão utilizados para análise de crédito em Serasa, Boa Vista e SPC.
-                    </p>
-                  </div>
-
-                  <div className="grid md:grid-cols-2 gap-5">
-                    <div className="md:col-span-2">
-                      <label className="text-sm font-medium text-foreground">Nome Completo *</label>
-                      <input
-                        type="text"
-                        value={nomeCompleto}
-                        onChange={(e) => setNomeCompleto(e.target.value)}
-                        className="w-full h-11 px-4 mt-1.5 rounded-lg border border-border bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
-                        required
-                      />
-                    </div>
-
-                    <div>
-                      <label className="text-sm font-medium text-foreground">CPF *</label>
-                      <input
-                        type="text"
-                        value={cpf}
-                        onChange={(e) => setCpf(maskCPF(e.target.value))}
-                        placeholder="000.000.000-00"
-                        className="w-full h-11 px-4 mt-1.5 rounded-lg border border-border bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
-                        required
-                      />
-                    </div>
-
-                    <div>
-                      <label className="text-sm font-medium text-foreground">RG *</label>
-                      <input
-                        type="text"
-                        value={rg}
-                        onChange={(e) => setRg(e.target.value)}
-                        className="w-full h-11 px-4 mt-1.5 rounded-lg border border-border bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
-                        required
-                      />
-                    </div>
-
-                    <div>
-                      <label className="text-sm font-medium text-foreground">Cargo *</label>
-                      <select
-                        value={cargo}
-                        onChange={(e) => setCargo(e.target.value)}
-                        className="w-full h-11 px-4 mt-1.5 rounded-lg border border-border bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
-                        required
-                      >
-                        <option value="">Selecione</option>
-                        {cargos.map((c) => (
-                          <option key={c} value={c}>{c}</option>
-                        ))}
-                      </select>
-                    </div>
-
-                    <div>
-                      <label className="text-sm font-medium text-foreground">Data de Nascimento *</label>
-                      <input
-                        type="date"
-                        value={dataNascimento}
-                        onChange={(e) => setDataNascimento(e.target.value)}
-                        className="w-full h-11 px-4 mt-1.5 rounded-lg border border-border bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
-                        required
-                      />
-                    </div>
-                  </div>
-                </div>
-              )}
-
-              {/* Step 5 - Password */}
-              {currentStep === 5 && (
                 <div className="space-y-5 animate-fade-in">
                   <h2 className="font-display font-semibold text-lg text-foreground mb-4">
                     Criar Senha
@@ -627,7 +528,7 @@ const Cadastro = () => {
                   Voltar
                 </Button>
 
-                {currentStep < 5 ? (
+                {currentStep < 4 ? (
                   <Button type="button" onClick={handleNext} className="gap-2">
                     Próximo
                     <ArrowRight className="w-4 h-4" />

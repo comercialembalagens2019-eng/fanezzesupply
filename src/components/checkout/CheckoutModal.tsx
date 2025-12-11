@@ -9,7 +9,7 @@ import { useCart } from "@/contexts/CartContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
-import { Loader2, QrCode, Building2, MapPin, Phone, User, ChevronRight, ChevronLeft, CheckCircle, Copy, Home, ShoppingBag, PartyPopper, CreditCard } from "lucide-react";
+import { Loader2, QrCode, Building2, MapPin, Phone, ChevronRight, ChevronLeft, CheckCircle, Copy, Home, ShoppingBag, PartyPopper, CreditCard } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
 
@@ -46,14 +46,6 @@ interface ContactData {
   email: string;
 }
 
-interface ResponsibleData {
-  nomeCompleto: string;
-  cpf: string;
-  rg: string;
-  cargo: string;
-  dataNascimento: string;
-}
-
 const formatCNPJ = (value: string) => {
   return value
     .replace(/\D/g, '')
@@ -62,15 +54,6 @@ const formatCNPJ = (value: string) => {
     .replace(/\.(\d{3})(\d)/, '.$1/$2')
     .replace(/(\d{4})(\d)/, '$1-$2')
     .slice(0, 18);
-};
-
-const formatCPF = (value: string) => {
-  return value
-    .replace(/\D/g, '')
-    .replace(/(\d{3})(\d)/, '$1.$2')
-    .replace(/(\d{3})(\d)/, '$1.$2')
-    .replace(/(\d{3})(\d{1,2})/, '$1-$2')
-    .slice(0, 14);
 };
 
 const formatPhone = (value: string) => {
@@ -132,14 +115,6 @@ export const CheckoutModal = ({ open, onOpenChange }: CheckoutModalProps) => {
     email: '',
   });
 
-  const [responsibleData, setResponsibleData] = useState<ResponsibleData>({
-    nomeCompleto: '',
-    cpf: '',
-    rg: '',
-    cargo: '',
-    dataNascimento: '',
-  });
-
   // Load existing company data for logged-in users
   useEffect(() => {
     const loadUserCompany = async () => {
@@ -186,16 +161,9 @@ export const CheckoutModal = ({ open, onOpenChange }: CheckoutModalProps) => {
             whatsapp: company.whatsapp || '',
             email: company.email || '',
           });
-          setResponsibleData({
-            nomeCompleto: company.responsavel_nome || '',
-            cpf: formatCPF(company.responsavel_cpf || ''),
-            rg: company.responsavel_rg || '',
-            cargo: company.responsavel_cargo || '',
-            dataNascimento: company.responsavel_nascimento || '',
-          });
           
-          // Skip directly to step 4 (summary) if all required data is filled
-          if (company.razao_social && company.cnpj && company.endereco && company.whatsapp && company.responsavel_nome && company.responsavel_cpf) {
+          // Skip directly to step 4 (payment) if all required data is filled
+          if (company.razao_social && company.cnpj && company.endereco && company.whatsapp) {
             setStep(4);
           }
         }
@@ -343,11 +311,11 @@ export const CheckoutModal = ({ open, onOpenChange }: CheckoutModalProps) => {
           telefone_fixo: contactData.telefoneFixo || null,
           whatsapp: contactData.whatsapp,
           email: contactData.email,
-          responsavel_nome: responsibleData.nomeCompleto,
-          responsavel_cpf: responsibleData.cpf.replace(/\D/g, ''),
-          responsavel_rg: responsibleData.rg || '',
-          responsavel_cargo: responsibleData.cargo,
-          responsavel_nascimento: responsibleData.dataNascimento || null,
+          responsavel_nome: companyData.nomeFantasia, // Use company name as fallback
+          responsavel_cpf: '00000000000', // Placeholder
+          responsavel_rg: '',
+          responsavel_cargo: 'socio',
+          responsavel_nascimento: null,
         })
         .eq('id', existingCompanyId)
         .select()
@@ -385,11 +353,11 @@ export const CheckoutModal = ({ open, onOpenChange }: CheckoutModalProps) => {
         telefone_fixo: contactData.telefoneFixo || null,
         whatsapp: contactData.whatsapp,
         email: contactData.email,
-        responsavel_nome: responsibleData.nomeCompleto,
-        responsavel_cpf: responsibleData.cpf.replace(/\D/g, ''),
-        responsavel_rg: responsibleData.rg || '',
-        responsavel_cargo: responsibleData.cargo,
-        responsavel_nascimento: responsibleData.dataNascimento || null,
+        responsavel_nome: companyData.nomeFantasia,
+        responsavel_cpf: '00000000000',
+        responsavel_rg: '',
+        responsavel_cargo: 'socio',
+        responsavel_nascimento: null,
       };
       
       // Link to user if logged in
@@ -428,11 +396,11 @@ export const CheckoutModal = ({ open, onOpenChange }: CheckoutModalProps) => {
         telefone_fixo: contactData.telefoneFixo || null,
         whatsapp: contactData.whatsapp,
         email: contactData.email,
-        responsavel_nome: responsibleData.nomeCompleto,
-        responsavel_cpf: responsibleData.cpf.replace(/\D/g, ''),
-        responsavel_rg: responsibleData.rg || '',
-        responsavel_cargo: responsibleData.cargo,
-        responsavel_nascimento: responsibleData.dataNascimento || null,
+        responsavel_nome: companyData.nomeFantasia,
+        responsavel_cpf: '00000000000',
+        responsavel_rg: '',
+        responsavel_cargo: 'socio',
+        responsavel_nascimento: null,
       };
       
       // Link to user if logged in
@@ -502,12 +470,12 @@ export const CheckoutModal = ({ open, onOpenChange }: CheckoutModalProps) => {
         return phone;
       };
 
-      // Use CPF with formatting for AbacatePay (expects format like "123.456.789-01")
+      // Use company name as customer name since we removed responsible person data
       const customer = {
-        name: responsibleData.nomeCompleto,
+        name: companyData.nomeFantasia || companyData.razaoSocial,
         cellphone: formatPhoneForApi(contactData.whatsapp),
         email: contactData.email,
-        taxId: responsibleData.cpf, // CPF already formatted from form
+        taxId: companyData.cnpj, // Use CNPJ instead of CPF
       };
 
       const { data, error } = await supabase.functions.invoke('create-pix-payment', {
@@ -589,7 +557,7 @@ export const CheckoutModal = ({ open, onOpenChange }: CheckoutModalProps) => {
           items: cartItems,
           companyId: company.id,
           customerEmail: contactData.email,
-          customerName: responsibleData.nomeCompleto,
+          customerName: companyData.nomeFantasia || companyData.razaoSocial,
         },
       });
 
@@ -635,7 +603,7 @@ export const CheckoutModal = ({ open, onOpenChange }: CheckoutModalProps) => {
       case 3:
         return !!(contactData.whatsapp && contactData.email);
       case 4:
-        return !!(responsibleData.nomeCompleto && responsibleData.cpf && responsibleData.cargo);
+        return true; // Payment step - just needs payment method selection
       default:
         return true;
     }
@@ -656,10 +624,9 @@ export const CheckoutModal = ({ open, onOpenChange }: CheckoutModalProps) => {
   const prevStep = () => setStep(prev => Math.max(prev - 1, 1));
 
   const stepTitles = [
-    { icon: Building2, label: "Dados da Empresa" },
+    { icon: Building2, label: "Empresa" },
     { icon: MapPin, label: "Endereço" },
     { icon: Phone, label: "Contatos" },
-    { icon: User, label: "Responsável" },
     { icon: QrCode, label: "Pagamento" },
   ];
 
@@ -685,7 +652,7 @@ export const CheckoutModal = ({ open, onOpenChange }: CheckoutModalProps) => {
             Finalizar Pedido
           </DialogTitle>
           <DialogDescription>
-            Complete o cadastro da sua empresa para gerar o pagamento via PIX
+            {user ? "Confirme os dados e escolha a forma de pagamento" : "Complete o cadastro da sua empresa para gerar o pagamento"}
           </DialogDescription>
         </DialogHeader>
 
@@ -693,7 +660,7 @@ export const CheckoutModal = ({ open, onOpenChange }: CheckoutModalProps) => {
         <div className="flex items-center justify-between mb-6 px-2">
           {stepTitles.map((s, index) => {
             const StepIcon = s.icon;
-            const isActive = step === index + 1;
+            const isActive = step === index + 1 || (step === 5 && index === 3);
             const isCompleted = step > index + 1;
             return (
               <div key={index} className="flex items-center">
@@ -951,71 +918,11 @@ export const CheckoutModal = ({ open, onOpenChange }: CheckoutModalProps) => {
           </div>
         )}
 
-        {/* Step 4: Responsible */}
-        {step === 4 && (
+        {/* Step 4: Payment Selection */}
+        {step === 4 && !paymentCreated && (
           <div className="space-y-4">
-            <div className="p-3 rounded-lg bg-blue-50 border border-blue-200 text-blue-800 text-sm">
-              Esses dados serão utilizados para análise de crédito em Serasa, Boa Vista e SPC.
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="md:col-span-2">
-                <Label htmlFor="nomeCompleto">Nome Completo *</Label>
-                <Input
-                  id="nomeCompleto"
-                  value={responsibleData.nomeCompleto}
-                  onChange={(e) => setResponsibleData(prev => ({ ...prev, nomeCompleto: e.target.value }))}
-                  placeholder="Nome completo do responsável"
-                />
-              </div>
-              <div>
-                <Label htmlFor="cpf">CPF *</Label>
-                <Input
-                  id="cpf"
-                  value={responsibleData.cpf}
-                  onChange={(e) => setResponsibleData(prev => ({ ...prev, cpf: formatCPF(e.target.value) }))}
-                  placeholder="000.000.000-00"
-                />
-              </div>
-              <div>
-                <Label htmlFor="rg">RG</Label>
-                <Input
-                  id="rg"
-                  value={responsibleData.rg}
-                  onChange={(e) => setResponsibleData(prev => ({ ...prev, rg: e.target.value }))}
-                  placeholder="Número do RG"
-                />
-              </div>
-              <div>
-                <Label htmlFor="cargo">Cargo *</Label>
-                <Select 
-                  value={responsibleData.cargo} 
-                  onValueChange={(value) => setResponsibleData(prev => ({ ...prev, cargo: value }))}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Selecione..." />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="socio">Sócio</SelectItem>
-                    <SelectItem value="administrador">Administrador</SelectItem>
-                    <SelectItem value="diretor">Diretor</SelectItem>
-                    <SelectItem value="procurador">Procurador</SelectItem>
-                    <SelectItem value="outro">Outro</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              <div>
-                <Label htmlFor="dataNascimento">Data de Nascimento</Label>
-                <Input
-                  id="dataNascimento"
-                  type="date"
-                  value={responsibleData.dataNascimento}
-                  onChange={(e) => setResponsibleData(prev => ({ ...prev, dataNascimento: e.target.value }))}
-                />
-              </div>
-            </div>
-
             {/* Order Summary */}
-            <div className="mt-6 p-4 rounded-lg bg-secondary/50 border">
+            <div className="p-4 rounded-lg bg-secondary/50 border">
               <h4 className="font-semibold text-foreground mb-3">Resumo do Pedido</h4>
               <div className="space-y-2 text-sm">
                 {items.map(item => (
@@ -1034,7 +941,7 @@ export const CheckoutModal = ({ open, onOpenChange }: CheckoutModalProps) => {
             </div>
 
             {/* Payment Method Selection */}
-            <div className="mt-6">
+            <div>
               <h4 className="font-semibold text-foreground mb-3">Forma de Pagamento</h4>
               <div className="grid grid-cols-2 gap-3">
                 <button
@@ -1184,7 +1091,7 @@ export const CheckoutModal = ({ open, onOpenChange }: CheckoutModalProps) => {
 
 
         {/* Navigation Buttons */}
-        {step < 5 && (
+        {step < 5 && !paymentCreated && (
           <div className="flex justify-between pt-4 border-t">
             <Button
               variant="outline"
@@ -1204,7 +1111,7 @@ export const CheckoutModal = ({ open, onOpenChange }: CheckoutModalProps) => {
             ) : (
               <Button 
                 onClick={paymentMethod === 'pix' ? handleCreatePayment : handleStripeCheckout} 
-                disabled={isLoading || !validateStep(4)}
+                disabled={isLoading}
                 className="gap-2"
               >
                 {isLoading ? (
