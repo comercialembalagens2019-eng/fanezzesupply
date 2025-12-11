@@ -37,15 +37,21 @@ serve(async (req: Request): Promise<Response> => {
     
     console.log('Creating PIX QR Code with AbacatePay:', JSON.stringify(requestData, null, 2));
 
+    // Clean taxId - remove all non-numeric characters
+    const cleanTaxId = requestData.customer.taxId.replace(/\D/g, '');
+    
+    // Clean cellphone - remove all non-numeric characters
+    const cleanCellphone = requestData.customer.cellphone.replace(/\D/g, '');
+    
     const pixPayload = {
       amount: requestData.amount,
       expiresIn: 3600, // 1 hora para expirar
       description: requestData.description,
       customer: {
         name: requestData.customer.name,
-        cellphone: requestData.customer.cellphone,
+        cellphone: cleanCellphone,
         email: requestData.customer.email,
-        taxId: requestData.customer.taxId,
+        taxId: cleanTaxId,
       },
       metadata: {
         externalId: requestData.externalId || Date.now().toString(),
