@@ -69,7 +69,14 @@ serve(async (req) => {
     console.log("[BOLETO] User authenticated:", userData.user.id.slice(0, 8) + "***");
 
     const body = await req.json();
-    const { amount, customer_email, customer_name, customer_cpf, order_id } = body;
+    const { 
+      amount, 
+      customer_email, 
+      customer_name, 
+      customer_cpf, 
+      order_id,
+      address 
+    } = body;
 
     // Validate inputs
     if (!amount || typeof amount !== "number") {
@@ -96,6 +103,11 @@ serve(async (req) => {
     const cpfDigits = (customer_cpf || "").replace(/\D/g, "");
     if (!cpfDigits || !isValidCPF(cpfDigits)) {
       throw new Error("CPF válido é obrigatório para pagamento via Boleto");
+    }
+
+    // Validate address (required by Stripe for Boleto)
+    if (!address || !address.line1 || !address.city || !address.state || !address.postal_code) {
+      throw new Error("Endereço completo é obrigatório para pagamento via Boleto");
     }
 
     console.log("[BOLETO] Creating payment:", { 
@@ -128,6 +140,14 @@ serve(async (req) => {
         billing_details: {
           name: customer_name,
           email: customer_email,
+          address: {
+            line1: address.line1,
+            line2: address.line2 || undefined,
+            city: address.city,
+            state: address.state,
+            postal_code: address.postal_code,
+            country: "BR",
+          },
         },
       },
       confirm: true, // Confirm immediately to generate boleto
