@@ -84,6 +84,7 @@ export const CheckoutModal = ({ open, onOpenChange }: CheckoutModalProps) => {
   const [paymentConfirmed, setPaymentConfirmed] = useState(false);
   const [existingCompanyId, setExistingCompanyId] = useState<string | null>(null);
   const [currentOrderId, setCurrentOrderId] = useState<string | null>(null);
+  const [currentPixId, setCurrentPixId] = useState<string | null>(null);
   const [paymentMethod, setPaymentMethod] = useState<'pix' | 'card'>('pix');
   const navigate = useNavigate();
 
@@ -194,13 +195,13 @@ export const CheckoutModal = ({ open, onOpenChange }: CheckoutModalProps) => {
     }, 4000);
   };
 
-  // Listen for payment confirmation via Realtime + Polling fallback
+  // Listen for payment confirmation via AbacatePay API + Realtime + DB Polling
   useEffect(() => {
     if (!paymentCreated || !currentOrderId || paymentConfirmed) return;
 
-    console.log('Starting realtime subscription and polling for order:', currentOrderId);
+    console.log('Starting payment status monitoring for order:', currentOrderId, 'pixId:', currentPixId);
 
-    // Setup Supabase Realtime subscription for instant updates
+    // Setup Supabase Realtime subscription for instant updates from webhook
     const channel = supabase
       .channel(`order-${currentOrderId}`)
       .on(
@@ -222,8 +223,39 @@ export const CheckoutModal = ({ open, onOpenChange }: CheckoutModalProps) => {
         console.log('Realtime subscription status:', status);
       });
 
-    // Polling fallback (every 10 seconds) in case realtime misses something
-    const checkPaymentStatus = async () => {
+    // Check PIX status directly with AbacatePay API
+    const checkPixStatus = async () => {
+      if (!currentPixId) return;
+      
+      try {
+        console.log('Checking PIX status via AbacatePay API...');
+        const { data, error } = await supabase.functions.invoke('check-pix-status', {
+          body: { pixId: currentPixId },
+        });
+
+        if (error) {
+          console.error('Error checking PIX status:', error);
+          return;
+        }
+
+        console.log('PIX status response:', data);
+        
+        if (data?.data?.status === 'PAID') {
+          // Update order status in database
+          await supabase
+            .from('orders')
+            .update({ status: 'paid' })
+            .eq('id', currentOrderId);
+          
+          handlePaymentConfirmed();
+        }
+      } catch (error) {
+        console.error('Error in PIX status check:', error);
+      }
+    };
+
+    // DB polling fallback
+    const checkDbStatus = async () => {
       try {
         const { data: order, error } = await supabase
           .from('orders')
@@ -232,7 +264,7 @@ export const CheckoutModal = ({ open, onOpenChange }: CheckoutModalProps) => {
           .maybeSingle();
 
         if (error) {
-          console.error('Error checking payment status:', error);
+          console.error('Error checking DB status:', error);
           return;
         }
 
@@ -240,22 +272,25 @@ export const CheckoutModal = ({ open, onOpenChange }: CheckoutModalProps) => {
           handlePaymentConfirmed();
         }
       } catch (error) {
-        console.error('Error in payment polling:', error);
+        console.error('Error in DB polling:', error);
       }
     };
 
     // Check immediately
-    checkPaymentStatus();
+    checkPixStatus();
+    checkDbStatus();
 
-    // Poll every 10 seconds as fallback
-    const intervalId = setInterval(checkPaymentStatus, 10000);
+    // Poll PIX status every 5 seconds, DB every 10 seconds
+    const pixIntervalId = setInterval(checkPixStatus, 5000);
+    const dbIntervalId = setInterval(checkDbStatus, 10000);
 
     return () => {
-      console.log('Cleaning up realtime subscription');
+      console.log('Cleaning up payment monitoring');
       supabase.removeChannel(channel);
-      clearInterval(intervalId);
+      clearInterval(pixIntervalId);
+      clearInterval(dbIntervalId);
     };
-  }, [paymentCreated, currentOrderId, paymentConfirmed, clearCart, onOpenChange, navigate]);
+  }, [paymentCreated, currentOrderId, currentPixId, paymentConfirmed, clearCart, onOpenChange, navigate]);
 
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat("pt-BR", {
@@ -499,6 +534,11 @@ export const CheckoutModal = ({ open, onOpenChange }: CheckoutModalProps) => {
         
         // Save company ID
         setExistingCompanyId(company.id);
+        
+        // Store PIX ID for status checking
+        if (paymentData.id) {
+          setCurrentPixId(paymentData.id);
+        }
         
         // Save order with brCode for reference and get order ID
         const savedOrder = await saveOrder(company.id, paymentData.brCode || paymentData.id);
