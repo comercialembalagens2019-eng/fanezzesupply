@@ -451,13 +451,13 @@ export const CheckoutModal = ({ open, onOpenChange }: CheckoutModalProps) => {
       // Save company data first
       const company = await saveCompanyData();
 
-      // Build description from items
-      const description = items.map(item => 
-        `${item.product.name} x ${item.quantity} ${item.product.unit}`
-      ).join(', ');
-
-      // Calculate total in cents (minimum R$1.00 = 100 cents required by AbacatePay)
-      const totalInCents = Math.max(100, Math.round(getTotal() * 100));
+      // Build products array for AbacatePay billing API
+      const products = items.map(item => ({
+        externalId: item.product.id,
+        name: `${item.product.name} (${item.quantity} ${item.product.unit})`,
+        quantity: 1, // We represent quantity in the name and use total price
+        price: Math.max(100, Math.round(item.product.price * item.quantity * 100)), // Price in cents, minimum R$1.00
+      }));
 
       // Format phone number for AbacatePay (expects format like "(11) 4002-8922")
       const formatPhoneForApi = (phone: string) => {
@@ -475,15 +475,16 @@ export const CheckoutModal = ({ open, onOpenChange }: CheckoutModalProps) => {
         name: companyData.nomeFantasia || companyData.razaoSocial,
         cellphone: formatPhoneForApi(contactData.whatsapp),
         email: contactData.email,
-        taxId: companyData.cnpj, // Use CNPJ instead of CPF
+        taxId: companyData.cnpj, // Use CNPJ
       };
 
       const { data, error } = await supabase.functions.invoke('create-pix-payment', {
         body: {
-          amount: totalInCents,
-          description: description.slice(0, 200), // Limit description length
+          products,
           customer,
           externalId: company.id,
+          returnUrl: `${window.location.origin}/pedidos`,
+          completionUrl: `${window.location.origin}/pedidos`,
         },
       });
 

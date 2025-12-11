@@ -90,11 +90,16 @@ serve(async (req: Request): Promise<Response> => {
       // Extract metadata to find the order
       let externalId: string | null = null;
       
-      // Check if it's from pixQrCode or billing
+      // Check different locations for externalId based on API version
       if (paymentData.pixQrCode?.metadata?.externalId) {
+        // Old pixQrCode format
         externalId = paymentData.pixQrCode.metadata.externalId;
-      } else if (paymentData.billing?.products?.[0]?.externalId) {
-        externalId = paymentData.billing.products[0].externalId;
+      } else if (paymentData.billing?.metadata?.externalId) {
+        // New billing format - metadata at billing level
+        externalId = paymentData.billing.metadata.externalId;
+      } else if (paymentData.metadata?.externalId) {
+        // Direct metadata on data object
+        externalId = paymentData.metadata.externalId;
       }
 
       console.log('External ID (company_id):', externalId);
