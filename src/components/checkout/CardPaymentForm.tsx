@@ -12,6 +12,8 @@ interface CardPaymentFormProps {
   total: string;
 }
 
+export type CardType = 'credit' | 'debit';
+
 export const CardPaymentForm = ({ onSubmit, isLoading, total }: CardPaymentFormProps) => {
   const [cardNumber, setCardNumber] = useState("");
   const [cardName, setCardName] = useState("");
@@ -22,6 +24,7 @@ export const CardPaymentForm = ({ onSubmit, isLoading, total }: CardPaymentFormP
   const [cardBrand, setCardBrand] = useState<CardBrand>('unknown');
   const [isCardValid, setIsCardValid] = useState<boolean | null>(null);
   const [isExpiryValid, setIsExpiryValid] = useState<boolean | null>(null);
+  const [cardType, setCardType] = useState<CardType>('credit');
 
   // Format card number with spaces
   const formatCardNumber = (value: string) => {
@@ -142,7 +145,40 @@ export const CardPaymentForm = ({ onSubmit, isLoading, total }: CardPaymentFormP
 
       {/* Card Form */}
       <div className="space-y-4 bg-secondary/30 rounded-xl p-4 border">
-        <div className="flex items-center gap-2 text-sm text-muted-foreground mb-2">
+        {/* Credit/Debit Selection */}
+        <div>
+          <Label className="mb-2 block">Tipo de Cartão</Label>
+          <div className="grid grid-cols-2 gap-3">
+            <button
+              type="button"
+              onClick={() => setCardType('credit')}
+              className={cn(
+                "flex items-center justify-center gap-2 py-3 px-4 rounded-lg border-2 transition-all font-medium",
+                cardType === 'credit'
+                  ? "border-primary bg-primary/10 text-primary"
+                  : "border-muted bg-background hover:border-primary/50 text-muted-foreground"
+              )}
+            >
+              <CreditCard className="w-5 h-5" />
+              Crédito
+            </button>
+            <button
+              type="button"
+              onClick={() => setCardType('debit')}
+              className={cn(
+                "flex items-center justify-center gap-2 py-3 px-4 rounded-lg border-2 transition-all font-medium",
+                cardType === 'debit'
+                  ? "border-primary bg-primary/10 text-primary"
+                  : "border-muted bg-background hover:border-primary/50 text-muted-foreground"
+              )}
+            >
+              <CreditCard className="w-5 h-5" />
+              Débito
+            </button>
+          </div>
+        </div>
+
+        <div className="flex items-center gap-2 text-sm text-muted-foreground">
           <Lock className="w-4 h-4" />
           <span>Seus dados estão protegidos</span>
         </div>
