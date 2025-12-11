@@ -28,6 +28,33 @@ export const detectCardBrand = (cardNumber: string): CardBrand => {
   return 'unknown';
 };
 
+// Luhn Algorithm validation
+export const validateLuhn = (cardNumber: string): boolean => {
+  const num = cardNumber.replace(/\D/g, '');
+  
+  if (num.length < 13 || num.length > 19) return false;
+  
+  let sum = 0;
+  let isEven = false;
+  
+  // Loop through values starting from the rightmost
+  for (let i = num.length - 1; i >= 0; i--) {
+    let digit = parseInt(num[i], 10);
+    
+    if (isEven) {
+      digit *= 2;
+      if (digit > 9) {
+        digit -= 9;
+      }
+    }
+    
+    sum += digit;
+    isEven = !isEven;
+  }
+  
+  return sum % 10 === 0;
+};
+
 interface MetallicCardProps {
   cardNumber: string;
   cardName: string;

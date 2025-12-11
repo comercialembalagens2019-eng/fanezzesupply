@@ -2,8 +2,9 @@ import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
-import { MetallicCard, detectCardBrand, CardBrand } from "./MetallicCard";
-import { CreditCard, Lock, Loader2 } from "lucide-react";
+import { MetallicCard, detectCardBrand, validateLuhn, CardBrand } from "./MetallicCard";
+import { CreditCard, Lock, Loader2, CheckCircle, XCircle } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 interface CardPaymentFormProps {
   onSubmit: () => void;
@@ -19,6 +20,7 @@ export const CardPaymentForm = ({ onSubmit, isLoading, total }: CardPaymentFormP
   const [isFlipped, setIsFlipped] = useState(false);
   const [displayNumber, setDisplayNumber] = useState("");
   const [cardBrand, setCardBrand] = useState<CardBrand>('unknown');
+  const [isCardValid, setIsCardValid] = useState<boolean | null>(null);
 
   // Format card number with spaces
   const formatCardNumber = (value: string) => {
@@ -45,6 +47,13 @@ export const CardPaymentForm = ({ onSubmit, isLoading, total }: CardPaymentFormP
     setCardNumber(raw);
     setDisplayNumber(formatted);
     setCardBrand(detectCardBrand(raw));
+    
+    // Validate with Luhn when we have enough digits
+    if (raw.length >= 13) {
+      setIsCardValid(validateLuhn(raw));
+    } else {
+      setIsCardValid(null);
+    }
   };
 
   const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -63,7 +72,7 @@ export const CardPaymentForm = ({ onSubmit, isLoading, total }: CardPaymentFormP
     setCardCvv(v);
   };
 
-  const isFormValid = cardNumber.length >= 13 && cardName.length >= 3 && cardExpiry.length === 5 && cardCvv.length >= 3;
+  const isFormValid = cardNumber.length >= 13 && isCardValid === true && cardName.length >= 3 && cardExpiry.length === 5 && cardCvv.length >= 3;
 
   const getBrandName = (brand: CardBrand): string => {
     const names: Record<CardBrand, string> = {
@@ -115,11 +124,29 @@ export const CardPaymentForm = ({ onSubmit, isLoading, total }: CardPaymentFormP
               value={displayNumber}
               onChange={handleCardNumberChange}
               placeholder="0000 0000 0000 0000"
-              className="pr-10 font-mono"
+              className={cn(
+                "pr-20 font-mono",
+                isCardValid === true && "border-green-500 focus-visible:ring-green-500",
+                isCardValid === false && "border-red-500 focus-visible:ring-red-500"
+              )}
               maxLength={19}
             />
-            <CreditCard className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
+            <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-2">
+              {isCardValid === true && (
+                <CheckCircle className="w-5 h-5 text-green-500" />
+              )}
+              {isCardValid === false && (
+                <XCircle className="w-5 h-5 text-red-500" />
+              )}
+              <CreditCard className="w-5 h-5 text-muted-foreground" />
+            </div>
           </div>
+          {isCardValid === false && (
+            <p className="text-xs text-red-500 mt-1">Número de cartão inválido</p>
+          )}
+          {isCardValid === true && (
+            <p className="text-xs text-green-500 mt-1">Número de cartão válido</p>
+          )}
         </div>
 
         <div>
