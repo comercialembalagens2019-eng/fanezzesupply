@@ -1,8 +1,11 @@
 import { Link } from "react-router-dom";
 import { ArrowRight, Package, Truck, Shield } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useAuth } from "@/contexts/AuthContext";
 
 export function HeroSection() {
+  const { user } = useAuth();
+
   return (
     <section className="relative min-h-[90vh] flex items-center overflow-hidden bg-primary">
       {/* Background Pattern */}
@@ -43,9 +46,9 @@ export function HeroSection() {
             </p>
 
             <div className="flex flex-col sm:flex-row gap-4 animate-slide-up stagger-2">
-              <Link to="/cadastro">
+              <Link to={user ? "/produtos" : "/cadastro"}>
                 <Button variant="hero" size="xl" className="w-full sm:w-auto group">
-                  Cadastre-se e comece a comprar
+                  {user ? "Comece a comprar" : "Cadastre-se e comece a comprar"}
                   <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
                 </Button>
               </Link>
