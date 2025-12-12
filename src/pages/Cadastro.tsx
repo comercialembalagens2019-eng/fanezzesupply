@@ -94,8 +94,77 @@ const Cadastro = () => {
     }
   };
 
+  const validateStep = (step: number): boolean => {
+    switch (step) {
+      case 1:
+        if (!razaoSocial.trim() || !nomeFantasia.trim() || !cnpj.trim() || !dataAbertura) {
+          toast({
+            title: "Campos obrigatórios",
+            description: "Preencha todos os campos obrigatórios antes de continuar.",
+            variant: "destructive",
+          });
+          return false;
+        }
+        if (cnpj.replace(/\D/g, "").length !== 14) {
+          toast({
+            title: "CNPJ inválido",
+            description: "O CNPJ deve ter 14 dígitos.",
+            variant: "destructive",
+          });
+          return false;
+        }
+        return true;
+      case 2:
+        if (!cep.trim() || !endereco.trim() || !numero.trim() || !bairro.trim() || !cidade.trim() || !estado) {
+          toast({
+            title: "Campos obrigatórios",
+            description: "Preencha todos os campos obrigatórios do endereço.",
+            variant: "destructive",
+          });
+          return false;
+        }
+        if (cep.replace(/\D/g, "").length !== 8) {
+          toast({
+            title: "CEP inválido",
+            description: "O CEP deve ter 8 dígitos.",
+            variant: "destructive",
+          });
+          return false;
+        }
+        return true;
+      case 3:
+        if (!whatsapp.trim() || !email.trim()) {
+          toast({
+            title: "Campos obrigatórios",
+            description: "Preencha o WhatsApp e o e-mail.",
+            variant: "destructive",
+          });
+          return false;
+        }
+        if (whatsapp.replace(/\D/g, "").length < 10) {
+          toast({
+            title: "WhatsApp inválido",
+            description: "O WhatsApp deve ter pelo menos 10 dígitos.",
+            variant: "destructive",
+          });
+          return false;
+        }
+        if (!email.includes("@") || !email.includes(".")) {
+          toast({
+            title: "E-mail inválido",
+            description: "Digite um e-mail válido.",
+            variant: "destructive",
+          });
+          return false;
+        }
+        return true;
+      default:
+        return true;
+    }
+  };
+
   const handleNext = () => {
-    if (currentStep < 4) {
+    if (currentStep < 4 && validateStep(currentStep)) {
       setCurrentStep(currentStep + 1);
     }
   };
