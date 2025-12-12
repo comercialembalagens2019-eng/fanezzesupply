@@ -76,6 +76,37 @@ const Cadastro = () => {
       .slice(0, 9);
   };
 
+  const validateCNPJ = (cnpjValue: string): boolean => {
+    const cnpjClean = cnpjValue.replace(/\D/g, "");
+    
+    if (cnpjClean.length !== 14) return false;
+    
+    // Check for known invalid patterns
+    if (/^(\d)\1+$/.test(cnpjClean)) return false;
+    
+    // Calculate first check digit
+    let sum = 0;
+    let weight = [5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2];
+    for (let i = 0; i < 12; i++) {
+      sum += parseInt(cnpjClean[i]) * weight[i];
+    }
+    let remainder = sum % 11;
+    let firstDigit = remainder < 2 ? 0 : 11 - remainder;
+    
+    if (parseInt(cnpjClean[12]) !== firstDigit) return false;
+    
+    // Calculate second check digit
+    sum = 0;
+    weight = [6, 5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2];
+    for (let i = 0; i < 13; i++) {
+      sum += parseInt(cnpjClean[i]) * weight[i];
+    }
+    remainder = sum % 11;
+    let secondDigit = remainder < 2 ? 0 : 11 - remainder;
+    
+    return parseInt(cnpjClean[13]) === secondDigit;
+  };
+
   const fetchAddress = async (cepValue: string) => {
     const cleanCep = cepValue.replace(/\D/g, "");
     if (cleanCep.length === 8) {
@@ -109,6 +140,14 @@ const Cadastro = () => {
           toast({
             title: "CNPJ inválido",
             description: "O CNPJ deve ter 14 dígitos.",
+            variant: "destructive",
+          });
+          return false;
+        }
+        if (!validateCNPJ(cnpj)) {
+          toast({
+            title: "CNPJ inválido",
+            description: "Os dígitos verificadores do CNPJ são inválidos.",
             variant: "destructive",
           });
           return false;
