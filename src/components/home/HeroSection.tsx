@@ -2,12 +2,11 @@ import { Link } from "react-router-dom";
 import { ArrowRight, Package, Truck, Shield } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
-
 export function HeroSection() {
-  const { user } = useAuth();
-
-  return (
-    <section className="relative min-h-[90vh] flex items-center overflow-hidden bg-primary">
+  const {
+    user
+  } = useAuth();
+  return <section className="relative min-h-[90vh] flex items-center overflow-hidden bg-primary">
       {/* Background Pattern */}
       <div className="absolute inset-0 opacity-10">
         <div className="absolute top-20 left-10 w-72 h-72 rounded-full bg-beige blur-3xl" />
@@ -15,14 +14,11 @@ export function HeroSection() {
       </div>
 
       {/* Grid Pattern */}
-      <div 
-        className="absolute inset-0 opacity-5"
-        style={{
-          backgroundImage: `linear-gradient(hsl(var(--beige)) 1px, transparent 1px),
+      <div className="absolute inset-0 opacity-5" style={{
+      backgroundImage: `linear-gradient(hsl(var(--beige)) 1px, transparent 1px),
                            linear-gradient(90deg, hsl(var(--beige)) 1px, transparent 1px)`,
-          backgroundSize: '60px 60px'
-        }}
-      />
+      backgroundSize: '60px 60px'
+    }} />
 
       <div className="container-custom relative z-10">
         <div className="grid lg:grid-cols-2 gap-12 items-center">
@@ -66,7 +62,7 @@ export function HeroSection() {
                 <p className="text-sm text-beige/60">Clientes Ativos</p>
               </div>
               <div className="space-y-1">
-                <p className="font-display text-3xl font-bold text-beige">15+</p>
+                <p className="font-display text-3xl font-bold text-beige">40+</p>
                 <p className="text-sm text-beige/60">Anos de Mercado</p>
               </div>
               <div className="space-y-1">
@@ -86,10 +82,14 @@ export function HeroSection() {
               <div className="absolute top-10 right-10 w-20 h-20 rounded-2xl bg-beige/10 backdrop-blur-sm border border-beige/20 flex items-center justify-center animate-float">
                 <Package className="w-10 h-10 text-beige" />
               </div>
-              <div className="absolute bottom-20 left-0 w-16 h-16 rounded-2xl bg-beige/10 backdrop-blur-sm border border-beige/20 flex items-center justify-center animate-float" style={{ animationDelay: "1s" }}>
+              <div className="absolute bottom-20 left-0 w-16 h-16 rounded-2xl bg-beige/10 backdrop-blur-sm border border-beige/20 flex items-center justify-center animate-float" style={{
+              animationDelay: "1s"
+            }}>
                 <Truck className="w-8 h-8 text-beige" />
               </div>
-              <div className="absolute top-1/2 right-0 w-14 h-14 rounded-2xl bg-beige/10 backdrop-blur-sm border border-beige/20 flex items-center justify-center animate-float" style={{ animationDelay: "2s" }}>
+              <div className="absolute top-1/2 right-0 w-14 h-14 rounded-2xl bg-beige/10 backdrop-blur-sm border border-beige/20 flex items-center justify-center animate-float" style={{
+              animationDelay: "2s"
+            }}>
                 <Shield className="w-7 h-7 text-beige" />
               </div>
 
@@ -108,6 +108,5 @@ export function HeroSection() {
           </div>
         </div>
       </div>
-    </section>
-  );
+    </section>;
 }

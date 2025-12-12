@@ -1,9 +1,7 @@
 import { Link } from "react-router-dom";
 import { Package, Phone, Mail, MapPin, Instagram, Facebook, Linkedin } from "lucide-react";
-
 export function Footer() {
-  return (
-    <footer className="bg-primary text-primary-foreground">
+  return <footer className="bg-primary text-primary-foreground">
       <div className="container-custom section-padding">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-12">
           {/* Brand */}
@@ -20,24 +18,13 @@ export function Footer() {
               Distribuição de embalagens com qualidade, preço justo e entrega rápida para sua empresa.
             </p>
             <div className="flex items-center gap-3">
-              <a
-                href="https://www.instagram.com/fanezzeembalagens?igsh=aTNmMXpreTYwMHJ5"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="w-9 h-9 rounded-lg bg-beige/10 hover:bg-beige/20 flex items-center justify-center transition-colors"
-              >
+              <a href="https://www.instagram.com/fanezzeembalagens?igsh=aTNmMXpreTYwMHJ5" target="_blank" rel="noopener noreferrer" className="w-9 h-9 rounded-lg bg-beige/10 hover:bg-beige/20 flex items-center justify-center transition-colors">
                 <Instagram className="w-4 h-4" />
               </a>
-              <a
-                href="#"
-                className="w-9 h-9 rounded-lg bg-beige/10 hover:bg-beige/20 flex items-center justify-center transition-colors"
-              >
+              <a href="#" className="w-9 h-9 rounded-lg bg-beige/10 hover:bg-beige/20 flex items-center justify-center transition-colors">
                 <Facebook className="w-4 h-4" />
               </a>
-              <a
-                href="#"
-                className="w-9 h-9 rounded-lg bg-beige/10 hover:bg-beige/20 flex items-center justify-center transition-colors"
-              >
+              <a href="#" className="w-9 h-9 rounded-lg bg-beige/10 hover:bg-beige/20 flex items-center justify-center transition-colors">
                 <Linkedin className="w-4 h-4" />
               </a>
             </div>
@@ -80,7 +67,7 @@ export function Footer() {
               </li>
               <li className="flex items-center gap-3 text-sm">
                 <Mail className="w-4 h-4 text-beige/60" />
-                <span className="text-beige/80">contato@fanezzesupply.com.br</span>
+                <span className="text-beige/80">fanezzesupply@gmail.com</span>
               </li>
               <li className="flex items-start gap-3 text-sm">
                 <MapPin className="w-4 h-4 text-beige/60 mt-0.5" />
@@ -129,6 +116,5 @@ export function Footer() {
           </div>
         </div>
       </div>
-    </footer>
-  );
+    </footer>;
 }
