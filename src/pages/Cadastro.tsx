@@ -162,10 +162,48 @@ const Cadastro = () => {
           });
           return false;
         }
-        if (cep.replace(/\D/g, "").length !== 8) {
+        const cepClean = cep.replace(/\D/g, "");
+        if (cepClean.length !== 8) {
           toast({
             title: "CEP inválido",
             description: "O CEP deve ter 8 dígitos.",
+            variant: "destructive",
+          });
+          return false;
+        }
+        // Validate CEP format (Brazilian CEPs: 01000-000 to 99999-999)
+        const cepNum = parseInt(cepClean);
+        if (cepNum < 1000000 || cepNum > 99999999) {
+          toast({
+            title: "CEP inválido",
+            description: "O CEP informado não existe.",
+            variant: "destructive",
+          });
+          return false;
+        }
+        // Validate number field (must contain at least one digit)
+        if (!/\d/.test(numero) && numero.toLowerCase() !== "s/n") {
+          toast({
+            title: "Número inválido",
+            description: "Digite o número do endereço ou 'S/N' se não houver.",
+            variant: "destructive",
+          });
+          return false;
+        }
+        // Validate city name (only letters and spaces)
+        if (!/^[a-zA-ZÀ-ÿ\s]+$/.test(cidade.trim())) {
+          toast({
+            title: "Cidade inválida",
+            description: "O nome da cidade deve conter apenas letras.",
+            variant: "destructive",
+          });
+          return false;
+        }
+        // Validate bairro (only letters, spaces, and numbers)
+        if (!/^[a-zA-ZÀ-ÿ0-9\s]+$/.test(bairro.trim())) {
+          toast({
+            title: "Bairro inválido",
+            description: "O nome do bairro contém caracteres inválidos.",
             variant: "destructive",
           });
           return false;
