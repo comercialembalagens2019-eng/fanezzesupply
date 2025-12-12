@@ -100,6 +100,35 @@ export const CheckoutModal = ({ open, onOpenChange }: CheckoutModalProps) => {
       .slice(0, 14);
   };
 
+  const validateCPF = (cpfValue: string): boolean => {
+    const cpfClean = cpfValue.replace(/\D/g, '');
+    
+    if (cpfClean.length !== 11) return false;
+    
+    // Check for known invalid patterns (all same digits)
+    if (/^(\d)\1+$/.test(cpfClean)) return false;
+    
+    // Calculate first check digit
+    let sum = 0;
+    for (let i = 0; i < 9; i++) {
+      sum += parseInt(cpfClean[i]) * (10 - i);
+    }
+    let remainder = (sum * 10) % 11;
+    let firstDigit = remainder === 10 ? 0 : remainder;
+    
+    if (parseInt(cpfClean[9]) !== firstDigit) return false;
+    
+    // Calculate second check digit
+    sum = 0;
+    for (let i = 0; i < 10; i++) {
+      sum += parseInt(cpfClean[i]) * (11 - i);
+    }
+    remainder = (sum * 10) % 11;
+    let secondDigit = remainder === 10 ? 0 : remainder;
+    
+    return parseInt(cpfClean[10]) === secondDigit;
+  };
+
   const [companyData, setCompanyData] = useState<CompanyData>({
     razaoSocial: '',
     nomeFantasia: '',
@@ -730,10 +759,11 @@ export const CheckoutModal = ({ open, onOpenChange }: CheckoutModalProps) => {
       case 3:
         return !!(contactData.whatsapp && contactData.email);
       case 4:
-        // For boleto, require CPF
+        // For boleto, require valid CPF
         if (paymentMethod === 'boleto') {
-          const cpfDigits = boletoCpf.replace(/\D/g, '');
-          return cpfDigits.length === 11;
+          if (!validateCPF(boletoCpf)) {
+            return false;
+          }
         }
         return true;
       default:
@@ -745,6 +775,24 @@ export const CheckoutModal = ({ open, onOpenChange }: CheckoutModalProps) => {
     if (validateStep(step)) {
       setStep(prev => Math.min(prev + 1, 5));
     } else {
+      // Custom error message for CPF validation
+      if (step === 4 && paymentMethod === 'boleto') {
+        const cpfDigits = boletoCpf.replace(/\D/g, '');
+        if (cpfDigits.length !== 11) {
+          toast({
+            title: "CPF inválido",
+            description: "O CPF deve ter 11 dígitos.",
+            variant: "destructive",
+          });
+        } else if (!validateCPF(boletoCpf)) {
+          toast({
+            title: "CPF inválido",
+            description: "Os dígitos verificadores do CPF são inválidos.",
+            variant: "destructive",
+          });
+        }
+        return;
+      }
       toast({
         title: "Campos obrigatórios",
         description: "Preencha todos os campos obrigatórios antes de continuar.",
