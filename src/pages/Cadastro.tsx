@@ -469,6 +469,8 @@ const Cadastro = () => {
                         type="date"
                         value={dataAbertura}
                         onChange={(e) => setDataAbertura(e.target.value)}
+                        min="1900-01-01"
+                        max={new Date().toISOString().split('T')[0]}
                         className="w-full h-11 px-4 mt-1.5 rounded-lg border border-border bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
                         required
                       />
