@@ -152,6 +152,29 @@ const Cadastro = () => {
           });
           return false;
         }
+        // Validate opening date
+        const openingDate = new Date(dataAbertura);
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        
+        if (openingDate > today) {
+          toast({
+            title: "Data de abertura inválida",
+            description: "A data de abertura não pode ser no futuro.",
+            variant: "destructive",
+          });
+          return false;
+        }
+        // Minimum date: 1900 (no company can be older than that)
+        const minDate = new Date(1900, 0, 1);
+        if (openingDate < minDate) {
+          toast({
+            title: "Data de abertura inválida",
+            description: "A data de abertura é muito antiga.",
+            variant: "destructive",
+          });
+          return false;
+        }
         return true;
       case 2:
         if (!cep.trim() || !endereco.trim() || !numero.trim() || !bairro.trim() || !cidade.trim() || !estado) {
