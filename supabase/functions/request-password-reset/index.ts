@@ -141,7 +141,7 @@ serve(async (req: Request): Promise<Response> => {
 
     // Send email with code
     const emailResult = await resend.emails.send({
-      from: "Fanezze Supply <noreply@fanezze.com.br>",
+      from: "Fanezze Supply <noreply@fanezzesupply.com.br>",
       to: [normalizedEmail],
       subject: "Código de Recuperação - Fanezze Supply",
       html: `
