@@ -134,7 +134,7 @@ const Login = () => {
                   Senha
                 </label>
                 <Link
-                  to="/esqueci-senha"
+                  to="/recuperar-senha"
                   className="text-sm text-primary hover:underline"
                 >
                   Esqueci minha senha
