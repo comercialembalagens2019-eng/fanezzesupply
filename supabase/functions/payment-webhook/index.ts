@@ -7,15 +7,28 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type, x-webhook-signature',
 };
 
-// AbacatePay public HMAC key for signature verification
-const ABACATEPAY_PUBLIC_KEY =
-  "t9dXRhHHo3yDEj5pVDYz0frf7q6bMKyMRmxxCPIPp3RCplBfXRxqlC6ZpiWmOqj4L63qEaeUOtrCI8P0VMUgo6iIga2ri9ogaHFs0WIIywSMg0q7RmBfybe1E5XJcfC4IW3alNqym0tXoAKkzvfEjZxV6bE0oG2zJrNNYmUCKZyV0KZ3JS8Votf9EAWWYdiDkMkpbMdPggfh1EqHlVkMiTady6jOR3hyzGEHrIz2Ret0xHKMbiqkr9HS1JhNHDX9";
+// Constant-time string comparison to prevent timing attacks
+function constantTimeCompare(a: string, b: string): boolean {
+  if (a.length !== b.length) return false;
+  let result = 0;
+  for (let i = 0; i < a.length; i++) {
+    result |= a.charCodeAt(i) ^ b.charCodeAt(i);
+  }
+  return result === 0;
+}
 
-// Verify HMAC signature
+// Verify HMAC signature using constant-time comparison
 async function verifySignature(rawBody: string, signatureFromHeader: string): Promise<boolean> {
   try {
+    // Get HMAC key from environment (moved from hardcoded value)
+    const publicKey = Deno.env.get('ABACATEPAY_PUBLIC_KEY');
+    if (!publicKey) {
+      console.error('ABACATEPAY_PUBLIC_KEY not configured');
+      return false;
+    }
+
     const encoder = new TextEncoder();
-    const keyData = encoder.encode(ABACATEPAY_PUBLIC_KEY);
+    const keyData = encoder.encode(publicKey);
     const bodyData = encoder.encode(rawBody);
 
     const cryptoKey = await crypto.subtle.importKey(
@@ -29,7 +42,8 @@ async function verifySignature(rawBody: string, signatureFromHeader: string): Pr
     const signature = await crypto.subtle.sign("HMAC", cryptoKey, bodyData);
     const expectedSig = btoa(String.fromCharCode(...new Uint8Array(signature)));
 
-    return expectedSig === signatureFromHeader;
+    // Use constant-time comparison to prevent timing attacks
+    return constantTimeCompare(expectedSig, signatureFromHeader);
   } catch (error) {
     console.error('Error verifying signature:', error);
     return false;

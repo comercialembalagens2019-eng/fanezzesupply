@@ -118,14 +118,28 @@ serve(async (req) => {
     
     const supabaseClient = createClient(supabaseUrl, supabaseAnonKey);
 
-    // Get user from auth header if available
+    // Require authentication
     const authHeader = req.headers.get("Authorization");
-    let user = null;
-    if (authHeader) {
-      const token = authHeader.replace("Bearer ", "");
-      const { data } = await supabaseClient.auth.getUser(token);
-      user = data.user;
+    if (!authHeader) {
+      console.log("[STRIPE] Missing authorization header");
+      return new Response(
+        JSON.stringify({ error: 'Authorization required' }),
+        { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
     }
+
+    const token = authHeader.replace("Bearer ", "");
+    const { data: userData, error: authError } = await supabaseClient.auth.getUser(token);
+    if (authError || !userData.user) {
+      console.log("[STRIPE] Authentication failed");
+      return new Response(
+        JSON.stringify({ error: 'Authentication failed' }),
+        { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    const user = userData.user;
+    console.log("[STRIPE] User authenticated:", user.id.slice(0, 8) + "***");
 
     const requestData: CheckoutRequest = await req.json();
 
@@ -140,6 +154,34 @@ serve(async (req) => {
     }
 
     const { items, companyId, customerEmail, customerName } = requestData;
+
+    // SECURITY: Verify user owns the company before creating order
+    const supabaseServiceClient = createClient(
+      supabaseUrl,
+      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? ""
+    );
+
+    const { data: company, error: companyError } = await supabaseServiceClient
+      .from("companies")
+      .select("user_id")
+      .eq("id", companyId)
+      .single();
+
+    if (companyError || !company) {
+      console.log("[STRIPE] Company not found:", companyId.substring(0, 8) + '...');
+      return new Response(
+        JSON.stringify({ error: 'Company not found' }),
+        { status: 404, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    if (company.user_id !== user.id) {
+      console.log("[STRIPE] Unauthorized: user does not own company");
+      return new Response(
+        JSON.stringify({ error: 'Unauthorized' }),
+        { status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
 
     console.log("[STRIPE] Processing checkout, items:", items.length, "companyId:", companyId.substring(0, 8) + '...');
 
@@ -192,12 +234,7 @@ serve(async (req) => {
       totalPrice: item.unitPrice * item.quantity,
     }));
 
-    // Use service role key to insert order (handles RLS)
-    const supabaseServiceClient = createClient(
-      supabaseUrl,
-      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? ""
-    );
-
+    // Create the order (service client already initialized above)
     const { data: order, error: orderError } = await supabaseServiceClient
       .from("orders")
       .insert({

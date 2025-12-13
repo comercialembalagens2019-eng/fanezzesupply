@@ -78,6 +78,37 @@ serve(async (req) => {
       address 
     } = body;
 
+    // SECURITY: Verify user owns the order before processing payment
+    if (order_id) {
+      const supabaseServiceClient = createClient(
+        Deno.env.get("SUPABASE_URL") ?? "",
+        Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? ""
+      );
+
+      const { data: order, error: orderError } = await supabaseServiceClient
+        .from("orders")
+        .select("company_id, companies!inner(user_id)")
+        .eq("id", order_id)
+        .single();
+
+      if (orderError || !order) {
+        console.log("[BOLETO] Order not found:", order_id?.slice(0, 8) + "***");
+        return new Response(
+          JSON.stringify({ error: "Order not found" }),
+          { status: 404, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      }
+
+      const companyUserId = (order as any).companies?.user_id;
+      if (companyUserId !== userData.user.id) {
+        console.log("[BOLETO] Unauthorized: user does not own order");
+        return new Response(
+          JSON.stringify({ error: "Unauthorized" }),
+          { status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      }
+    }
+
     // Validate inputs
     if (!amount || typeof amount !== "number") {
       throw new Error("Amount is required and must be a number");
