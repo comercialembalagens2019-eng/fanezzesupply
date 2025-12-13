@@ -79,22 +79,18 @@ serve(async (req) => {
       if (orderId && session.payment_status === "paid") {
         console.log("[STRIPE-WEBHOOK] Updating order:", orderId);
 
-        const { data, error } = await supabaseClient
-          .from("orders")
-          .update({ 
-            status: "paid",
-            updated_at: new Date().toISOString(),
-          })
-          .eq("id", orderId)
-          .select()
-          .single();
+        // Use secure RPC function instead of direct update
+        const { error } = await supabaseClient.rpc('update_order_status', {
+          p_order_id: orderId,
+          p_new_status: 'paid'
+        });
 
         if (error) {
           console.error("[STRIPE-WEBHOOK] Error updating order:", error);
           throw new Error(`Failed to update order: ${error.message}`);
         }
 
-        console.log("[STRIPE-WEBHOOK] Order updated successfully:", data.id);
+        console.log("[STRIPE-WEBHOOK] Order updated successfully:", orderId);
       } else {
         console.log("[STRIPE-WEBHOOK] Order ID not found in metadata or payment not completed");
       }
@@ -113,20 +109,16 @@ serve(async (req) => {
       if (orderId) {
         console.log("[STRIPE-WEBHOOK] Updating order from payment_intent:", orderId);
 
-        const { data, error } = await supabaseClient
-          .from("orders")
-          .update({ 
-            status: "paid",
-            updated_at: new Date().toISOString(),
-          })
-          .eq("id", orderId)
-          .select()
-          .single();
+        // Use secure RPC function instead of direct update
+        const { error } = await supabaseClient.rpc('update_order_status', {
+          p_order_id: orderId,
+          p_new_status: 'paid'
+        });
 
         if (error) {
           console.error("[STRIPE-WEBHOOK] Error updating order:", error);
         } else {
-          console.log("[STRIPE-WEBHOOK] Order updated successfully:", data.id);
+          console.log("[STRIPE-WEBHOOK] Order updated successfully:", orderId);
         }
       }
     }
@@ -143,13 +135,11 @@ serve(async (req) => {
       if (orderId) {
         console.log("[STRIPE-WEBHOOK] Marking order as failed:", orderId);
 
-        const { error } = await supabaseClient
-          .from("orders")
-          .update({ 
-            status: "failed",
-            updated_at: new Date().toISOString(),
-          })
-          .eq("id", orderId);
+        // Use secure RPC function instead of direct update
+        const { error } = await supabaseClient.rpc('update_order_status', {
+          p_order_id: orderId,
+          p_new_status: 'failed'
+        });
 
         if (error) {
           console.error("[STRIPE-WEBHOOK] Error updating order:", error);
@@ -168,13 +158,11 @@ serve(async (req) => {
       const orderId = paymentIntent.metadata?.order_id;
 
       if (orderId) {
-        const { error } = await supabaseClient
-          .from("orders")
-          .update({ 
-            status: "processing",
-            updated_at: new Date().toISOString(),
-          })
-          .eq("id", orderId);
+        // Use secure RPC function instead of direct update
+        const { error } = await supabaseClient.rpc('update_order_status', {
+          p_order_id: orderId,
+          p_new_status: 'processing'
+        });
 
         if (error) {
           console.error("[STRIPE-WEBHOOK] Error updating order:", error);

@@ -213,6 +213,10 @@ export type Database = {
         }
         Returns: boolean
       }
+      update_order_status: {
+        Args: { p_new_status: string; p_order_id: string }
+        Returns: undefined
+      }
     }
     Enums: {
       app_role: "admin" | "user"
