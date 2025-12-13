@@ -15,11 +15,23 @@ const RecuperarSenha = () => {
     setIsLoading(true);
 
     try {
-      const { error } = await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: `${window.location.origin}/redefinir-senha`,
+      const { data, error } = await supabase.functions.invoke("request-password-reset", {
+        body: {
+          email: email.toLowerCase().trim(),
+          redirectTo: `${window.location.origin}/redefinir-senha`,
+        },
       });
 
       if (error) throw error;
+
+      if (data?.rateLimited) {
+        toast({
+          title: "Limite excedido",
+          description: "Muitas tentativas. Aguarde 1 hora antes de tentar novamente.",
+          variant: "destructive",
+        });
+        return;
+      }
 
       setEmailSent(true);
       toast({
@@ -30,7 +42,7 @@ const RecuperarSenha = () => {
       console.error("Password reset error:", error);
       toast({
         title: "Erro",
-        description: "Não foi possível enviar o email. Verifique o endereço.",
+        description: "Não foi possível processar a solicitação. Tente novamente.",
         variant: "destructive",
       });
     } finally {
