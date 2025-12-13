@@ -21,5 +21,11 @@ verify_jwt = true
 [functions.request-password-reset]
 verify_jwt = false
 
+[functions.validate-reset-code]
+verify_jwt = false
+
+[functions.reset-password-with-code]
+verify_jwt = false
+
 [functions.create-test-user]
 verify_jwt = false

@@ -9,14 +9,23 @@ const corsHeaders = {
 
 const RATE_LIMIT_MAX_ATTEMPTS = 3;
 const RATE_LIMIT_WINDOW_HOURS = 1;
+const CODE_EXPIRY_MINUTES = 15;
 
-interface RequestBody {
-  email: string;
-  redirectTo: string;
+// Generate 6-digit code
+function generateCode(): string {
+  return Math.floor(100000 + Math.random() * 900000).toString();
+}
+
+// Simple hash function for code storage
+async function hashCode(code: string): Promise<string> {
+  const encoder = new TextEncoder();
+  const data = encoder.encode(code);
+  const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+  const hashArray = Array.from(new Uint8Array(hashBuffer));
+  return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
 }
 
 serve(async (req: Request): Promise<Response> => {
-  // Handle CORS preflight
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }
@@ -25,7 +34,7 @@ serve(async (req: Request): Promise<Response> => {
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
     const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
     const resendApiKey = Deno.env.get("RESEND_API_KEY");
-    
+
     if (!resendApiKey) {
       console.error("RESEND_API_KEY not configured");
       return new Response(
@@ -37,194 +46,198 @@ serve(async (req: Request): Promise<Response> => {
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
     const resend = new Resend(resendApiKey);
 
-    const { email, redirectTo }: RequestBody = await req.json();
+    const { email } = await req.json();
 
-    if (!email || !redirectTo) {
-      console.log("Missing required fields");
+    if (!email || typeof email !== 'string') {
       return new Response(
-        JSON.stringify({ error: "Email e redirectTo são obrigatórios" }),
+        JSON.stringify({ error: "Email é obrigatório" }),
         { status: 400, headers: { "Content-Type": "application/json", ...corsHeaders } }
       );
     }
 
-    // Normalize email
     const normalizedEmail = email.toLowerCase().trim();
     console.log(`Password reset request for: ${normalizedEmail.substring(0, 3)}***`);
 
-    // Get client IP (for logging only)
-    const clientIp = req.headers.get("x-forwarded-for")?.split(",")[0] || "unknown";
-
-    // Check rate limit - count attempts in the last hour
-    const windowStart = new Date();
-    windowStart.setHours(windowStart.getHours() - RATE_LIMIT_WINDOW_HOURS);
-
-    const { count, error: countError } = await supabase
-      .from("password_reset_attempts")
-      .select("*", { count: "exact", head: true })
-      .eq("email", normalizedEmail)
-      .gte("created_at", windowStart.toISOString());
-
-    if (countError) {
-      console.error("Error checking rate limit:", countError);
+    // Check if user exists
+    const { data: userData, error: userError } = await supabase.auth.admin.listUsers();
+    
+    if (userError) {
+      console.error("Error checking user:", userError);
       return new Response(
-        JSON.stringify({ error: "Erro interno do servidor" }),
-        { status: 500, headers: { "Content-Type": "application/json", ...corsHeaders } }
+        JSON.stringify({ success: true, message: "Se o email estiver cadastrado, você receberá um código." }),
+        { status: 200, headers: { "Content-Type": "application/json", ...corsHeaders } }
       );
     }
 
-    console.log(`Rate limit check: ${count}/${RATE_LIMIT_MAX_ATTEMPTS} attempts in last ${RATE_LIMIT_WINDOW_HOURS}h`);
+    const userExists = userData.users.some(u => u.email?.toLowerCase() === normalizedEmail);
+    
+    if (!userExists) {
+      console.log("User with this email not found");
+      return new Response(
+        JSON.stringify({ success: true, message: "Se o email estiver cadastrado, você receberá um código." }),
+        { status: 200, headers: { "Content-Type": "application/json", ...corsHeaders } }
+      );
+    }
 
-    if ((count || 0) >= RATE_LIMIT_MAX_ATTEMPTS) {
-      console.log(`Rate limit exceeded for ${normalizedEmail.substring(0, 3)}***`);
+    // Rate limiting - check recent attempts
+    const rateLimitTime = new Date();
+    rateLimitTime.setHours(rateLimitTime.getHours() - RATE_LIMIT_WINDOW_HOURS);
+
+    const { data: recentAttempts, error: rateError } = await supabase
+      .from('password_reset_codes')
+      .select('id')
+      .eq('email', normalizedEmail)
+      .gte('created_at', rateLimitTime.toISOString());
+
+    if (rateError) {
+      console.error("Error checking rate limit:", rateError);
+    }
+
+    const attemptCount = recentAttempts?.length || 0;
+    console.log(`Rate limit check: ${attemptCount}/${RATE_LIMIT_MAX_ATTEMPTS} attempts in last ${RATE_LIMIT_WINDOW_HOURS}h`);
+
+    if (attemptCount >= RATE_LIMIT_MAX_ATTEMPTS) {
+      console.log("Rate limit exceeded");
       return new Response(
         JSON.stringify({ 
-          error: "Muitas tentativas. Aguarde 1 hora antes de tentar novamente.",
+          error: "Muitas tentativas. Aguarde 1 hora antes de solicitar novamente.",
           rateLimited: true 
         }),
         { status: 429, headers: { "Content-Type": "application/json", ...corsHeaders } }
       );
     }
 
-    // Record this attempt
+    // Generate 6-digit code
+    const code = generateCode();
+    const codeHash = await hashCode(code);
+    const expiresAt = new Date();
+    expiresAt.setMinutes(expiresAt.getMinutes() + CODE_EXPIRY_MINUTES);
+
+    // Invalidate any existing codes for this email
+    await supabase
+      .from('password_reset_codes')
+      .update({ used: true })
+      .eq('email', normalizedEmail)
+      .eq('used', false);
+
+    // Store the new code
     const { error: insertError } = await supabase
-      .from("password_reset_attempts")
+      .from('password_reset_codes')
       .insert({
         email: normalizedEmail,
-        ip_address: clientIp,
+        code_hash: codeHash,
+        expires_at: expiresAt.toISOString(),
       });
 
     if (insertError) {
-      console.error("Error recording attempt:", insertError);
-      // Continue anyway - don't block the user
-    }
-
-    // Generate password reset link using Supabase Admin API
-    const { data: linkData, error: linkError } = await supabase.auth.admin.generateLink({
-      type: "recovery",
-      email: normalizedEmail,
-      options: {
-        redirectTo: redirectTo,
-      },
-    });
-
-    if (linkError) {
-      console.error("Error generating reset link:", linkError);
-      // Don't reveal if email exists or not for security
+      console.error("Error storing code:", insertError);
       return new Response(
-        JSON.stringify({ 
-          success: true,
-          message: "Se o email estiver cadastrado, você receberá um link de recuperação." 
-        }),
-        { status: 200, headers: { "Content-Type": "application/json", ...corsHeaders } }
+        JSON.stringify({ error: "Erro ao gerar código" }),
+        { status: 500, headers: { "Content-Type": "application/json", ...corsHeaders } }
       );
     }
 
-    const resetLink = linkData.properties.action_link;
-    console.log("Reset link generated successfully");
+    console.log("Code generated successfully, sending email...");
 
-    // Send email via Resend
-    const emailResponse = await resend.emails.send({
+    // Send email with code
+    const emailResult = await resend.emails.send({
       from: "Fanezze Supply <noreply@fanezze.com.br>",
       to: [normalizedEmail],
-      subject: "Redefinir senha - Fanezze Supply",
+      subject: "Código de Recuperação - Fanezze Supply",
       html: `
         <!DOCTYPE html>
         <html>
         <head>
           <meta charset="utf-8">
           <meta name="viewport" content="width=device-width, initial-scale=1.0">
+          <style>
+            body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; margin: 0; padding: 0; background-color: #f5f5f5; }
+            .container { max-width: 600px; margin: 0 auto; background-color: #ffffff; }
+            .header { background-color: #1B2845; color: white; padding: 40px 20px; text-align: center; }
+            .header h1 { margin: 0; font-size: 28px; }
+            .content { padding: 40px 30px; }
+            .code-box { background: linear-gradient(135deg, #1B2845 0%, #2a3d5f 100%); color: white; padding: 30px; text-align: center; border-radius: 10px; margin: 30px 0; }
+            .code { font-size: 48px; font-weight: bold; letter-spacing: 10px; font-family: 'Courier New', monospace; margin: 10px 0; }
+            .warning-box { background-color: #fff3cd; border-left: 4px solid #ffc107; padding: 15px; margin: 20px 0; border-radius: 4px; }
+            .info-box { background-color: #F5E6D3; padding: 20px; border-radius: 8px; margin: 20px 0; }
+            .footer { background-color: #f8f9fa; padding: 30px; text-align: center; font-size: 12px; color: #666; }
+          </style>
         </head>
-        <body style="margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #F5E6D3;">
-          <table role="presentation" style="width: 100%; border-collapse: collapse;">
-            <tr>
-              <td style="padding: 40px 0;">
-                <table role="presentation" style="max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 8px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
-                  <!-- Header -->
-                  <tr>
-                    <td style="background-color: #1B2845; padding: 30px 40px; border-radius: 8px 8px 0 0; text-align: center;">
-                      <h1 style="color: #F5E6D3; margin: 0; font-size: 28px; font-weight: 700;">Fanezze Supply</h1>
-                      <p style="color: #F5E6D3; margin: 8px 0 0 0; font-size: 14px; opacity: 0.9;">Distribuição de Embalagens</p>
-                    </td>
-                  </tr>
-                  
-                  <!-- Content -->
-                  <tr>
-                    <td style="padding: 40px;">
-                      <h2 style="color: #1B2845; margin: 0 0 20px 0; font-size: 24px;">Redefinir Senha</h2>
-                      
-                      <p style="color: #444; font-size: 16px; line-height: 1.6; margin: 0 0 20px 0;">
-                        Olá,
-                      </p>
-                      
-                      <p style="color: #444; font-size: 16px; line-height: 1.6; margin: 0 0 20px 0;">
-                        Recebemos uma solicitação para redefinir a senha da sua conta. Clique no botão abaixo para criar uma nova senha:
-                      </p>
-                      
-                      <table role="presentation" style="width: 100%; margin: 30px 0;">
-                        <tr>
-                          <td style="text-align: center;">
-                            <a href="${resetLink}" 
-                               style="display: inline-block; 
-                                      padding: 16px 40px; 
-                                      background-color: #1B2845; 
-                                      color: #F5E6D3; 
-                                      text-decoration: none; 
-                                      border-radius: 6px;
-                                      font-size: 16px;
-                                      font-weight: 600;
-                                      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);">
-                              Redefinir Minha Senha
-                            </a>
-                          </td>
-                        </tr>
-                      </table>
-                      
-                      <p style="color: #666; font-size: 14px; line-height: 1.6; margin: 20px 0;">
-                        <strong>⏰ Este link expira em 1 hora.</strong>
-                      </p>
-                      
-                      <p style="color: #666; font-size: 14px; line-height: 1.6; margin: 20px 0 0 0;">
-                        Se você não solicitou esta alteração, ignore este e-mail. Sua senha permanecerá a mesma.
-                      </p>
-                    </td>
-                  </tr>
-                  
-                  <!-- Footer -->
-                  <tr>
-                    <td style="background-color: #f8f8f8; padding: 25px 40px; border-radius: 0 0 8px 8px; border-top: 1px solid #eee;">
-                      <p style="color: #888; font-size: 12px; margin: 0; text-align: center;">
-                        Fanezze Supply - Distribuição de Embalagens<br>
-                        Avenida Antonio Ramos Alvin, 1084 - Joinville/SC<br><br>
-                        Este é um e-mail automático, por favor não responda.
-                      </p>
-                    </td>
-                  </tr>
-                </table>
-              </td>
-            </tr>
-          </table>
+        <body>
+          <div class="container">
+            <div class="header">
+              <h1>🔐 Fanezze Supply</h1>
+              <p style="margin: 10px 0 0 0; font-size: 16px;">Distribuição de Embalagens</p>
+            </div>
+            
+            <div class="content">
+              <h2 style="color: #1B2845; margin-top: 0;">Código de Recuperação de Senha</h2>
+              
+              <p>Olá,</p>
+              
+              <p>Você solicitou a recuperação da senha da sua conta na <strong>Fanezze Supply</strong>.</p>
+              
+              <p>Use o código abaixo para redefinir sua senha:</p>
+              
+              <div class="code-box">
+                <p style="margin: 0; font-size: 14px; opacity: 0.9;">Seu código de verificação:</p>
+                <div class="code">${code}</div>
+                <p style="margin: 0; font-size: 12px; opacity: 0.8;">Digite este código no site</p>
+              </div>
+              
+              <div class="info-box">
+                <p style="margin: 0 0 10px 0; font-weight: bold; color: #1B2845;">📋 Como usar:</p>
+                <ol style="margin: 0; padding-left: 20px;">
+                  <li>Volte à página de recuperação de senha</li>
+                  <li>Digite este código de 6 dígitos</li>
+                  <li>Crie sua nova senha</li>
+                </ol>
+              </div>
+              
+              <div class="warning-box">
+                <p style="margin: 0 0 10px 0; font-weight: bold;">⚠️ Importante:</p>
+                <ul style="margin: 0; padding-left: 20px;">
+                  <li><strong>Este código expira em ${CODE_EXPIRY_MINUTES} minutos</strong></li>
+                  <li>Use apenas uma vez</li>
+                  <li>Se não solicitou, ignore este email</li>
+                  <li>Nunca compartilhe este código</li>
+                </ul>
+              </div>
+              
+              <p style="margin-top: 30px; color: #666; font-size: 14px;">
+                Se você não solicitou a recuperação de senha, pode ignorar este email com segurança.
+              </p>
+            </div>
+            
+            <div class="footer">
+              <p style="margin: 0 0 10px 0;"><strong>Fanezze Supply</strong></p>
+              <p style="margin: 0 0 5px 0;">Distribuição de Embalagens</p>
+              <p style="margin: 0; color: #999;">Este é um email automático, não responda.</p>
+            </div>
+          </div>
         </body>
         </html>
       `,
     });
 
-    console.log("Email sent successfully via Resend:", emailResponse);
+    console.log("Email result:", emailResult);
 
-    // Clean up old attempts periodically (simple approach)
+    if (emailResult.error) {
+      console.error("Error sending email:", emailResult.error);
+      return new Response(
+        JSON.stringify({ error: "Erro ao enviar email. Verifique se o domínio está verificado no Resend." }),
+        { status: 500, headers: { "Content-Type": "application/json", ...corsHeaders } }
+      );
+    }
+
+    // Cleanup old codes (probabilistic, 10% chance)
     if (Math.random() < 0.1) {
-      console.log("Running cleanup of old attempts...");
-      try {
-        await supabase.rpc("cleanup_old_reset_attempts");
-      } catch (e) {
-        // Ignore cleanup errors
-      }
+      console.log("Running cleanup of expired codes...");
+      await supabase.rpc('cleanup_expired_reset_codes');
     }
 
     return new Response(
-      JSON.stringify({ 
-        success: true,
-        message: "Se o email estiver cadastrado, você receberá um link de recuperação." 
-      }),
+      JSON.stringify({ success: true, message: "Código enviado com sucesso!" }),
       { status: 200, headers: { "Content-Type": "application/json", ...corsHeaders } }
     );
 
