@@ -17,3 +17,6 @@ verify_jwt = true
 
 [functions.create-boleto-payment]
 verify_jwt = true
+
+[functions.request-password-reset]
+verify_jwt = false
