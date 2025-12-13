@@ -133,10 +133,11 @@ serve(async (req: Request): Promise<Response> => {
         } else if (orders && orders.length > 0) {
           const orderId = orders[0].id;
           
-          const { error: updateError } = await supabase
-            .from('orders')
-            .update({ status: 'paid' })
-            .eq('id', orderId);
+          // Use secure RPC function instead of direct update
+          const { error: updateError } = await supabase.rpc('update_order_status', {
+            p_order_id: orderId,
+            p_new_status: 'paid'
+          });
 
           if (updateError) {
             console.error('Error updating order status:', updateError);
