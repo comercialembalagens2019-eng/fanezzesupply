@@ -1,34 +1,7 @@
-import { useState } from "react";
 import { Layout } from "@/components/layout/Layout";
-import { Button } from "@/components/ui/button";
-import { Phone, Mail, MapPin, MessageCircle, Clock, Send } from "lucide-react";
-import { toast } from "@/hooks/use-toast";
+import { Phone, Mail, MapPin, MessageCircle, Clock } from "lucide-react";
 
 const Contato = () => {
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [phone, setPhone] = useState("");
-  const [message, setMessage] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsLoading(true);
-
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-
-    toast({
-      title: "Mensagem enviada!",
-      description: "Entraremos em contato em breve.",
-    });
-
-    setName("");
-    setEmail("");
-    setPhone("");
-    setMessage("");
-    setIsLoading(false);
-  };
-
   return (
     <Layout>
       {/* Hero */}
@@ -48,141 +21,73 @@ const Contato = () => {
       {/* Contact Section */}
       <section className="section-padding bg-background">
         <div className="container-custom">
-          <div className="grid lg:grid-cols-2 gap-12">
-            {/* Contact Info */}
-            <div className="space-y-8">
-              <div>
-                <h2 className="font-display text-2xl font-bold text-foreground mb-6">
-                  Informações de Contato
-                </h2>
-                <p className="text-muted-foreground mb-8">
-                  Tire suas dúvidas, solicite orçamentos ou agende uma visita com nossos consultores.
-                </p>
+          <div className="max-w-3xl mx-auto text-center mb-12">
+            <h2 className="font-display text-2xl md:text-3xl font-bold text-foreground mb-4">
+              Informações de Contato
+            </h2>
+            <p className="text-muted-foreground text-lg">
+              Tire suas dúvidas, solicite orçamentos ou agende uma visita com nossos consultores.
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-5xl mx-auto">
+            {/* Telefone */}
+            <div className="group bg-card rounded-2xl border border-border p-6 hover:border-primary/30 hover:shadow-lg transition-all duration-300">
+              <div className="w-14 h-14 rounded-xl bg-primary/10 flex items-center justify-center mb-4 group-hover:bg-primary/20 transition-colors">
+                <Phone className="w-6 h-6 text-primary" />
               </div>
-
-              <div className="space-y-6">
-                <div className="flex items-start gap-4">
-                  <div className="w-12 h-12 rounded-lg bg-secondary flex items-center justify-center flex-shrink-0">
-                    <Phone className="w-5 h-5 text-primary" />
-                  </div>
-                  <div>
-                    <h3 className="font-semibold text-foreground mb-1">Telefone</h3>
-                    <p className="text-muted-foreground">(11) 3456-7890</p>
-                  </div>
-                </div>
-
-                <div className="flex items-start gap-4">
-                  <div className="w-12 h-12 rounded-lg bg-secondary flex items-center justify-center flex-shrink-0">
-                    <MessageCircle className="w-5 h-5 text-primary" />
-                  </div>
-                  <div>
-                    <h3 className="font-semibold text-foreground mb-1">WhatsApp</h3>
-                    <p className="text-muted-foreground">(11) 99999-9999</p>
-                    <a
-                      href="https://wa.me/5511999999999"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-sm text-primary hover:underline"
-                    >
-                      Iniciar conversa
-                    </a>
-                  </div>
-                </div>
-
-                <div className="flex items-start gap-4">
-                  <div className="w-12 h-12 rounded-lg bg-secondary flex items-center justify-center flex-shrink-0">
-                    <Mail className="w-5 h-5 text-primary" />
-                  </div>
-                  <div>
-                    <h3 className="font-semibold text-foreground mb-1">E-mail</h3>
-                    <p className="text-muted-foreground">contato@fanezzesupply.com.br</p>
-                  </div>
-                </div>
-
-                <div className="flex items-start gap-4">
-                  <div className="w-12 h-12 rounded-lg bg-secondary flex items-center justify-center flex-shrink-0">
-                    <MapPin className="w-5 h-5 text-primary" />
-                  </div>
-                  <div>
-                    <h3 className="font-semibold text-foreground mb-1">Endereço</h3>
-                    <p className="text-muted-foreground">
-                      Rua das Embalagens, 123<br />
-                      Bairro Industrial - São Paulo/SP<br />
-                      CEP: 01234-567
-                    </p>
-                  </div>
-                </div>
-
-                <div className="flex items-start gap-4">
-                  <div className="w-12 h-12 rounded-lg bg-secondary flex items-center justify-center flex-shrink-0">
-                    <Clock className="w-5 h-5 text-primary" />
-                  </div>
-                  <div>
-                    <h3 className="font-semibold text-foreground mb-1">Horário de Atendimento</h3>
-                    <p className="text-muted-foreground">
-                      Segunda a Sexta: 08h às 18h<br />
-                      Sábado: 08h às 12h
-                    </p>
-                  </div>
-                </div>
-              </div>
+              <h3 className="font-display font-semibold text-foreground text-lg mb-2">Telefone</h3>
+              <p className="text-muted-foreground">(11) 3456-7890</p>
             </div>
 
-            {/* Contact Form */}
-            <div className="bg-card rounded-2xl border border-border p-6 md:p-8">
-              <h2 className="font-display text-xl font-bold text-foreground mb-6">
-                Envie sua Mensagem
-              </h2>
+            {/* WhatsApp */}
+            <div className="group bg-card rounded-2xl border border-border p-6 hover:border-primary/30 hover:shadow-lg transition-all duration-300">
+              <div className="w-14 h-14 rounded-xl bg-primary/10 flex items-center justify-center mb-4 group-hover:bg-primary/20 transition-colors">
+                <MessageCircle className="w-6 h-6 text-primary" />
+              </div>
+              <h3 className="font-display font-semibold text-foreground text-lg mb-2">WhatsApp</h3>
+              <p className="text-muted-foreground mb-2">(11) 99999-9999</p>
+              <a
+                href="https://wa.me/5511999999999"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1 text-sm font-medium text-primary hover:underline"
+              >
+                Iniciar conversa →
+              </a>
+            </div>
 
-              <form onSubmit={handleSubmit} className="space-y-5">
-                <div>
-                  <label className="text-sm font-medium text-foreground">Nome *</label>
-                  <input
-                    type="text"
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
-                    className="w-full h-11 px-4 mt-1.5 rounded-lg border border-border bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
-                    required
-                  />
-                </div>
+            {/* E-mail */}
+            <div className="group bg-card rounded-2xl border border-border p-6 hover:border-primary/30 hover:shadow-lg transition-all duration-300">
+              <div className="w-14 h-14 rounded-xl bg-primary/10 flex items-center justify-center mb-4 group-hover:bg-primary/20 transition-colors">
+                <Mail className="w-6 h-6 text-primary" />
+              </div>
+              <h3 className="font-display font-semibold text-foreground text-lg mb-2">E-mail</h3>
+              <p className="text-muted-foreground break-all">contato@fanezzesupply.com.br</p>
+            </div>
 
-                <div>
-                  <label className="text-sm font-medium text-foreground">E-mail *</label>
-                  <input
-                    type="email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    className="w-full h-11 px-4 mt-1.5 rounded-lg border border-border bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
-                    required
-                  />
-                </div>
+            {/* Endereço */}
+            <div className="group bg-card rounded-2xl border border-border p-6 hover:border-primary/30 hover:shadow-lg transition-all duration-300">
+              <div className="w-14 h-14 rounded-xl bg-primary/10 flex items-center justify-center mb-4 group-hover:bg-primary/20 transition-colors">
+                <MapPin className="w-6 h-6 text-primary" />
+              </div>
+              <h3 className="font-display font-semibold text-foreground text-lg mb-2">Endereço</h3>
+              <p className="text-muted-foreground">
+                Avenida Antonio Ramos Alvin, 1084<br />
+                Joinville/SC
+              </p>
+            </div>
 
-                <div>
-                  <label className="text-sm font-medium text-foreground">Telefone</label>
-                  <input
-                    type="tel"
-                    value={phone}
-                    onChange={(e) => setPhone(e.target.value)}
-                    className="w-full h-11 px-4 mt-1.5 rounded-lg border border-border bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
-                  />
-                </div>
-
-                <div>
-                  <label className="text-sm font-medium text-foreground">Mensagem *</label>
-                  <textarea
-                    value={message}
-                    onChange={(e) => setMessage(e.target.value)}
-                    rows={5}
-                    className="w-full px-4 py-3 mt-1.5 rounded-lg border border-border bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary resize-none"
-                    required
-                  />
-                </div>
-
-                <Button type="submit" size="lg" className="w-full gap-2" disabled={isLoading}>
-                  {isLoading ? "Enviando..." : "Enviar Mensagem"}
-                  <Send className="w-4 h-4" />
-                </Button>
-              </form>
+            {/* Horário */}
+            <div className="group bg-card rounded-2xl border border-border p-6 hover:border-primary/30 hover:shadow-lg transition-all duration-300 md:col-span-2 lg:col-span-2">
+              <div className="w-14 h-14 rounded-xl bg-primary/10 flex items-center justify-center mb-4 group-hover:bg-primary/20 transition-colors">
+                <Clock className="w-6 h-6 text-primary" />
+              </div>
+              <h3 className="font-display font-semibold text-foreground text-lg mb-2">Horário de Atendimento</h3>
+              <div className="flex flex-wrap gap-x-8 gap-y-1 text-muted-foreground">
+                <span>Segunda a Sexta: 08h às 18h</span>
+                <span>Sábado: 08h às 12h</span>
+              </div>
             </div>
           </div>
         </div>
