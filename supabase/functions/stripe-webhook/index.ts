@@ -50,9 +50,12 @@ serve(async (req) => {
         );
       }
     } else {
-      // Parse event without verification (for testing)
-      console.log("[STRIPE-WEBHOOK] No webhook secret configured, parsing without verification");
-      event = JSON.parse(body);
+      // SECURITY: Reject requests when webhook secret is not configured
+      console.error("[STRIPE-WEBHOOK] STRIPE_WEBHOOK_SECRET not configured or missing signature");
+      return new Response(
+        JSON.stringify({ error: "Webhook not properly configured" }),
+        { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
     }
 
     console.log("[STRIPE-WEBHOOK] Event type:", event.type);
