@@ -17,6 +17,7 @@ import Checkout from "./pages/Checkout";
 import Pedidos from "./pages/Pedidos";
 import AdminClientes from "./pages/AdminClientes";
 import RecuperarSenha from "./pages/RecuperarSenha";
+import ValidarCodigo from "./pages/ValidarCodigo";
 import RedefinirSenha from "./pages/RedefinirSenha";
 import NotFound from "./pages/NotFound";
 
@@ -40,6 +41,7 @@ const App = () => (
               <Route path="/login" element={<Login />} />
               <Route path="/cadastro" element={<Cadastro />} />
               <Route path="/recuperar-senha" element={<RecuperarSenha />} />
+              <Route path="/validar-codigo" element={<ValidarCodigo />} />
               <Route path="/redefinir-senha" element={<RedefinirSenha />} />
               <Route path="/sobre" element={<Sobre />} />
               <Route path="/contato" element={<Contato />} />

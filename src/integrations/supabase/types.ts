@@ -148,24 +148,33 @@ export type Database = {
           },
         ]
       }
-      password_reset_attempts: {
+      password_reset_codes: {
         Row: {
+          attempts: number
+          code_hash: string
           created_at: string
           email: string
+          expires_at: string
           id: string
-          ip_address: string | null
+          used: boolean
         }
         Insert: {
+          attempts?: number
+          code_hash: string
           created_at?: string
           email: string
+          expires_at: string
           id?: string
-          ip_address?: string | null
+          used?: boolean
         }
         Update: {
+          attempts?: number
+          code_hash?: string
           created_at?: string
           email?: string
+          expires_at?: string
           id?: string
-          ip_address?: string | null
+          used?: boolean
         }
         Relationships: []
       }
@@ -195,6 +204,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      cleanup_expired_reset_codes: { Args: never; Returns: undefined }
       cleanup_old_reset_attempts: { Args: never; Returns: undefined }
       has_role: {
         Args: {

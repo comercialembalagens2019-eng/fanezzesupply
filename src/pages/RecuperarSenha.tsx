@@ -1,6 +1,6 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
-import { Package, Mail, Loader2, ArrowLeft, CheckCircle } from "lucide-react";
+import { Link, useNavigate } from "react-router-dom";
+import { Package, Mail, Loader2, ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { toast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
@@ -8,7 +8,7 @@ import { supabase } from "@/integrations/supabase/client";
 const RecuperarSenha = () => {
   const [email, setEmail] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const [emailSent, setEmailSent] = useState(false);
+  const navigate = useNavigate();
 
   const handlePasswordReset = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -18,7 +18,6 @@ const RecuperarSenha = () => {
       const { data, error } = await supabase.functions.invoke("request-password-reset", {
         body: {
           email: email.toLowerCase().trim(),
-          redirectTo: `${window.location.origin}/redefinir-senha`,
         },
       });
 
@@ -33,11 +32,22 @@ const RecuperarSenha = () => {
         return;
       }
 
-      setEmailSent(true);
+      if (data?.error) {
+        toast({
+          title: "Erro",
+          description: data.error,
+          variant: "destructive",
+        });
+        return;
+      }
+
       toast({
-        title: "Link enviado!",
+        title: "Código enviado!",
         description: "Verifique sua caixa de entrada e spam.",
       });
+
+      // Navigate to code validation page
+      navigate(`/validar-codigo?email=${encodeURIComponent(email.toLowerCase().trim())}`);
     } catch (error) {
       console.error("Password reset error:", error);
       toast({
@@ -91,85 +101,64 @@ const RecuperarSenha = () => {
             </span>
           </Link>
 
-          {emailSent ? (
-            // Success State
-            <div className="text-center">
-              <div className="w-16 h-16 rounded-full bg-green-100 flex items-center justify-center mx-auto mb-6">
-                <CheckCircle className="w-8 h-8 text-green-600" />
+          <div className="text-center lg:text-left mb-8">
+            <h2 className="font-display text-2xl font-bold text-foreground mb-2">
+              Recuperar Senha
+            </h2>
+            <p className="text-muted-foreground">
+              Digite seu e-mail cadastrado e enviaremos um código de 6 dígitos para redefinir sua senha.
+            </p>
+          </div>
+
+          <form onSubmit={handlePasswordReset} className="space-y-5">
+            {/* Email */}
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-foreground">
+                Email
+              </label>
+              <div className="relative">
+                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
+                <input
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="seu@email.com"
+                  className="w-full h-12 pl-10 pr-4 rounded-lg border border-border bg-card text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
+                  required
+                />
               </div>
-              <h2 className="font-display text-2xl font-bold text-foreground mb-2">
-                Email enviado!
-              </h2>
-              <p className="text-muted-foreground mb-6">
-                Enviamos um link de recuperação para <strong>{email}</strong>. 
-                Verifique sua caixa de entrada e pasta de spam.
-              </p>
-              <p className="text-sm text-muted-foreground mb-8">
-                O link expira em 1 hora.
-              </p>
-              <Link to="/login">
-                <Button variant="outline" className="w-full">
-                  <ArrowLeft className="w-4 h-4 mr-2" />
-                  Voltar para o login
-                </Button>
-              </Link>
             </div>
-          ) : (
-            // Form State
-            <>
-              <div className="text-center lg:text-left mb-8">
-                <h2 className="font-display text-2xl font-bold text-foreground mb-2">
-                  Recuperar Senha
-                </h2>
-                <p className="text-muted-foreground">
-                  Digite seu e-mail cadastrado e enviaremos um link para redefinir sua senha.
-                </p>
-              </div>
 
-              <form onSubmit={handlePasswordReset} className="space-y-5">
-                {/* Email */}
-                <div className="space-y-2">
-                  <label className="text-sm font-medium text-foreground">
-                    Email
-                  </label>
-                  <div className="relative">
-                    <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
-                    <input
-                      type="email"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      placeholder="seu@email.com"
-                      className="w-full h-12 pl-10 pr-4 rounded-lg border border-border bg-card text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
-                      required
-                    />
-                  </div>
-                </div>
+            {/* Info box */}
+            <div className="bg-muted/50 rounded-lg p-4">
+              <p className="text-sm text-muted-foreground">
+                📱 Você receberá um código de 6 dígitos no email informado. O código expira em 15 minutos.
+              </p>
+            </div>
 
-                {/* Submit */}
-                <Button type="submit" size="lg" className="w-full" disabled={isLoading}>
-                  {isLoading ? (
-                    <>
-                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                      Enviando...
-                    </>
-                  ) : (
-                    "Enviar link de recuperação"
-                  )}
-                </Button>
-              </form>
+            {/* Submit */}
+            <Button type="submit" size="lg" className="w-full" disabled={isLoading}>
+              {isLoading ? (
+                <>
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  Enviando código...
+                </>
+              ) : (
+                "Enviar código de verificação"
+              )}
+            </Button>
+          </form>
 
-              {/* Back to login */}
-              <div className="text-center mt-8">
-                <Link 
-                  to="/login"
-                  className="inline-flex items-center text-primary hover:underline"
-                >
-                  <ArrowLeft className="w-4 h-4 mr-2" />
-                  Voltar para o login
-                </Link>
-              </div>
-            </>
-          )}
+          {/* Back to login */}
+          <div className="text-center mt-8">
+            <Link 
+              to="/login"
+              className="inline-flex items-center text-primary hover:underline"
+            >
+              <ArrowLeft className="w-4 h-4 mr-2" />
+              Voltar para o login
+            </Link>
+          </div>
         </div>
       </div>
     </div>

@@ -1,11 +1,15 @@
 import { useState, useEffect } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { Package, Lock, Loader2, Eye, EyeOff, CheckCircle, XCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { toast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 
 const RedefinirSenha = () => {
+  const [searchParams] = useSearchParams();
+  const email = searchParams.get("email") || "";
+  const resetToken = searchParams.get("token") || "";
+  
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -13,6 +17,18 @@ const RedefinirSenha = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
   const navigate = useNavigate();
+
+  // Redirect if no email or token
+  useEffect(() => {
+    if (!email || !resetToken) {
+      toast({
+        title: "Link inválido",
+        description: "Por favor, solicite um novo código de recuperação.",
+        variant: "destructive",
+      });
+      navigate("/recuperar-senha");
+    }
+  }, [email, resetToken, navigate]);
 
   // Password validation
   const hasMinLength = password.length >= 8;
@@ -46,11 +62,24 @@ const RedefinirSenha = () => {
     setIsLoading(true);
 
     try {
-      const { error } = await supabase.auth.updateUser({
-        password: password,
+      const { data, error } = await supabase.functions.invoke("reset-password-with-code", {
+        body: {
+          email: email,
+          resetToken: resetToken,
+          newPassword: password,
+        },
       });
 
       if (error) throw error;
+
+      if (data?.error) {
+        toast({
+          title: "Erro",
+          description: data.error,
+          variant: "destructive",
+        });
+        return;
+      }
 
       setIsSuccess(true);
       toast({
@@ -64,17 +93,9 @@ const RedefinirSenha = () => {
       }, 3000);
     } catch (error) {
       console.error("Password update error:", error);
-      
-      let errorMessage = "Não foi possível atualizar a senha.";
-      if (error instanceof Error) {
-        if (error.message.includes("expired")) {
-          errorMessage = "Link expirado. Solicite um novo link de recuperação.";
-        }
-      }
-      
       toast({
         title: "Erro",
-        description: errorMessage,
+        description: "Não foi possível atualizar a senha. O link pode ter expirado.",
         variant: "destructive",
       });
     } finally {
@@ -147,11 +168,14 @@ const RedefinirSenha = () => {
             // Form State
             <>
               <div className="text-center lg:text-left mb-8">
+                <div className="w-16 h-16 rounded-full bg-green-100 flex items-center justify-center mx-auto lg:mx-0 mb-4">
+                  <Lock className="w-8 h-8 text-green-600" />
+                </div>
                 <h2 className="font-display text-2xl font-bold text-foreground mb-2">
                   Criar Nova Senha
                 </h2>
                 <p className="text-muted-foreground">
-                  Digite sua nova senha abaixo.
+                  Código validado! ✓ Agora crie uma senha segura para: <strong>{email}</strong>
                 </p>
               </div>
 
