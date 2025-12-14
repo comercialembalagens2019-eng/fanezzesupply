@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { Package, Phone, Mail, MapPin, Instagram, Facebook, Linkedin } from "lucide-react";
+import { Package, Phone, Mail, MapPin, Instagram } from "lucide-react";
 export function Footer() {
   return <footer className="bg-primary text-primary-foreground">
       <div className="container-custom section-padding">
@@ -21,12 +21,8 @@ export function Footer() {
               <a href="https://www.instagram.com/fanezzeembalagens?igsh=aTNmMXpreTYwMHJ5" target="_blank" rel="noopener noreferrer" className="w-9 h-9 rounded-lg bg-beige/10 hover:bg-beige/20 flex items-center justify-center transition-colors">
                 <Instagram className="w-4 h-4" />
               </a>
-              <a href="#" className="w-9 h-9 rounded-lg bg-beige/10 hover:bg-beige/20 flex items-center justify-center transition-colors">
-                <Facebook className="w-4 h-4" />
-              </a>
-              <a href="#" className="w-9 h-9 rounded-lg bg-beige/10 hover:bg-beige/20 flex items-center justify-center transition-colors">
-                <Linkedin className="w-4 h-4" />
-              </a>
+              
+              
             </div>
           </div>
 
@@ -63,7 +59,7 @@ export function Footer() {
             <ul className="space-y-3">
               <li className="flex items-center gap-3 text-sm">
                 <Phone className="w-4 h-4 text-beige/60" />
-                <span className="text-beige/80">(11) 99999-9999</span>
+                <span className="text-beige/80">+55 (47) 99149-0027</span>
               </li>
               <li className="flex items-center gap-3 text-sm">
                 <Mail className="w-4 h-4 text-beige/60" />

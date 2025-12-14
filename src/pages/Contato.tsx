@@ -1,9 +1,7 @@
 import { Layout } from "@/components/layout/Layout";
 import { Phone, Mail, MapPin, MessageCircle, Clock } from "lucide-react";
-
 const Contato = () => {
-  return (
-    <Layout>
+  return <Layout>
       {/* Hero */}
       <section className="bg-primary py-16 md:py-24">
         <div className="container-custom">
@@ -46,13 +44,8 @@ const Contato = () => {
                 <MessageCircle className="w-6 h-6 text-primary" />
               </div>
               <h3 className="font-display font-semibold text-foreground text-lg mb-2">WhatsApp</h3>
-              <p className="text-muted-foreground mb-2">(11) 99999-9999</p>
-              <a
-                href="https://wa.me/5511999999999"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-1 text-sm font-medium text-primary hover:underline"
-              >
+              <p className="text-muted-foreground mb-2">+55 (47) 99149-0027</p>
+              <a href="https://wa.me/5511999999999" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 text-sm font-medium text-primary hover:underline">
                 Iniciar conversa →
               </a>
             </div>
@@ -63,7 +56,7 @@ const Contato = () => {
                 <Mail className="w-6 h-6 text-primary" />
               </div>
               <h3 className="font-display font-semibold text-foreground text-lg mb-2">E-mail</h3>
-              <p className="text-muted-foreground break-all">contato@fanezzesupply.com.br</p>
+              <p className="text-muted-foreground break-all">fanezzesupply@gmail.com</p>
             </div>
 
             {/* Endereço */}
@@ -92,8 +85,6 @@ const Contato = () => {
           </div>
         </div>
       </section>
-    </Layout>
-  );
+    </Layout>;
 };
-
 export default Contato;
