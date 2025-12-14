@@ -46,7 +46,7 @@ const Contato = () => {
               <h3 className="font-display font-semibold text-foreground text-lg mb-2">WhatsApp</h3>
               <p className="text-muted-foreground mb-2">+55 (47) 99149-0027</p>
               <button
-                onClick={() => window.open('https://wa.me/5547991490027?text=Olá!%20Vim%20pelo%20site.', '_blank')}
+                onClick={() => window.open('https://web.whatsapp.com/send?phone=5547991490027&text=Olá%20Vim%20pelo%20site', '_blank')}
                 className="inline-flex items-center gap-1 px-4 py-2 bg-[#25D366] text-white rounded-lg font-semibold text-sm hover:bg-[#1da851] transition-colors cursor-pointer border-none"
               >
                 Iniciar conversa →
