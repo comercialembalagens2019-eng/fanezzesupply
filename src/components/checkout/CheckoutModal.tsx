@@ -676,17 +676,8 @@ export const CheckoutModal = ({ open, onOpenChange }: CheckoutModalProps) => {
       }
 
       if (data?.url) {
-        // Open Stripe checkout in a new tab
-        window.open(data.url, '_blank');
-        
-        toast({
-          title: "Checkout Stripe aberto!",
-          description: "Complete o pagamento na nova aba. Após o pagamento, você será redirecionado.",
-        });
-
-        // Close modal and clear cart
-        clearCart();
-        onOpenChange(false);
+        // Redirect to Stripe checkout in the same window
+        window.location.href = data.url;
       } else {
         throw new Error('URL de checkout não retornada');
       }
