@@ -22,9 +22,7 @@ export function Footer() {
               <span className="text-beige/80 font-medium">Somente retirada no local</span>
             </div>
             <div className="flex items-center gap-3">
-              <a href="https://www.instagram.com/fanezzeembalagens?igsh=aTNmMXpreTYwMHJ5" target="_blank" rel="noopener noreferrer" className="w-9 h-9 rounded-lg bg-beige/10 hover:bg-beige/20 flex items-center justify-center transition-colors">
-                <Instagram className="w-4 h-4" />
-              </a>
+              
               
               
             </div>
@@ -115,16 +113,9 @@ export function Footer() {
               </p>
             </div>
             <div className="w-full lg:w-96 h-48 rounded-lg overflow-hidden border border-beige/20">
-              <iframe
-                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3578.5!2d-48.8494!3d-26.3044!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x94de907b0a7e5b6f%3A0x0!2sAv.%20Antonio%20Ramos%20Alvim%2C%201084%20-%20Joinville%2C%20SC!5e0!3m2!1spt-BR!2sbr!4v1"
-                width="100%"
-                height="100%"
-                style={{ border: 0 }}
-                allowFullScreen
-                loading="lazy"
-                referrerPolicy="no-referrer-when-downgrade"
-                title="Localização Fanezze Supply"
-              />
+              <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3578.5!2d-48.8494!3d-26.3044!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x94de907b0a7e5b6f%3A0x0!2sAv.%20Antonio%20Ramos%20Alvim%2C%201084%20-%20Joinville%2C%20SC!5e0!3m2!1spt-BR!2sbr!4v1" width="100%" height="100%" style={{
+              border: 0
+            }} allowFullScreen loading="lazy" referrerPolicy="no-referrer-when-downgrade" title="Localização Fanezze Supply" />
             </div>
           </div>
         </div>
