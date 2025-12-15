@@ -1415,7 +1415,7 @@ export const CheckoutModal = ({ open, onOpenChange }: CheckoutModalProps) => {
                 </div>
 
                 <div className="p-3 rounded-lg bg-amber-50 border border-amber-200 text-amber-800 text-sm">
-                  <strong>Importante:</strong> O boleto vence em 3 dias úteis. Após o pagamento, pode levar até 3 dias úteis para compensação.
+                  <strong>Importante:</strong> O boleto vence em 28 dias. Após o pagamento, pode levar até 3 dias úteis para compensação.
                 </div>
                 
                 {boletoUrl && (
