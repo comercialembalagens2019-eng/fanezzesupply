@@ -20,7 +20,9 @@ import {
   MapPin,
   ChevronDown,
   ChevronUp,
-  ExternalLink
+  QrCode,
+  CreditCard,
+  FileText
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -36,6 +38,7 @@ interface OrderItem {
 interface Order {
   id: string;
   payment_url: string | null;
+  payment_method: string | null;
   total_amount: number;
   status: string;
   items: OrderItem[];
@@ -90,6 +93,19 @@ const getStatusConfig = (status: string) => {
       return { label: 'Cancelado', color: 'bg-red-100 text-red-800' };
     default:
       return { label: status, color: 'bg-muted text-muted-foreground' };
+  }
+};
+
+const getPaymentMethodConfig = (method: string | null) => {
+  switch (method) {
+    case 'pix':
+      return { label: 'PIX', icon: QrCode, color: 'bg-emerald-100 text-emerald-800' };
+    case 'card':
+      return { label: 'Cartão', icon: CreditCard, color: 'bg-indigo-100 text-indigo-800' };
+    case 'boleto':
+      return { label: 'Boleto', icon: FileText, color: 'bg-orange-100 text-orange-800' };
+    default:
+      return { label: 'N/A', icon: Package, color: 'bg-muted text-muted-foreground' };
   }
 };
 
@@ -350,14 +366,20 @@ export default function AdminClientes() {
                           <div className="space-y-3">
                             {company.orders.map((order) => {
                               const statusConfig = getStatusConfig(order.status);
+                              const paymentConfig = getPaymentMethodConfig(order.payment_method);
+                              const PaymentIcon = paymentConfig.icon;
                               return (
                                 <div key={order.id} className="p-3 rounded-lg bg-muted/50 border">
                                   <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-2">
-                                    <div className="flex items-center gap-2">
+                                    <div className="flex items-center gap-2 flex-wrap">
                                       <Calendar className="w-4 h-4 text-muted-foreground" />
                                       <span className="text-sm">{formatDate(order.created_at)}</span>
                                       <Badge className={cn("text-xs", statusConfig.color)}>
                                         {statusConfig.label}
+                                      </Badge>
+                                      <Badge className={cn("text-xs gap-1", paymentConfig.color)}>
+                                        <PaymentIcon className="w-3 h-3" />
+                                        {paymentConfig.label}
                                       </Badge>
                                     </div>
                                     <span className="font-display font-bold text-primary">
@@ -372,17 +394,6 @@ export default function AdminClientes() {
                                       </span>
                                     ))}
                                   </div>
-                                  {order.payment_url && order.status === 'pending' && (
-                                    <Button
-                                      variant="outline"
-                                      size="sm"
-                                      className="mt-2 gap-1"
-                                      onClick={() => window.open(order.payment_url!, '_blank')}
-                                    >
-                                      <ExternalLink className="w-3 h-3" />
-                                      Ver pagamento
-                                    </Button>
-                                  )}
                                 </div>
                               );
                             })}
