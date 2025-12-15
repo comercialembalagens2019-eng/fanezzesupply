@@ -115,6 +115,34 @@ export default function AdminClientes() {
     }
   }, [isAdmin]);
 
+  // Realtime subscription for order updates (admin panel)
+  useEffect(() => {
+    if (!isAdmin) return;
+
+    const channel = supabase
+      .channel('admin-orders-updates')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'orders'
+        },
+        (payload) => {
+          console.log('Admin: Order update received:', payload);
+          // Refresh companies data when any order changes
+          fetchCompanies();
+        }
+      )
+      .subscribe((status) => {
+        console.log('Admin realtime subscription status:', status);
+      });
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [isAdmin]);
+
   const fetchCompanies = async () => {
     setIsLoading(true);
     try {
