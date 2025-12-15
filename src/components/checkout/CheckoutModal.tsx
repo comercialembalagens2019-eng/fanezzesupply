@@ -1221,7 +1221,7 @@ export const CheckoutModal = ({ open, onOpenChange }: CheckoutModalProps) => {
                 >
                   <FileText className={cn("w-8 h-8", paymentMethod === 'boleto' ? "text-primary" : "text-muted-foreground")} />
                   <span className={cn("font-medium text-sm", paymentMethod === 'boleto' ? "text-primary" : "text-foreground")}>Boleto</span>
-                  <span className="text-xs text-muted-foreground text-center">3 dias úteis</span>
+                  <span className="text-xs text-muted-foreground text-center">28 dias para pagar</span>
                 </button>
                 <button
                   type="button"
@@ -1254,6 +1254,12 @@ export const CheckoutModal = ({ open, onOpenChange }: CheckoutModalProps) => {
                 <p className="text-xs text-muted-foreground mt-1">
                   O CPF é obrigatório para emissão do boleto bancário.
                 </p>
+                <div className="mt-3 p-3 bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800 rounded-lg">
+                  <p className="text-sm text-amber-700 dark:text-amber-400 flex items-center gap-2">
+                    <FileText className="w-4 h-4 flex-shrink-0" />
+                    <span>O boleto vence em <strong>28 dias</strong> após a emissão.</span>
+                  </p>
+                </div>
               </div>
             )}
           </div>
