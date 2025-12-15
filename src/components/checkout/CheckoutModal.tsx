@@ -523,7 +523,7 @@ export const CheckoutModal = ({ open, onOpenChange }: CheckoutModalProps) => {
     }
   };
 
-  const saveOrder = async (companyId: string, paymentUrl: string) => {
+  const saveOrder = async (companyId: string, paymentUrl: string, method: 'pix' | 'card' | 'boleto') => {
     const orderItems = items.map(item => ({
       productId: item.product.id,
       productName: item.product.name,
@@ -541,6 +541,7 @@ export const CheckoutModal = ({ open, onOpenChange }: CheckoutModalProps) => {
         total_amount: getTotal(),
         status: 'pending',
         items: orderItems,
+        payment_method: method,
       })
       .select()
       .single();
@@ -610,7 +611,7 @@ export const CheckoutModal = ({ open, onOpenChange }: CheckoutModalProps) => {
         }
         
         // Save order with brCode for reference and get order ID
-        const savedOrder = await saveOrder(company.id, paymentData.brCode || paymentData.id);
+        const savedOrder = await saveOrder(company.id, paymentData.brCode || paymentData.id, 'pix');
         console.log('Saved order:', savedOrder);
         setCurrentOrderId(savedOrder.id);
         
@@ -712,7 +713,7 @@ export const CheckoutModal = ({ open, onOpenChange }: CheckoutModalProps) => {
       const totalInCents = Math.max(500, Math.round(getTotal() * 100));
 
       // Save order first
-      const savedOrder = await saveOrder(company.id, 'boleto-pending');
+      const savedOrder = await saveOrder(company.id, 'boleto-pending', 'boleto');
       setCurrentOrderId(savedOrder.id);
 
       const { data, error } = await supabase.functions.invoke('create-boleto-payment', {
