@@ -162,6 +162,11 @@ serve(async (req) => {
         order_id: order_id || "",
         user_id: userData.user.id,
       },
+      payment_method_options: {
+        boleto: {
+          expires_after_days: 28,
+        },
+      },
       // Provide payment method data to confirm immediately
       payment_method_data: {
         type: "boleto",
