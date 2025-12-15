@@ -11,19 +11,6 @@ import desinfetanteImg from "@/assets/desinfetante.webp";
 
 export const products: Product[] = [
   {
-    id: "0",
-    name: "Teste",
-    description: "Produto de teste para verificar pagamento.",
-    price: 1.00,
-    unit: "unidade",
-    minOrder: 1,
-    minOrderUnit: "unidade",
-    image: "/placeholder.svg",
-    category: "Teste",
-    featured: true,
-    stripePriceId: "price_1ScwlpAndfpC5YIBBTcfvzdl",
-  },
-  {
     id: "1",
     name: "Saco Plástico PP",
     description: "Saco plástico de polipropileno de alta qualidade, ideal para embalagens diversas. Disponível em diversos tamanhos e espessuras.",
