@@ -243,6 +243,7 @@ serve(async (req) => {
         status: "pending",
         items: orderItems,
         payment_url: "stripe_pending",
+        payment_method: "card",
       })
       .select()
       .single();

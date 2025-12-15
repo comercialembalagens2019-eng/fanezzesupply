@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "@/hooks/use-toast";
-import { Search, Package, Clock, CheckCircle, XCircle, ExternalLink, Loader2, Building2, PartyPopper } from "lucide-react";
+import { Search, Package, Clock, CheckCircle, XCircle, Loader2, Building2, PartyPopper, QrCode, CreditCard, FileText } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/contexts/AuthContext";
 
@@ -23,6 +23,7 @@ interface Order {
   id: string;
   company_id: string;
   payment_url: string | null;
+  payment_method: string | null;
   total_amount: number;
   status: string;
   items: OrderItem[];
@@ -32,6 +33,19 @@ interface Order {
     cnpj: string;
   } | null;
 }
+
+const getPaymentMethodConfig = (method: string | null) => {
+  switch (method) {
+    case 'pix':
+      return { label: 'PIX', icon: QrCode, color: 'bg-emerald-100 text-emerald-800 border-emerald-200' };
+    case 'card':
+      return { label: 'Cartão', icon: CreditCard, color: 'bg-indigo-100 text-indigo-800 border-indigo-200' };
+    case 'boleto':
+      return { label: 'Boleto', icon: FileText, color: 'bg-orange-100 text-orange-800 border-orange-200' };
+    default:
+      return { label: 'Não informado', icon: Package, color: 'bg-muted text-muted-foreground border-border' };
+  }
+};
 
 const formatPrice = (price: number) => {
   return new Intl.NumberFormat("pt-BR", {
@@ -444,6 +458,8 @@ export default function Pedidos() {
                   {orders.map((order) => {
                     const statusConfig = getStatusConfig(order.status);
                     const StatusIcon = statusConfig.icon;
+                    const paymentMethodConfig = getPaymentMethodConfig(order.payment_method);
+                    const PaymentIcon = paymentMethodConfig.icon;
                     const items = order.items as OrderItem[];
 
                     const isRecentlyPaid = recentlyPaidOrders.has(order.id);
@@ -485,7 +501,7 @@ export default function Pedidos() {
                                 </p>
                               </div>
                             </div>
-                            <div className="flex items-center gap-3">
+                            <div className="flex items-center gap-2 flex-wrap">
                               <Badge className={cn(
                                 "gap-1 transition-all duration-500",
                                 isRecentlyPaid 
@@ -494,6 +510,10 @@ export default function Pedidos() {
                               )}>
                                 <StatusIcon className={cn("w-3 h-3", isRecentlyPaid && "animate-pulse")} />
                                 {statusConfig.label}
+                              </Badge>
+                              <Badge className={cn("gap-1", paymentMethodConfig.color)}>
+                                <PaymentIcon className="w-3 h-3" />
+                                {paymentMethodConfig.label}
                               </Badge>
                               <span className="font-display font-bold text-primary">
                                 {formatPrice(Number(order.total_amount))}
@@ -515,19 +535,6 @@ export default function Pedidos() {
                             ))}
                           </div>
 
-                          {order.payment_url && order.status === 'pending' && (
-                            <div className="mt-4 pt-4 border-t">
-                              <Button 
-                                variant="outline" 
-                                size="sm"
-                                className="gap-2"
-                                onClick={() => window.open(order.payment_url!, '_blank')}
-                              >
-                                <ExternalLink className="w-4 h-4" />
-                                Acessar Pagamento
-                              </Button>
-                            </div>
-                          )}
                         </CardContent>
                       </Card>
                     );
