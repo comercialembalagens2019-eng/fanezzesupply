@@ -1,11 +1,68 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import Stripe from "https://esm.sh/stripe@18.5.0";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
+import { Resend } from "https://esm.sh/resend@2.0.0";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, stripe-signature",
 };
+
+// Send payment notification email
+async function sendPaymentNotificationEmail(orderId: string, amount: number, paymentMethod: string) {
+  const resendApiKey = Deno.env.get("RESEND_API_KEY");
+  if (!resendApiKey) {
+    console.error("[STRIPE-WEBHOOK] RESEND_API_KEY not configured, skipping email");
+    return;
+  }
+
+  const resend = new Resend(resendApiKey);
+  const formattedAmount = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(amount / 100);
+
+  try {
+    await resend.emails.send({
+      from: "Fanezze Supply <noreply@fanezzesupply.com.br>",
+      to: ["fanezzesupply@gmail.com"],
+      subject: `💰 Novo pagamento recebido - ${formattedAmount}`,
+      html: `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+          <div style="background: linear-gradient(135deg, #1B2845 0%, #0A1128 100%); padding: 30px; border-radius: 10px 10px 0 0;">
+            <h1 style="color: #F5E6D3; margin: 0; font-size: 24px;">Novo Pagamento Recebido!</h1>
+          </div>
+          <div style="background: #ffffff; padding: 30px; border: 1px solid #e5e5e5; border-top: none; border-radius: 0 0 10px 10px;">
+            <p style="color: #333; font-size: 16px; margin-bottom: 20px;">
+              Um novo pagamento foi confirmado no sistema.
+            </p>
+            <table style="width: 100%; border-collapse: collapse;">
+              <tr>
+                <td style="padding: 10px 0; border-bottom: 1px solid #eee; color: #666;">Pedido:</td>
+                <td style="padding: 10px 0; border-bottom: 1px solid #eee; color: #333; font-weight: bold;">${orderId}</td>
+              </tr>
+              <tr>
+                <td style="padding: 10px 0; border-bottom: 1px solid #eee; color: #666;">Valor:</td>
+                <td style="padding: 10px 0; border-bottom: 1px solid #eee; color: #22c55e; font-weight: bold; font-size: 18px;">${formattedAmount}</td>
+              </tr>
+              <tr>
+                <td style="padding: 10px 0; border-bottom: 1px solid #eee; color: #666;">Método:</td>
+                <td style="padding: 10px 0; border-bottom: 1px solid #eee; color: #333;">${paymentMethod}</td>
+              </tr>
+              <tr>
+                <td style="padding: 10px 0; color: #666;">Data:</td>
+                <td style="padding: 10px 0; color: #333;">${new Date().toLocaleString('pt-BR', { timeZone: 'America/Sao_Paulo' })}</td>
+              </tr>
+            </table>
+            <p style="color: #888; font-size: 12px; margin-top: 30px; text-align: center;">
+              Este é um email automático do sistema Fanezze Supply.
+            </p>
+          </div>
+        </div>
+      `,
+    });
+    console.log("[STRIPE-WEBHOOK] Payment notification email sent");
+  } catch (error) {
+    console.error("[STRIPE-WEBHOOK] Error sending email:", error);
+  }
+}
 
 serve(async (req) => {
   // Handle CORS preflight requests
@@ -91,6 +148,10 @@ serve(async (req) => {
         }
 
         console.log("[STRIPE-WEBHOOK] Order updated successfully:", orderId);
+        
+        // Send payment notification email
+        const amountTotal = session.amount_total || 0;
+        await sendPaymentNotificationEmail(orderId, amountTotal, "Cartão de Crédito");
       } else {
         console.log("[STRIPE-WEBHOOK] Order ID not found in metadata or payment not completed");
       }
@@ -119,6 +180,10 @@ serve(async (req) => {
           console.error("[STRIPE-WEBHOOK] Error updating order:", error);
         } else {
           console.log("[STRIPE-WEBHOOK] Order updated successfully:", orderId);
+          
+          // Determine payment method
+          const paymentMethodType = paymentIntent.payment_method_types?.includes("boleto") ? "Boleto" : "Cartão";
+          await sendPaymentNotificationEmail(orderId, paymentIntent.amount, paymentMethodType);
         }
       }
     }
