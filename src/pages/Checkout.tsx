@@ -8,7 +8,7 @@ import { ArrowLeft, Check, CreditCard, FileText, QrCode, Truck, Package } from "
 import { cn } from "@/lib/utils";
 
 const paymentMethods = [
-  { id: "boleto", label: "Boleto Bancário", icon: FileText, description: "Vencimento em 3 dias úteis" },
+  { id: "boleto", label: "Boleto Bancário", icon: FileText, description: "28 dias para pagar" },
   { id: "pix", label: "PIX", icon: QrCode, description: "Pagamento instantâneo" },
   { id: "credito", label: "Crédito (Aprovados)", icon: CreditCard, description: "Para clientes com crédito aprovado" },
 ];
