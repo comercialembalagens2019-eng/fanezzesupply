@@ -219,21 +219,52 @@ export const CheckoutModal = ({ open, onOpenChange }: CheckoutModalProps) => {
     loadUserCompany();
   }, [user, open, paymentCreated]);
 
-  // Handle payment confirmation
-  const handlePaymentConfirmed = () => {
-    console.log('Payment confirmed!');
+  // Handle payment confirmation - verify DB status before confirming
+  const handlePaymentConfirmed = async () => {
+    if (paymentConfirmed) return; // Prevent duplicate calls
+    
+    console.log('Payment confirmation triggered, verifying DB status...');
+    
+    // Double-check the database to ensure payment is really confirmed
+    if (currentOrderId) {
+      try {
+        const { data: order, error } = await supabase
+          .from('orders')
+          .select('status')
+          .eq('id', currentOrderId)
+          .maybeSingle();
+        
+        if (error) {
+          console.error('Error verifying payment status:', error);
+          return;
+        }
+        
+        if (order?.status !== 'paid') {
+          console.log('Payment not yet confirmed in DB, waiting...');
+          return;
+        }
+        
+        console.log('Payment verified in DB as paid!');
+      } catch (error) {
+        console.error('Error in payment verification:', error);
+        return;
+      }
+    }
+    
     setPaymentConfirmed(true);
     toast({
       title: "🎉 Pagamento Confirmado!",
       description: "Seu pedido foi pago com sucesso. Redirecionando...",
     });
     
-    // Auto close and redirect after 4 seconds
+    // Clear cart immediately
+    clearCart();
+    
+    // Redirect after animation
     setTimeout(() => {
-      clearCart();
       onOpenChange(false);
       navigate('/pedidos');
-    }, 4000);
+    }, 3000);
   };
 
   // Listen for payment confirmation via AbacatePay API + Realtime + DB Polling
@@ -264,14 +295,14 @@ export const CheckoutModal = ({ open, onOpenChange }: CheckoutModalProps) => {
         console.log('Realtime subscription status:', status);
       });
 
-    // Check PIX status directly with AbacatePay API
+    // Check PIX status directly with AbacatePay API - now also updates DB on server side
     const checkPixStatus = async () => {
       if (!currentPixId) return;
       
       try {
         console.log('Checking PIX status via AbacatePay API...');
         const { data, error } = await supabase.functions.invoke('check-pix-status', {
-          body: { pixId: currentPixId },
+          body: { pixId: currentPixId, orderId: currentOrderId },
         });
 
         if (error) {
@@ -282,12 +313,7 @@ export const CheckoutModal = ({ open, onOpenChange }: CheckoutModalProps) => {
         console.log('PIX status response:', data);
         
         if (data?.data?.status === 'PAID') {
-          // Update order status in database
-          await supabase
-            .from('orders')
-            .update({ status: 'paid' })
-            .eq('id', currentOrderId);
-          
+          // Server already updated the DB, but verify before confirming
           handlePaymentConfirmed();
         }
       } catch (error) {
@@ -295,7 +321,7 @@ export const CheckoutModal = ({ open, onOpenChange }: CheckoutModalProps) => {
       }
     };
 
-    // DB polling fallback
+    // DB polling fallback - check more frequently
     const checkDbStatus = async () => {
       try {
         const { data: order, error } = await supabase
@@ -309,6 +335,8 @@ export const CheckoutModal = ({ open, onOpenChange }: CheckoutModalProps) => {
           return;
         }
 
+        console.log('DB status check:', order?.status);
+
         if (order?.status === 'paid') {
           handlePaymentConfirmed();
         }
@@ -321,9 +349,9 @@ export const CheckoutModal = ({ open, onOpenChange }: CheckoutModalProps) => {
     checkPixStatus();
     checkDbStatus();
 
-    // Poll PIX status every 5 seconds, DB every 10 seconds
-    const pixIntervalId = setInterval(checkPixStatus, 5000);
-    const dbIntervalId = setInterval(checkDbStatus, 10000);
+    // Poll PIX status every 3 seconds, DB every 5 seconds (more frequent)
+    const pixIntervalId = setInterval(checkPixStatus, 3000);
+    const dbIntervalId = setInterval(checkDbStatus, 5000);
 
     return () => {
       console.log('Cleaning up payment monitoring');
