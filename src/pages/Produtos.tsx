@@ -73,7 +73,7 @@ const Produtos = () => {
               Nossos Produtos
             </h1>
             <p className="text-lg text-beige/80">
-              Encontre as melhores embalagens para sua empresa com preços competitivos e pedidos mínimos acessíveis.
+              Encontre as melhores embalagens para sua empresa com pedidos mínimos acessíveis.
             </p>
           </div>
         </div>
