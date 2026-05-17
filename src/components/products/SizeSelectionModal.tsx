@@ -193,14 +193,17 @@ export function SizeSelectionModal({
             )}
           </div>
 
-          {/* Total Price */}
+          {/* Contact Info */}
           <div className="p-4 bg-primary/5 rounded-lg border border-primary/20">
-            <div className="flex justify-between items-center">
-              <span className="text-muted-foreground">Total:</span>
-              <span className="font-display text-2xl font-bold text-primary">
-                {formatPrice(totalPrice)}
-              </span>
-            </div>
+            <p className="text-sm text-muted-foreground text-center">
+              Entre em contato para valores
+            </p>
+            <p className="text-center font-medium text-primary mt-1">
+              (47) 99149-0027
+            </p>
+            <p className="text-center text-sm text-muted-foreground">
+              vendas@fnzsupply.com.br
+            </p>
           </div>
 
           {/* Action Buttons */}
