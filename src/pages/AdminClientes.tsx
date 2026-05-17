@@ -264,7 +264,7 @@ export default function AdminClientes() {
                   <Package className="w-6 h-6 text-primary" />
                 </div>
                 <div>
-                  <p className="text-2xl font-display font-bold text-primary">{formatPrice(totalRevenue)}</p>
+                  <p className="text-2xl font-display font-bold text-primary">Consulte-nos</p>
                   <p className="text-sm text-muted-foreground">Valor total em pedidos</p>
                 </div>
               </CardContent>
