@@ -48,6 +48,11 @@ const Carrinho = () => {
 
   return (
     <Layout>
+      <SEO
+        title="Carrinho — Fanezze Supply"
+        description="Revise os itens do seu carrinho e finalize seu pedido de embalagens na Fanezze Supply."
+        path="/carrinho"
+      />
       <section className="section-padding bg-background">
         <div className="container-custom">
           <div className="flex items-center justify-between mb-8">
