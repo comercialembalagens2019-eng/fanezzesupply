@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { useCart } from "@/contexts/CartContext";
 import { cn } from "@/lib/utils";
 import { CheckoutModal } from "@/components/checkout/CheckoutModal";
+import { SEO } from "@/components/SEO";
 const Carrinho = () => {
   const { items, removeFromCart, updateQuantity, getTotal, clearCart, isMinOrderMet, allMinOrdersMet } = useCart();
   const [checkoutOpen, setCheckoutOpen] = useState(false);
@@ -47,6 +48,11 @@ const Carrinho = () => {
 
   return (
     <Layout>
+      <SEO
+        title="Carrinho — Fanezze Supply"
+        description="Revise os itens do seu carrinho e finalize seu pedido de embalagens na Fanezze Supply."
+        path="/carrinho"
+      />
       <section className="section-padding bg-background">
         <div className="container-custom">
           <div className="flex items-center justify-between mb-8">

@@ -1,6 +1,8 @@
 import { useState, useMemo } from "react";
 import { Search, SlidersHorizontal, Grid3X3, LayoutList } from "lucide-react";
 import { Layout } from "@/components/layout/Layout";
+import { SEO } from "@/components/SEO";
+import { Helmet } from "react-helmet-async";
 import { ProductCard } from "@/components/products/ProductCard";
 import { Button } from "@/components/ui/button";
 import { products, categories } from "@/data/products";
@@ -52,6 +54,23 @@ const Produtos = () => {
 
   return (
     <Layout>
+      <SEO
+        title="Nossos Produtos — Fanezze Supply"
+        description="Catálogo completo de embalagens para empresas: caixas, fitas, papel kraft, plásticos e mais. Preços competitivos e pedidos mínimos acessíveis."
+        path="/produtos"
+      />
+      <Helmet>
+        <script type="application/ld+json">{JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "ItemList",
+          "name": "Catálogo Fanezze Supply",
+          "itemListElement": products.slice(0, 20).map((p, i) => ({
+            "@type": "ListItem",
+            "position": i + 1,
+            "name": p.name,
+          })),
+        })}</script>
+      </Helmet>
       {/* Header */}
       <section className="bg-primary py-16 md:py-24">
         <div className="container-custom">
@@ -75,6 +94,7 @@ const Produtos = () => {
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
               <input
                 type="text"
+                aria-label="Buscar produtos"
                 placeholder="Buscar produtos..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
@@ -103,6 +123,7 @@ const Produtos = () => {
 
               {/* Sort */}
               <select
+                aria-label="Ordenar produtos"
                 value={sortBy}
                 onChange={(e) => setSortBy(e.target.value as SortOption)}
                 className="h-10 px-3 rounded-lg border border-border bg-background text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
@@ -117,6 +138,8 @@ const Produtos = () => {
               <div className="hidden md:flex items-center border border-border rounded-lg overflow-hidden">
                 <button
                   onClick={() => setViewMode("grid")}
+                  aria-label="Visualizar em grade"
+                  aria-pressed={viewMode === "grid"}
                   className={cn(
                     "p-2 transition-colors",
                     viewMode === "grid"
@@ -128,6 +151,8 @@ const Produtos = () => {
                 </button>
                 <button
                   onClick={() => setViewMode("list")}
+                  aria-label="Visualizar em lista"
+                  aria-pressed={viewMode === "list"}
                   className={cn(
                     "p-2 transition-colors",
                     viewMode === "list"
@@ -154,6 +179,7 @@ const Produtos = () => {
             </div>
           ) : (
             <>
+              <h2 className="sr-only">Catálogo de produtos</h2>
               <p className="text-muted-foreground mb-6">
                 {filteredProducts.length} produto{filteredProducts.length !== 1 && "s"} encontrado{filteredProducts.length !== 1 && "s"}
               </p>

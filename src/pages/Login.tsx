@@ -4,6 +4,7 @@ import { Eye, EyeOff, Package, Mail, Lock, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { toast } from "@/hooks/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
+import { SEO } from "@/components/SEO";
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -60,6 +61,11 @@ const Login = () => {
 
   return (
     <div className="min-h-screen bg-secondary flex">
+      <SEO
+        title="Entrar — Fanezze Supply"
+        description="Acesse sua conta empresarial na Fanezze Supply para acompanhar pedidos e comprar embalagens no atacado."
+        path="/login"
+      />
       {/* Left Side - Branding */}
       <div className="hidden lg:flex lg:w-1/2 bg-primary relative overflow-hidden">
         <div className="absolute inset-0 opacity-10">

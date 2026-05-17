@@ -94,8 +94,8 @@ export function Header() {
                 </Button>
               </Link>
             )}
-            <Link to="/carrinho" className="relative">
-              <Button variant="secondary" size="icon" className="relative">
+            <Link to="/carrinho" className="relative" aria-label="Abrir carrinho">
+              <Button variant="secondary" size="icon" className="relative" aria-label="Carrinho">
                 <ShoppingCart className="w-5 h-5" />
                 {itemCount > 0 && (
                   <span className="absolute -top-1.5 -right-1.5 w-5 h-5 bg-primary text-primary-foreground text-xs font-bold rounded-full flex items-center justify-center">
@@ -108,8 +108,8 @@ export function Header() {
 
           {/* Mobile Menu Button */}
           <div className="flex md:hidden items-center gap-2">
-            <Link to="/carrinho" className="relative">
-              <Button variant="ghost" size="icon">
+            <Link to="/carrinho" className="relative" aria-label="Abrir carrinho">
+              <Button variant="ghost" size="icon" aria-label="Carrinho">
                 <ShoppingCart className="w-5 h-5" />
                 {itemCount > 0 && (
                   <span className="absolute -top-1 -right-1 w-5 h-5 bg-primary text-primary-foreground text-xs font-bold rounded-full flex items-center justify-center">
@@ -121,6 +121,8 @@ export function Header() {
             <Button
               variant="ghost"
               size="icon"
+              aria-label={isMobileMenuOpen ? "Fechar menu" : "Abrir menu"}
+              aria-expanded={isMobileMenuOpen}
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
             >
               {isMobileMenuOpen ? (

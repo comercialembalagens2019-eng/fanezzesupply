@@ -1,0 +1,17 @@
+# Fanezze Supply
+
+> Distribuidora B2B de embalagens em Joinville/SC. Atendemos empresas com preço justo, qualidade e nota fiscal eletrônica. Retirada no local.
+
+A Fanezze Supply é uma distribuidora de embalagens (caixas, fitas, papel kraft, plásticos e mais) para empresas e atacado. Pedidos mínimos acessíveis, emissão de nota fiscal e atendimento personalizado para o seu negócio.
+
+## Pages
+
+- [Início](/): Apresentação da empresa, produtos em destaque e diferenciais.
+- [Produtos](/produtos): Catálogo completo de embalagens disponíveis para empresas.
+- [Sobre](/sobre): Quem somos, missão e valores da Fanezze Supply.
+- [Contato](/contato): Telefone, WhatsApp, e-mail e endereço para retirada.
+- [Cadastre sua empresa](/cadastro): Crie uma conta empresarial para comprar no atacado.
+
+## Optional
+
+- [Login](/login): Acesso à conta empresarial existente.

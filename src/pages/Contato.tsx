@@ -1,7 +1,13 @@
 import { Layout } from "@/components/layout/Layout";
+import { SEO } from "@/components/SEO";
 import { Phone, Mail, MapPin, MessageCircle, Clock } from "lucide-react";
 const Contato = () => {
   return <Layout>
+      <SEO
+        title="Contato — Fanezze Supply"
+        description="Fale com a Fanezze Supply: telefone, WhatsApp, e-mail e endereço para retirada em Joinville/SC. Solicite seu orçamento de embalagens."
+        path="/contato"
+      />
       {/* Hero */}
       <section className="bg-primary py-16 md:py-24">
         <div className="container-custom">
@@ -45,8 +51,14 @@ const Contato = () => {
               </div>
               <h3 className="font-display font-semibold text-foreground text-lg mb-2">WhatsApp</h3>
               <p className="text-muted-foreground mb-2">(47) 99149-0027</p>
-              <a target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 text-sm font-medium text-primary hover:underline" href="">
-                ​
+              <a
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Conversar com a Fanezze Supply no WhatsApp"
+                className="inline-flex items-center gap-1 text-sm font-medium text-primary hover:underline"
+                href="https://wa.me/5547991490027"
+              >
+                Conversar no WhatsApp
               </a>
             </div>
 
