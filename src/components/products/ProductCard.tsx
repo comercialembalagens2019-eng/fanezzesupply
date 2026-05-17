@@ -1,46 +1,10 @@
-import { useState } from "react";
-import { ShoppingCart, Plus, Minus, AlertCircle } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import { Product } from "@/types";
-import { useCart } from "@/contexts/CartContext";
-import { cn } from "@/lib/utils";
-import { SizeSelectionModal } from "./SizeSelectionModal";
 
 interface ProductCardProps {
   product: Product;
 }
 
 export function ProductCard({ product }: ProductCardProps) {
-  const [quantity, setQuantity] = useState(product.minOrder);
-  const [modalOpen, setModalOpen] = useState(false);
-  const { addToCart } = useCart();
-  const isMinMet = quantity >= product.minOrder;
-
-  const handleQuantityChange = (delta: number) => {
-    const newQuantity = quantity + delta;
-    if (newQuantity >= 1) {
-      setQuantity(newQuantity);
-    }
-  };
-
-  const handleAddToCart = () => {
-    if (product.hasVariations) {
-      setModalOpen(true);
-      return;
-    }
-
-    if (isMinMet) {
-      addToCart(product, quantity);
-      setQuantity(product.minOrder);
-    }
-  };
-
-  const formatPrice = (price: number) => {
-    return new Intl.NumberFormat("pt-BR", {
-      style: "currency",
-      currency: "BRL",
-    }).format(price);
-  };
 
   return (
     <>
