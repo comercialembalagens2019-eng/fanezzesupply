@@ -98,6 +98,7 @@ export function ProductCard({ product }: ProductCardProps) {
                   <Button
                     variant="outline"
                     size="icon"
+                    aria-label="Diminuir quantidade"
                     onClick={() => handleQuantityChange(-1)}
                     disabled={quantity <= 1}
                     className="h-10 w-10"
@@ -106,6 +107,7 @@ export function ProductCard({ product }: ProductCardProps) {
                   </Button>
                   <input
                     type="number"
+                    aria-label="Quantidade"
                     value={quantity}
                     onChange={(e) =>
                       setQuantity(Math.max(1, parseInt(e.target.value) || 1))
@@ -115,6 +117,7 @@ export function ProductCard({ product }: ProductCardProps) {
                   <Button
                     variant="outline"
                     size="icon"
+                    aria-label="Aumentar quantidade"
                     onClick={() => handleQuantityChange(1)}
                     className="h-10 w-10"
                   >
