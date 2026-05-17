@@ -92,87 +92,28 @@ export function ProductCard({ product }: ProductCardProps) {
             </p>
           </div>
 
-          {/* Actions Container - Fixed height to align buttons */}
+          {/* Contact CTA - replaces add to cart */}
           <div className="mt-auto">
-            {/* Quantity Selector - Only show for products without variations */}
-            {!product.hasVariations ? (
-              <div className="space-y-3">
-                <div className="flex items-center gap-3">
-                  <Button
-                    variant="outline"
-                    size="icon"
-                    aria-label="Diminuir quantidade"
-                    onClick={() => handleQuantityChange(-1)}
-                    disabled={quantity <= 1}
-                    className="h-10 w-10"
-                  >
-                    <Minus className="w-4 h-4" />
-                  </Button>
-                  <input
-                    type="number"
-                    aria-label="Quantidade"
-                    value={quantity}
-                    onChange={(e) =>
-                      setQuantity(Math.max(1, parseInt(e.target.value) || 1))
-                    }
-                    className="w-20 h-10 text-center border border-border rounded-lg bg-background text-foreground font-semibold"
-                  />
-                  <Button
-                    variant="outline"
-                    size="icon"
-                    aria-label="Aumentar quantidade"
-                    onClick={() => handleQuantityChange(1)}
-                    className="h-10 w-10"
-                  >
-                    <Plus className="w-4 h-4" />
-                  </Button>
-                </div>
-
-                {/* Min Order Warning */}
-                <div className="h-5">
-                  {!isMinMet && (
-                    <div className="flex items-center gap-2 text-destructive text-xs">
-                      <AlertCircle className="w-4 h-4" />
-                      <span>
-                        Pedido mínimo: {product.minOrder} {product.minOrderUnit}
-                      </span>
-                    </div>
-                  )}
-                </div>
-              </div>
-            ) : (
-              /* Spacer for products with variations to align buttons */
-              <div className="h-[72px]" />
-            )}
-
-            {/* Add to Cart Button */}
-            <Button
-              onClick={handleAddToCart}
-              disabled={!product.hasVariations && !isMinMet}
-              className={cn(
-                "w-full gap-2 mt-3",
-                !product.hasVariations && isMinMet
-                  ? "bg-primary hover:bg-navy-light"
-                  : product.hasVariations
-                  ? "bg-primary hover:bg-navy-light"
-                  : "opacity-50"
-              )}
-            >
-              <ShoppingCart className="w-4 h-4" />
-              {product.hasVariations ? "Selecionar Tamanho" : "Adicionar ao Carrinho"}
-            </Button>
+            <div className="rounded-lg border border-border bg-secondary/40 p-4 text-center">
+              <p className="text-sm text-muted-foreground mb-2">
+                Para informações e cotação:
+              </p>
+              <a
+                href="tel:+5547991490027"
+                className="block font-semibold text-primary hover:underline"
+              >
+                (47) 99149-0027
+              </a>
+              <a
+                href="mailto:vendas@fnzsupply.com.br"
+                className="block text-sm text-primary hover:underline mt-1"
+              >
+                vendas@fnzsupply.com.br
+              </a>
+            </div>
           </div>
         </div>
       </div>
-
-      {/* Size Selection Modal */}
-      {product.hasVariations && (
-        <SizeSelectionModal
-          product={product}
-          open={modalOpen}
-          onOpenChange={setModalOpen}
-        />
-      )}
     </>
   );
 }
