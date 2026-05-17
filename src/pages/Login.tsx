@@ -4,6 +4,7 @@ import { Eye, EyeOff, Package, Mail, Lock, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { toast } from "@/hooks/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
+import { SEO } from "@/components/SEO";
 
 const Login = () => {
   const [email, setEmail] = useState("");
