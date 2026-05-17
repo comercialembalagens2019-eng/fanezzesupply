@@ -1,7 +1,13 @@
 import { Layout } from "@/components/layout/Layout";
+import { SEO } from "@/components/SEO";
 import { Phone, Mail, MapPin, MessageCircle, Clock } from "lucide-react";
 const Contato = () => {
   return <Layout>
+      <SEO
+        title="Contato — Fanezze Supply"
+        description="Fale com a Fanezze Supply: telefone, WhatsApp, e-mail e endereço para retirada em Joinville/SC. Solicite seu orçamento de embalagens."
+        path="/contato"
+      />
       {/* Hero */}
       <section className="bg-primary py-16 md:py-24">
         <div className="container-custom">
