@@ -68,7 +68,7 @@ const Contato = () => {
                 <Mail className="w-6 h-6 text-primary" />
               </div>
               <h3 className="font-display font-semibold text-foreground text-lg mb-2">E-mail</h3>
-              <p className="text-muted-foreground break-all">fanezzesupply@gmail.com</p>
+              <p className="text-muted-foreground break-all">vendas@fnzsupply.com.br</p>
             </div>
 
             {/* Endereço */}
