@@ -177,6 +177,7 @@ const Produtos = () => {
             </div>
           ) : (
             <>
+              <h2 className="sr-only">Catálogo de produtos</h2>
               <p className="text-muted-foreground mb-6">
                 {filteredProducts.length} produto{filteredProducts.length !== 1 && "s"} encontrado{filteredProducts.length !== 1 && "s"}
               </p>
