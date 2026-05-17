@@ -3,7 +3,7 @@ import { ArrowRight, CheckCircle2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 const benefits = [
-  "Preços exclusivos para atacado",
+  "Condições exclusivas para atacado",
   "Nota fiscal eletrônica em todas as compras",
   "Condições especiais de pagamento",
   "Atendimento personalizado",
