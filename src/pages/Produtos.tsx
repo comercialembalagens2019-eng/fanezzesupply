@@ -1,6 +1,8 @@
 import { useState, useMemo } from "react";
 import { Search, SlidersHorizontal, Grid3X3, LayoutList } from "lucide-react";
 import { Layout } from "@/components/layout/Layout";
+import { SEO } from "@/components/SEO";
+import { Helmet } from "react-helmet-async";
 import { ProductCard } from "@/components/products/ProductCard";
 import { Button } from "@/components/ui/button";
 import { products, categories } from "@/data/products";
