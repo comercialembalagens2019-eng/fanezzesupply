@@ -1173,12 +1173,12 @@ export const CheckoutModal = ({ open, onOpenChange }: CheckoutModalProps) => {
                     <span className="text-muted-foreground">
                       {item.product.name} x {item.quantity}
                     </span>
-                    <span className="font-medium">{formatPrice(item.product.price * item.quantity)}</span>
+                    <span className="font-medium text-primary">Consulte-nos</span>
                   </div>
                 ))}
                 <div className="border-t pt-2 mt-2 flex justify-between font-bold">
                   <span>Total</span>
-                  <span className="text-primary">{formatPrice(getTotal())}</span>
+                  <span className="text-primary">Consulte-nos</span>
                 </div>
               </div>
             </div>
