@@ -50,7 +50,7 @@ const Produtos = () => {
     <Layout>
       <SEO
         title="Nossos Produtos — Fanezze Supply"
-        description="Catálogo completo de embalagens para empresas: caixas, fitas, papel kraft, plásticos e mais. Preços competitivos e pedidos mínimos acessíveis."
+        description="Catálogo completo de embalagens para empresas: caixas, fitas, papel kraft, plásticos e mais. Pedidos mínimos acessíveis. Consulte-nos."
         path="/produtos"
       />
       <Helmet>
