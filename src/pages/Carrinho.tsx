@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { useCart } from "@/contexts/CartContext";
 import { cn } from "@/lib/utils";
 import { CheckoutModal } from "@/components/checkout/CheckoutModal";
+import { SEO } from "@/components/SEO";
 const Carrinho = () => {
   const { items, removeFromCart, updateQuantity, getTotal, clearCart, isMinOrderMet, allMinOrdersMet } = useCart();
   const [checkoutOpen, setCheckoutOpen] = useState(false);
