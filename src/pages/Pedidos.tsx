@@ -516,7 +516,7 @@ export default function Pedidos() {
                                 {paymentMethodConfig.label}
                               </Badge>
                               <span className="font-display font-bold text-primary">
-                                {formatPrice(Number(order.total_amount))}
+                                Consulte-nos
                               </span>
                             </div>
                           </div>
