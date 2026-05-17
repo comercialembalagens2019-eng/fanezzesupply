@@ -38,7 +38,7 @@ export function HeroSection() {
             </h1>
 
             <p className="text-lg md:text-xl text-beige/80 max-w-xl animate-slide-up stagger-1">
-              Qualidade, preço justo e entrega rápida. Cadastre sua empresa e tenha acesso a preços exclusivos para atacado.
+              Qualidade e entrega rápida. Cadastre sua empresa e tenha acesso a condições exclusivas para atacado.
             </p>
 
             <div className="flex flex-col sm:flex-row gap-4 animate-slide-up stagger-2">
