@@ -12,3 +12,11 @@ Allow: /
 
 User-agent: *
 Allow: /
+Disallow: /admin/
+Disallow: /checkout
+Disallow: /pedidos
+Disallow: /redefinir-senha
+Disallow: /validar-codigo
+Disallow: /recuperar-senha
+
+Sitemap: https://fanezzesupply.com.br/sitemap.xml
