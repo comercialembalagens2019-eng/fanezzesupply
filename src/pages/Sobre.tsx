@@ -35,6 +35,11 @@ const values = [
 const Sobre = () => {
   return (
     <Layout>
+      <SEO
+        title="Sobre a Fanezze Supply — Distribuição de Embalagens"
+        description="Conheça a Fanezze Supply: 40+ anos de mercado, 500+ clientes ativos. Missão, visão e valores de uma distribuidora de embalagens em Joinville/SC."
+        path="/sobre"
+      />
       {/* Hero */}
       <section className="bg-primary py-16 md:py-24">
         <div className="container-custom">
