@@ -94,8 +94,8 @@ const Carrinho = () => {
                             <h3 className="font-display font-semibold text-foreground">
                               {item.product.name}
                             </h3>
-                            <p className="text-sm text-muted-foreground mt-1">
-                              {formatPrice(item.product.price)}/{item.product.unit}
+                            <p className="text-sm text-primary font-medium mt-1">
+                              Consulte-nos
                             </p>
                           </div>
                           <button
