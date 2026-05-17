@@ -140,8 +140,8 @@ const Carrinho = () => {
                           </div>
 
                           {/* Subtotal */}
-                          <p className="font-display font-bold text-lg text-foreground">
-                            {formatPrice(item.product.price * item.quantity)}
+                          <p className="font-display font-bold text-lg text-primary">
+                            Consulte-nos
                           </p>
                         </div>
 
