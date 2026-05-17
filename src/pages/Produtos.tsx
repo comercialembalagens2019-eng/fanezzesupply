@@ -136,6 +136,8 @@ const Produtos = () => {
               <div className="hidden md:flex items-center border border-border rounded-lg overflow-hidden">
                 <button
                   onClick={() => setViewMode("grid")}
+                  aria-label="Visualizar em grade"
+                  aria-pressed={viewMode === "grid"}
                   className={cn(
                     "p-2 transition-colors",
                     viewMode === "grid"
@@ -147,6 +149,8 @@ const Produtos = () => {
                 </button>
                 <button
                   onClick={() => setViewMode("list")}
+                  aria-label="Visualizar em lista"
+                  aria-pressed={viewMode === "list"}
                   className={cn(
                     "p-2 transition-colors",
                     viewMode === "list"
