@@ -104,11 +104,11 @@ const Checkout = () => {
                             {item.product.name}
                           </h3>
                           <p className="text-sm text-muted-foreground">
-                            {item.quantity} {item.product.minOrderUnit} x {formatPrice(item.product.price)}
+                            {item.quantity} {item.product.minOrderUnit}
                           </p>
                         </div>
-                        <p className="font-semibold text-foreground">
-                          {formatPrice(item.product.price * item.quantity)}
+                        <p className="font-semibold text-primary">
+                          Consulte-nos
                         </p>
                       </div>
                     ))}
