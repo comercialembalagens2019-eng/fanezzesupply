@@ -4,6 +4,7 @@ import { Package, Building2, MapPin, Phone, Lock, Check, ArrowLeft, ArrowRight, 
 import { Button } from "@/components/ui/button";
 import { toast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
+import { SEO } from "@/components/SEO";
 
 const steps = [
   { id: 1, title: "Dados da Empresa", icon: Building2 },
