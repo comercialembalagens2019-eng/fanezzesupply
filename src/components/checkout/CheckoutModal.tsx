@@ -1403,8 +1403,10 @@ export const CheckoutModal = ({ open, onOpenChange }: CheckoutModalProps) => {
                 </div>
                 
                 <div className="p-4 rounded-lg bg-secondary/50 border">
-                  <p className="text-sm font-medium text-foreground mb-2">Total a pagar:</p>
-                  <p className="text-2xl font-display font-bold text-primary">{formatPrice(getTotal())}</p>
+                  <p className="text-sm font-medium text-foreground mb-2">Entre em contato para valores:</p>
+                  <p className="text-lg font-display font-bold text-primary">Consulte-nos</p>
+                  <p className="text-sm text-muted-foreground mt-1">(47) 99149-0027</p>
+                  <p className="text-sm text-muted-foreground">vendas@fnzsupply.com.br</p>
                 </div>
 
                 <div className="p-3 rounded-lg bg-amber-50 border border-amber-200 text-amber-800 text-sm">
