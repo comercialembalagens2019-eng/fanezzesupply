@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { products, categories } from "@/data/products";
 import { cn } from "@/lib/utils";
 
-type SortOption = "name-asc" | "name-desc" | "price-asc" | "price-desc";
+type SortOption = "name-asc" | "name-desc";
 
 const Produtos = () => {
   const [searchTerm, setSearchTerm] = useState("");
