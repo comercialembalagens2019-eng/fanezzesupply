@@ -309,6 +309,11 @@ const Cadastro = () => {
 
   return (
     <div className="min-h-screen bg-secondary">
+      <SEO
+        title="Cadastre sua Empresa — Fanezze Supply"
+        description="Crie sua conta empresarial na Fanezze Supply e compre embalagens no atacado com nota fiscal e preços B2B."
+        path="/cadastro"
+      />
       {/* Header */}
       <header className="bg-card border-b border-border py-4">
         <div className="container-custom">
