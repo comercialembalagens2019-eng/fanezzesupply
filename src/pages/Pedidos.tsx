@@ -516,7 +516,7 @@ export default function Pedidos() {
                                 {paymentMethodConfig.label}
                               </Badge>
                               <span className="font-display font-bold text-primary">
-                                {formatPrice(Number(order.total_amount))}
+                                Consulte-nos
                               </span>
                             </div>
                           </div>
@@ -524,14 +524,14 @@ export default function Pedidos() {
                         <CardContent className="py-4">
                           <div className="space-y-2">
                             {items.map((item, index) => (
-                              <div key={index} className="flex justify-between text-sm">
+                            <div key={index} className="flex justify-between text-sm">
                                 <span className="text-muted-foreground">
                                   {item.productName} x {item.quantity} {item.unit}
                                 </span>
-                                <span className="font-medium">
-                                  {formatPrice(item.totalPrice)}
+                                <span className="font-medium text-primary">
+                                  Consulte-nos
                                 </span>
-                              </div>
+                            </div>
                             ))}
                           </div>
 

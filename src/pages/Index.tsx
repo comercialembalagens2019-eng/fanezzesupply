@@ -10,7 +10,7 @@ const Index = () => {
     <Layout>
       <SEO
         title="Fanezze Supply — Distribuição de Embalagens B2B em Joinville/SC"
-        description="Distribuidora de embalagens para empresas: caixas, fitas, papel kraft e mais. Preço justo, nota fiscal e retirada em Joinville/SC."
+        description="Distribuidora de embalagens para empresas: caixas, fitas, papel kraft e mais. Nota fiscal e retirada em Joinville/SC."
         path="/"
       />
       <HeroSection />

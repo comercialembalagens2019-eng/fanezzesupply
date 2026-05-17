@@ -94,8 +94,8 @@ const Carrinho = () => {
                             <h3 className="font-display font-semibold text-foreground">
                               {item.product.name}
                             </h3>
-                            <p className="text-sm text-muted-foreground mt-1">
-                              {formatPrice(item.product.price)}/{item.product.unit}
+                            <p className="text-sm text-primary font-medium mt-1">
+                              Consulte-nos
                             </p>
                           </div>
                           <button
@@ -140,8 +140,8 @@ const Carrinho = () => {
                           </div>
 
                           {/* Subtotal */}
-                          <p className="font-display font-bold text-lg text-foreground">
-                            {formatPrice(item.product.price * item.quantity)}
+                          <p className="font-display font-bold text-lg text-primary">
+                            Consulte-nos
                           </p>
                         </div>
 
@@ -172,19 +172,19 @@ const Carrinho = () => {
                   <div className="flex justify-between text-sm">
                     <span className="text-muted-foreground">Subtotal</span>
                     <span className="text-foreground font-medium">
-                      {formatPrice(getTotal())}
+                      Consulte-nos
                     </span>
                   </div>
                   <div className="flex justify-between text-sm">
                     <span className="text-muted-foreground">Frete</span>
-                    <span className="text-muted-foreground">A calcular</span>
+                    <span className="text-muted-foreground">Retirada no local</span>
                   </div>
                 </div>
 
                 <div className="flex justify-between py-4">
                   <span className="font-semibold text-foreground">Total</span>
                   <span className="font-display font-bold text-xl text-primary">
-                    {formatPrice(getTotal())}
+                    Consulte-nos
                   </span>
                 </div>
 

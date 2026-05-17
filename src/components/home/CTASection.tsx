@@ -3,7 +3,7 @@ import { ArrowRight, CheckCircle2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 const benefits = [
-  "Preços exclusivos para atacado",
+  "Condições exclusivas para atacado",
   "Nota fiscal eletrônica em todas as compras",
   "Condições especiais de pagamento",
   "Atendimento personalizado",
@@ -24,7 +24,7 @@ export function CTASection() {
             Pronto para economizar nas suas embalagens?
           </h2>
           <p className="text-lg md:text-xl text-beige/80 mb-8">
-            Cadastre sua empresa agora e tenha acesso a preços exclusivos para atacado.
+            Cadastre sua empresa agora e tenha acesso a condições exclusivas para atacado.
           </p>
 
           <div className="flex flex-wrap justify-center gap-4 mb-10">

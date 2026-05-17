@@ -81,11 +81,14 @@ export function ProductCard({ product }: ProductCardProps) {
 
           {/* Price */}
           <div className="mb-4">
-            <p className="font-display text-2xl font-bold text-primary">
-              {formatPrice(product.price)}
-              <span className="text-sm font-normal text-muted-foreground">
-                /{product.unit}
-              </span>
+            <p className="font-display text-xl font-bold text-primary">
+              Consulte-nos
+            </p>
+            <p className="text-sm text-muted-foreground mt-1">
+              (47) 99149-0027
+            </p>
+            <p className="text-sm text-muted-foreground">
+              vendas@fnzsupply.com.br
             </p>
           </div>
 

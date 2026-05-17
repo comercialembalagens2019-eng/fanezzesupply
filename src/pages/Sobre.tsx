@@ -13,7 +13,7 @@ const values = [
   {
     icon: Target,
     title: "Missão",
-    description: "Fornecer embalagens de qualidade com preços competitivos, contribuindo para o sucesso dos nossos clientes.",
+    description: "Fornecer embalagens de qualidade com condições diferenciadas, contribuindo para o sucesso dos nossos clientes.",
   },
   {
     icon: Users,
@@ -82,7 +82,7 @@ const Sobre = () => {
                 A Fanezze Supply nasceu da necessidade de oferecer um serviço diferenciado no mercado de embalagens. Fundada em Joinville, começamos atendendo pequenos comerciantes locais e, ao longo de mais de 40 anos, expandimos nossa atuação para atender empresas de diversos segmentos.
               </p>
               <p>
-                Nossa trajetória foi construída com base em valores sólidos: compromisso com a qualidade, preços justos e um atendimento personalizado que entende as necessidades específicas de cada cliente.
+                Nossa trajetória foi construída com base em valores sólidos: compromisso com a qualidade, condições diferenciadas e um atendimento personalizado que entende as necessidades específicas de cada cliente.
               </p>
               <p>
                 Hoje, contamos com uma ampla variedade de produtos, desde plásticos e papéis até itens de limpeza, sempre mantendo o foco em oferecer as melhores soluções para embalagem e proteção de produtos.

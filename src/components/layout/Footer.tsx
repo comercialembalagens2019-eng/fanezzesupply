@@ -15,7 +15,7 @@ export function Footer() {
               </span>
             </Link>
             <p className="text-beige/80 text-sm leading-relaxed">
-              Distribuição de embalagens com qualidade e preço justo para sua empresa.
+              Distribuição de embalagens com qualidade para sua empresa.
             </p>
             <div className="flex items-center gap-2 text-sm bg-beige/10 rounded-lg px-3 py-2 mt-2">
               <MapPin className="w-4 h-4 text-beige/60" />
@@ -65,7 +65,7 @@ export function Footer() {
               </li>
               <li className="flex items-center gap-3 text-sm">
                 <Mail className="w-4 h-4 text-beige/60" />
-                <span className="text-beige/80">fanezzesupply@gmail.com</span>
+                <span className="text-beige/80">vendas@fnzsupply.com.br</span>
               </li>
               <li className="flex items-start gap-3 text-sm">
                 <MapPin className="w-4 h-4 text-beige/60 mt-0.5" />

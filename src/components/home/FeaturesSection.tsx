@@ -13,7 +13,7 @@ const features = [
   },
   {
     icon: TrendingDown,
-    title: "Preços competitivos para atacado",
+    title: "Condições diferenciadas para atacado",
     description: "Condições especiais para compras em quantidade. Quanto mais você compra, mais economiza.",
   },
   {

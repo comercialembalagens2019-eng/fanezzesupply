@@ -110,8 +110,8 @@ export function SizeSelectionModal({
             />
             <div>
               <h3 className="font-semibold text-foreground">{product.name}</h3>
-              <p className="text-sm text-muted-foreground">
-                {formatPrice(product.price)}/{product.unit}
+              <p className="text-sm text-primary font-medium mt-1">
+                Consulte-nos
               </p>
               <span className="inline-block mt-1 px-2 py-0.5 text-xs font-medium bg-primary/10 text-primary rounded">
                 Mínimo: {product.minOrder}
@@ -193,14 +193,17 @@ export function SizeSelectionModal({
             )}
           </div>
 
-          {/* Total Price */}
+          {/* Contact Info */}
           <div className="p-4 bg-primary/5 rounded-lg border border-primary/20">
-            <div className="flex justify-between items-center">
-              <span className="text-muted-foreground">Total:</span>
-              <span className="font-display text-2xl font-bold text-primary">
-                {formatPrice(totalPrice)}
-              </span>
-            </div>
+            <p className="text-sm text-muted-foreground text-center">
+              Entre em contato para valores
+            </p>
+            <p className="text-center font-medium text-primary mt-1">
+              (47) 99149-0027
+            </p>
+            <p className="text-center text-sm text-muted-foreground">
+              vendas@fnzsupply.com.br
+            </p>
           </div>
 
           {/* Action Buttons */}

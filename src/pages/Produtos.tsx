@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { products, categories } from "@/data/products";
 import { cn } from "@/lib/utils";
 
-type SortOption = "name-asc" | "name-desc" | "price-asc" | "price-desc";
+type SortOption = "name-asc" | "name-desc";
 
 const Produtos = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -41,12 +41,6 @@ const Produtos = () => {
       case "name-desc":
         result.sort((a, b) => b.name.localeCompare(a.name));
         break;
-      case "price-asc":
-        result.sort((a, b) => a.price - b.price);
-        break;
-      case "price-desc":
-        result.sort((a, b) => b.price - a.price);
-        break;
     }
 
     return result;
@@ -56,7 +50,7 @@ const Produtos = () => {
     <Layout>
       <SEO
         title="Nossos Produtos — Fanezze Supply"
-        description="Catálogo completo de embalagens para empresas: caixas, fitas, papel kraft, plásticos e mais. Preços competitivos e pedidos mínimos acessíveis."
+        description="Catálogo completo de embalagens para empresas: caixas, fitas, papel kraft, plásticos e mais. Pedidos mínimos acessíveis. Consulte-nos."
         path="/produtos"
       />
       <Helmet>
@@ -79,7 +73,7 @@ const Produtos = () => {
               Nossos Produtos
             </h1>
             <p className="text-lg text-beige/80">
-              Encontre as melhores embalagens para sua empresa com preços competitivos e pedidos mínimos acessíveis.
+              Encontre as melhores embalagens para sua empresa com pedidos mínimos acessíveis.
             </p>
           </div>
         </div>
@@ -130,8 +124,6 @@ const Produtos = () => {
               >
                 <option value="name-asc">Nome (A-Z)</option>
                 <option value="name-desc">Nome (Z-A)</option>
-                <option value="price-asc">Menor Preço</option>
-                <option value="price-desc">Maior Preço</option>
               </select>
 
               {/* View Toggle */}
