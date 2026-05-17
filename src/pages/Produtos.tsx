@@ -54,6 +54,23 @@ const Produtos = () => {
 
   return (
     <Layout>
+      <SEO
+        title="Nossos Produtos — Fanezze Supply"
+        description="Catálogo completo de embalagens para empresas: caixas, fitas, papel kraft, plásticos e mais. Preços competitivos e pedidos mínimos acessíveis."
+        path="/produtos"
+      />
+      <Helmet>
+        <script type="application/ld+json">{JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "ItemList",
+          "name": "Catálogo Fanezze Supply",
+          "itemListElement": products.slice(0, 20).map((p, i) => ({
+            "@type": "ListItem",
+            "position": i + 1,
+            "name": p.name,
+          })),
+        })}</script>
+      </Helmet>
       {/* Header */}
       <section className="bg-primary py-16 md:py-24">
         <div className="container-custom">
