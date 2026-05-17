@@ -110,8 +110,8 @@ export function SizeSelectionModal({
             />
             <div>
               <h3 className="font-semibold text-foreground">{product.name}</h3>
-              <p className="text-sm text-muted-foreground">
-                {formatPrice(product.price)}/{product.unit}
+              <p className="text-sm text-primary font-medium mt-1">
+                Consulte-nos
               </p>
               <span className="inline-block mt-1 px-2 py-0.5 text-xs font-medium bg-primary/10 text-primary rounded">
                 Mínimo: {product.minOrder}
