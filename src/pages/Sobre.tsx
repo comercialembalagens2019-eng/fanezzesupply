@@ -13,7 +13,7 @@ const values = [
   {
     icon: Target,
     title: "Missão",
-    description: "Fornecer embalagens de qualidade com preços competitivos, contribuindo para o sucesso dos nossos clientes.",
+    description: "Fornecer embalagens de qualidade com condições diferenciadas, contribuindo para o sucesso dos nossos clientes.",
   },
   {
     icon: Users,
