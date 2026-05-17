@@ -123,6 +123,7 @@ const Produtos = () => {
 
               {/* Sort */}
               <select
+                aria-label="Ordenar produtos"
                 value={sortBy}
                 onChange={(e) => setSortBy(e.target.value as SortOption)}
                 className="h-10 px-3 rounded-lg border border-border bg-background text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
