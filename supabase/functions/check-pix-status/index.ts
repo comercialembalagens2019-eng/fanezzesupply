@@ -82,8 +82,29 @@ serve(async (req: Request): Promise<Response> => {
   }
 
   try {
+    // Authenticate the caller
+    const authHeader = req.headers.get('Authorization');
+    if (!authHeader?.startsWith('Bearer ')) {
+      return new Response(
+        JSON.stringify({ error: 'Unauthorized' }),
+        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+    const token = authHeader.replace('Bearer ', '');
+    const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
+    const supabaseAnonKey = Deno.env.get('SUPABASE_ANON_KEY')!;
+    const authClient = createClient(supabaseUrl, supabaseAnonKey);
+    const { data: userData, error: userErr } = await authClient.auth.getUser(token);
+    if (userErr || !userData?.user) {
+      return new Response(
+        JSON.stringify({ error: 'Unauthorized' }),
+        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+    const authedUserId = userData.user.id;
+
     const apiKey = Deno.env.get('ABACATEPAY_API_KEY');
-    
+
     if (!apiKey) {
       console.error('[CHECK-PIX] API key not configured');
       throw new Error('API key not configured');
@@ -140,16 +161,27 @@ serve(async (req: Request): Promise<Response> => {
       const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
       const supabase = createClient(supabaseUrl, supabaseServiceKey);
       
-      // First check current status to avoid duplicate updates
+      // Verify the order belongs to the authenticated user's company
       const { data: currentOrder, error: selectError } = await supabase
         .from('orders')
-        .select('status, total_amount')
+        .select('status, total_amount, companies!inner(user_id)')
         .eq('id', orderId)
         .maybeSingle();
       
       if (selectError) {
         console.error('[CHECK-PIX] Error fetching order:', selectError);
-      } else if (currentOrder && currentOrder.status !== 'paid') {
+      } else if (!currentOrder) {
+        return new Response(
+          JSON.stringify({ error: 'Order not found' }),
+          { status: 404, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      } else if ((currentOrder as any).companies?.user_id !== authedUserId) {
+        console.warn('[CHECK-PIX] Order ownership mismatch');
+        return new Response(
+          JSON.stringify({ error: 'Forbidden' }),
+          { status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      } else if (currentOrder.status !== 'paid') {
         // Update order status using RPC
         const { error: updateError } = await supabase.rpc('update_order_status', {
           p_order_id: orderId,
