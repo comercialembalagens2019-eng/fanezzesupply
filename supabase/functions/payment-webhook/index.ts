@@ -118,8 +118,8 @@ serve(async (req: Request): Promise<Response> => {
     const webhookSecret = url.searchParams.get('webhookSecret');
     const expectedSecret = Deno.env.get('ABACATEPAY_WEBHOOK_SECRET');
 
-    // Validate webhook secret from URL
-    if (!expectedSecret || webhookSecret !== expectedSecret) {
+    // Validate webhook secret from URL using constant-time compare
+    if (!expectedSecret || !webhookSecret || !constantTimeCompare(webhookSecret, expectedSecret)) {
       console.error('Invalid webhook secret');
       return new Response(
         JSON.stringify({ error: 'Invalid webhook secret' }),
@@ -129,20 +129,23 @@ serve(async (req: Request): Promise<Response> => {
 
     // Get raw body for signature verification
     const rawBody = await req.text();
-    console.log('Received webhook payload:', rawBody);
 
-    // Verify HMAC signature if present
+    // Require HMAC signature header (no bypass when absent)
     const signatureHeader = req.headers.get('x-webhook-signature');
-    if (signatureHeader) {
-      const isValid = await verifySignature(rawBody, signatureHeader);
-      if (!isValid) {
-        console.error('Invalid webhook signature');
-        return new Response(
-          JSON.stringify({ error: 'Invalid signature' }),
-          { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-        );
-      }
-      console.log('Webhook signature verified successfully');
+    if (!signatureHeader) {
+      console.error('Missing webhook signature header');
+      return new Response(
+        JSON.stringify({ error: 'Missing signature' }),
+        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+    const isValid = await verifySignature(rawBody, signatureHeader);
+    if (!isValid) {
+      console.error('Invalid webhook signature');
+      return new Response(
+        JSON.stringify({ error: 'Invalid signature' }),
+        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
     }
 
     // Parse the payload
