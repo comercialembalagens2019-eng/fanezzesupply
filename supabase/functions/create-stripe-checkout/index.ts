@@ -199,39 +199,84 @@ serve(async (req) => {
       }
     }
 
-    // Build line items using Stripe price IDs
-    const lineItems = items.map((item) => {
-      if (item.stripePriceId) {
-        return {
-          price: item.stripePriceId,
-          quantity: item.quantity,
-        };
-      } else {
-        return {
-          price_data: {
-            currency: "brl",
-            product_data: {
-              name: item.productName,
-              description: `${item.quantity} ${item.unit}`,
-            },
-            unit_amount: Math.round(item.unitPrice * 100),
-          },
-          quantity: item.quantity,
-        };
+    // SECURITY: server-side allowlist of productId -> Stripe Price ID.
+    // Never trust client-supplied stripePriceId or unitPrice.
+    const PRODUCT_PRICE_MAP: Record<string, string> = {
+      "1": "price_1ScwuDAndfpC5YIBpp9VoACm",
+      "2": "price_1ScwuKAndfpC5YIBr26jz3UX",
+      "3": "price_1ScwuLAndfpC5YIBgg1A9Qhz",
+      "4": "price_1ScwuMAndfpC5YIB5vdKBZRg",
+      "5": "price_1ScwuNAndfpC5YIBA15X71Lu",
+      "6": "price_1ScwuOAndfpC5YIB5kvSLv46",
+      "7": "price_1ScwuQAndfpC5YIBkUwYWJWd",
+      "8": "price_1ScwuRAndfpC5YIBiqDuZ8xx",
+      "9": "price_1ScwuSAndfpC5YIB6Xh3nzjy",
+      "10": "price_1ScwuTAndfpC5YIB4wytsXff",
+      "11": "price_1ScwuUAndfpC5YIBPQU4ASpI",
+      "12": "price_1ScwuVAndfpC5YIBzRjvVLcN",
+      "13": "price_1ScwuWAndfpC5YIBJfpishZc",
+      "14": "price_1ScwuXAndfpC5YIBBDl7gfK3",
+      "15": "price_1ScwuYAndfpC5YIBxv99FeiT",
+    };
+
+    // Resolve Stripe price IDs server-side and fetch authoritative unit amounts.
+    const resolvedItems: Array<{
+      productId: string;
+      productName: string;
+      quantity: number;
+      unit: string;
+      priceId: string;
+      unitAmount: number; // in cents (BRL)
+    }> = [];
+
+    for (const item of items) {
+      const priceId = PRODUCT_PRICE_MAP[item.productId];
+      if (!priceId) {
+        console.log("[STRIPE] Unknown productId:", item.productId);
+        return new Response(
+          JSON.stringify({ error: `Invalid product: ${item.productId}` }),
+          { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
       }
-    });
 
-    // Calculate total for order
-    const totalAmount = items.reduce((sum, item) => sum + (item.unitPrice * item.quantity), 0);
+      const stripePrice = await stripe.prices.retrieve(priceId);
+      if (!stripePrice.active || stripePrice.currency !== "brl" || stripePrice.unit_amount == null) {
+        console.log("[STRIPE] Invalid Stripe price for product:", item.productId);
+        return new Response(
+          JSON.stringify({ error: 'Product unavailable' }),
+          { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      }
 
-    // Create order items for database
-    const orderItems = items.map(item => ({
+      resolvedItems.push({
+        productId: item.productId,
+        productName: item.productName,
+        quantity: item.quantity,
+        unit: item.unit,
+        priceId,
+        unitAmount: stripePrice.unit_amount,
+      });
+    }
+
+    const lineItems = resolvedItems.map((item) => ({
+      price: item.priceId,
+      quantity: item.quantity,
+    }));
+
+    // Authoritative total computed from Stripe-resolved amounts (BRL)
+    const totalAmount = resolvedItems.reduce(
+      (sum, item) => sum + (item.unitAmount / 100) * item.quantity,
+      0
+    );
+
+    // Create order items for database using server-resolved prices
+    const orderItems = resolvedItems.map(item => ({
       productId: item.productId,
       productName: item.productName,
       quantity: item.quantity,
       unit: item.unit,
-      unitPrice: item.unitPrice,
-      totalPrice: item.unitPrice * item.quantity,
+      unitPrice: item.unitAmount / 100,
+      totalPrice: (item.unitAmount / 100) * item.quantity,
     }));
 
     // Create the order (service client already initialized above)
