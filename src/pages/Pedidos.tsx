@@ -330,10 +330,7 @@ export default function Pedidos() {
                       Nenhum pedido encontrado
                     </h3>
                     <p className="text-muted-foreground">
-                      {user 
-                        ? "Você ainda não realizou nenhum pedido."
-                        : "Não encontramos pedidos para este CNPJ. Verifique se o número está correto."
-                      }
+                      Você ainda não realizou nenhum pedido.
                     </p>
                   </CardContent>
                 </Card>
