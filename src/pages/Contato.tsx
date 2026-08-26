@@ -1,6 +1,6 @@
 import { Layout } from "@/components/layout/Layout";
 import { SEO } from "@/components/SEO";
-import { Phone, Mail, MapPin, MessageCircle, Clock } from "lucide-react";
+import { Phone, Mail, MessageCircle } from "lucide-react";
 const Contato = () => {
   return <Layout>
       <SEO
@@ -69,30 +69,6 @@ const Contato = () => {
               </div>
               <h3 className="font-display font-semibold text-foreground text-lg mb-2">E-mail</h3>
               <p className="text-muted-foreground break-all">vendas@fnzsupply.com.br</p>
-            </div>
-
-            {/* Endereço */}
-            <div className="group bg-card rounded-2xl border border-border p-6 hover:border-primary/30 hover:shadow-lg transition-all duration-300">
-              <div className="w-14 h-14 rounded-xl bg-primary/10 flex items-center justify-center mb-4 group-hover:bg-primary/20 transition-colors">
-                <MapPin className="w-6 h-6 text-primary" />
-              </div>
-              <h3 className="font-display font-semibold text-foreground text-lg mb-2">Endereço</h3>
-              <p className="text-muted-foreground">
-                Avenida Antonio Ramos Alvin, 1084<br />
-                Joinville/SC
-              </p>
-            </div>
-
-            {/* Horário */}
-            <div className="group bg-card rounded-2xl border border-border p-6 hover:border-primary/30 hover:shadow-lg transition-all duration-300 md:col-span-2 lg:col-span-2">
-              <div className="w-14 h-14 rounded-xl bg-primary/10 flex items-center justify-center mb-4 group-hover:bg-primary/20 transition-colors">
-                <Clock className="w-6 h-6 text-primary" />
-              </div>
-              <h3 className="font-display font-semibold text-foreground text-lg mb-2">Horário de Atendimento</h3>
-              <div className="flex flex-wrap gap-x-8 gap-y-1 text-muted-foreground">
-                <span>Segunda a Sexta: 08h às 18h</span>
-                <span>Sábado: 08h às 12h</span>
-              </div>
             </div>
           </div>
         </div>
