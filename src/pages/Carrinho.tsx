@@ -177,7 +177,7 @@ const Carrinho = () => {
                   </div>
                   <div className="flex justify-between text-sm">
                     <span className="text-muted-foreground">Frete</span>
-                    <span className="text-muted-foreground">Retirada no local</span>
+                    <span className="text-muted-foreground">Grátis para Joinville • R$ 19,90 demais localidades</span>
                   </div>
                 </div>
 

@@ -10,7 +10,7 @@ const Index = () => {
     <Layout>
       <SEO
         title="FNZ Supply — Distribuição de Embalagens B2B em Joinville/SC"
-        description="Distribuidora de embalagens para empresas: caixas, fitas, papel kraft e mais. Nota fiscal e retirada em Joinville/SC."
+        description="Distribuidora de embalagens para empresas: caixas, fitas, papel kraft e mais. Nota fiscal e entrega. Frete grátis em Joinville/SC."
         path="/"
       />
       <HeroSection />

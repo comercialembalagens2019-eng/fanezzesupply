@@ -5,7 +5,7 @@ const Contato = () => {
   return <Layout>
       <SEO
         title="Contato — FNZ Supply"
-        description="Fale com a FNZ Supply: telefone, WhatsApp, e-mail e endereço para retirada em Joinville/SC. Solicite seu orçamento de embalagens."
+        description="Fale com a FNZ Supply: telefone, WhatsApp, e-mail e localização em Joinville/SC. Solicite seu orçamento de embalagens."
         path="/contato"
       />
       {/* Hero */}

@@ -19,7 +19,7 @@ export function Footer() {
             </p>
             <div className="flex items-center gap-2 text-sm bg-beige/10 rounded-lg px-3 py-2 mt-2">
               <MapPin className="w-4 h-4 text-beige/60" />
-              <span className="text-beige/80 font-medium">Somente retirada no local</span>
+              <span className="text-beige/80 font-medium">Frete grátis para Joinville • R$ 19,90 demais localidades</span>
             </div>
             <div className="flex items-center gap-3">
               
@@ -103,13 +103,13 @@ export function Footer() {
             <div className="flex-1 space-y-2">
               <h4 className="font-display font-semibold text-lg flex items-center gap-2">
                 <MapPin className="w-5 h-5 text-beige/60" />
-                Retire seu pedido aqui
+                Nossa localização
               </h4>
               <p className="text-beige/80 text-sm">
                 Avenida Antonio Ramos Alvin, 1084 - Joinville, SC
               </p>
               <p className="text-beige/60 text-xs">
-                Somente retirada no local • Não realizamos entregas
+                Enviamos para todo o Brasil • Frete grátis para Joinville
               </p>
             </div>
             <div className="w-full lg:w-96 h-48 rounded-lg overflow-hidden border border-beige/20">
