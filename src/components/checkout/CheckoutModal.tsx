@@ -715,11 +715,13 @@ export const CheckoutModal = ({ open, onOpenChange }: CheckoutModalProps) => {
           customer_cpf: boletoCpf.replace(/\D/g, ''),
           order_id: savedOrder.id,
           address: {
-            line1: `${addressData.endereco}, ${addressData.numero}`,
+            line1: addressData.endereco
+              ? `${addressData.endereco}, ${addressData.numero}`
+              : 'Avenida Antonio Ramos Alvin, 1084',
             line2: addressData.complemento || undefined,
-            city: addressData.cidade,
-            state: addressData.estado,
-            postal_code: addressData.cep.replace(/\D/g, ''),
+            city: addressData.cidade || 'Joinville',
+            state: addressData.estado || 'SC',
+            postal_code: (addressData.cep.replace(/\D/g, '') || '89219000'),
           },
         },
       });
