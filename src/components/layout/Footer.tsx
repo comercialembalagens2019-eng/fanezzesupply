@@ -118,6 +118,8 @@ export function Footer() {
             }} allowFullScreen loading="lazy" referrerPolicy="no-referrer-when-downgrade" title="Localização FNZ Supply" />
             </div>
           </div>
+        </div>
+
 
         {/* Consulte-nos */}
         <div className="mt-8 pt-8 border-t border-beige/10">
