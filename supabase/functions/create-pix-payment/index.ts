@@ -238,12 +238,38 @@ serve(async (req: Request): Promise<Response> => {
       }
     }
 
+    // SECURITY: recompute the authoritative amount from the server-side catalog
+    const totals = computeOrderTotalCents(requestData.items);
+    if ('error' in totals) {
+      console.log('[PIX] Order total rejected:', totals.error);
+      return new Response(
+        JSON.stringify({ error: totals.error }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+    const authoritativeAmount = totals.totalCents;
+    if (authoritativeAmount < 100) {
+      return new Response(
+        JSON.stringify({ error: 'Valor mínimo é R$ 1,00' }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+    if (authoritativeAmount > 100000000) {
+      return new Response(
+        JSON.stringify({ error: 'Valor máximo excedido' }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+    if (typeof requestData.amount === 'number' && requestData.amount !== authoritativeAmount) {
+      console.log('[PIX] Client amount mismatch, using server total');
+    }
+
     // Clean and prepare data
     const cleanTaxId = requestData.customer.taxId.replace(/\D/g, '');
     const cleanCellphone = requestData.customer.cellphone.replace(/\D/g, '');
 
     const pixPayload = {
-      amount: requestData.amount,
+      amount: authoritativeAmount,
       expiresIn: 3600,
       description: requestData.description.trim(),
       customer: {
