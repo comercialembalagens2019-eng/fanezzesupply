@@ -71,13 +71,14 @@ serve(async (req) => {
 
     const body = await req.json();
     const { 
-      amount, 
       customer_email, 
       customer_name, 
       customer_cpf, 
       order_id,
       address 
     } = body;
+
+    let orderItems: unknown = body.items;
 
     // SECURITY: Verify user owns the order before processing payment
     if (order_id) {
@@ -88,7 +89,7 @@ serve(async (req) => {
 
       const { data: order, error: orderError } = await supabaseServiceClient
         .from("orders")
-        .select("company_id, companies!inner(user_id)")
+        .select("company_id, items, companies!inner(user_id)")
         .eq("id", order_id)
         .single();
 
@@ -108,12 +109,23 @@ serve(async (req) => {
           { status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" } }
         );
       }
+
+      if (Array.isArray((order as any).items)) {
+        orderItems = (order as any).items;
+      }
     }
 
-    // Validate inputs
-    if (!amount || typeof amount !== "number") {
-      throw new Error("Amount is required and must be a number");
+    // SECURITY: amount is recalculated server-side from the trusted catalog,
+    // never taken from the client payload.
+    const totals = computeOrderTotalCents(orderItems);
+    if ("error" in totals) {
+      console.log("[BOLETO] Order total rejected:", totals.error);
+      return new Response(
+        JSON.stringify({ error: totals.error }),
+        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
     }
+    const amount = totals.totalCents;
 
     if (amount < 500) {
       throw new Error("Minimum amount for boleto is R$5.00 (500 centavos)");
