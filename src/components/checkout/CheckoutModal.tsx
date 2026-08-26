@@ -205,7 +205,7 @@ export const CheckoutModal = ({ open, onOpenChange }: CheckoutModalProps) => {
           });
           
           // Skip directly to step 4 (payment) if all required data is filled
-          if (company.razao_social && company.cnpj && company.endereco && company.whatsapp) {
+          if (company.razao_social && company.cnpj && company.whatsapp) {
             setStep(4);
           }
         }
@@ -715,11 +715,13 @@ export const CheckoutModal = ({ open, onOpenChange }: CheckoutModalProps) => {
           customer_cpf: boletoCpf.replace(/\D/g, ''),
           order_id: savedOrder.id,
           address: {
-            line1: `${addressData.endereco}, ${addressData.numero}`,
+            line1: addressData.endereco
+              ? `${addressData.endereco}, ${addressData.numero}`
+              : 'Avenida Antonio Ramos Alvin, 1084',
             line2: addressData.complemento || undefined,
-            city: addressData.cidade,
-            state: addressData.estado,
-            postal_code: addressData.cep.replace(/\D/g, ''),
+            city: addressData.cidade || 'Joinville',
+            state: addressData.estado || 'SC',
+            postal_code: (addressData.cep.replace(/\D/g, '') || '89219000'),
           },
         },
       });
@@ -774,8 +776,7 @@ export const CheckoutModal = ({ open, onOpenChange }: CheckoutModalProps) => {
         return !!(companyData.razaoSocial && companyData.nomeFantasia && companyData.cnpj && 
           (companyData.isento || companyData.inscricaoEstadual) && companyData.naturezaJuridica);
       case 2:
-        return !!(addressData.cep && addressData.endereco && addressData.numero && 
-          addressData.bairro && addressData.cidade && addressData.estado);
+        return true;
       case 3:
         return !!(contactData.whatsapp && contactData.email);
       case 4:
@@ -793,7 +794,8 @@ export const CheckoutModal = ({ open, onOpenChange }: CheckoutModalProps) => {
 
   const nextStep = () => {
     if (validateStep(step)) {
-      setStep(prev => Math.min(prev + 1, 5));
+      // Step 2 (address) was removed: go straight from company to contacts
+      setStep(prev => Math.min(prev === 1 ? 3 : prev + 1, 5));
     } else {
       // Custom error message for CPF validation
       if (step === 4 && paymentMethod === 'boleto') {
@@ -821,13 +823,12 @@ export const CheckoutModal = ({ open, onOpenChange }: CheckoutModalProps) => {
     }
   };
 
-  const prevStep = () => setStep(prev => Math.max(prev - 1, 1));
+  const prevStep = () => setStep(prev => (prev === 3 ? 1 : Math.max(prev - 1, 1)));
 
   const stepTitles = [
-    { icon: Building2, label: "Empresa" },
-    { icon: MapPin, label: "Endereço" },
-    { icon: Phone, label: "Contatos" },
-    { icon: QrCode, label: "Pagamento" },
+    { icon: Building2, label: "Empresa", step: 1 },
+    { icon: Phone, label: "Contatos", step: 3 },
+    { icon: QrCode, label: "Pagamento", step: 4 },
   ];
 
   const handleClose = () => {
@@ -894,8 +895,8 @@ export const CheckoutModal = ({ open, onOpenChange }: CheckoutModalProps) => {
         <div className="flex items-center justify-between mb-6 px-2">
           {stepTitles.map((s, index) => {
             const StepIcon = s.icon;
-            const isActive = step === index + 1 || (step === 5 && index === 3);
-            const isCompleted = step > index + 1;
+            const isActive = step === s.step || (step === 5 && index === stepTitles.length - 1);
+            const isCompleted = step > s.step;
             return (
               <div key={index} className="flex items-center">
                 <div className="flex flex-col items-center">
@@ -1031,90 +1032,6 @@ export const CheckoutModal = ({ open, onOpenChange }: CheckoutModalProps) => {
           </div>
         )}
 
-        {/* Step 2: Address */}
-        {step === 2 && (
-          <div className="space-y-4">
-            <div className="p-3 rounded-lg bg-amber-50 border border-amber-200 text-amber-800 text-sm">
-              <strong>Importante:</strong> Preencha o endereço exatamente como aparece na Receita Federal para evitar rejeição da NF-e.
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div>
-                <Label htmlFor="cep">CEP *</Label>
-                <Input
-                  id="cep"
-                  value={addressData.cep}
-                  onChange={(e) => {
-                    const formatted = formatCEP(e.target.value);
-                    setAddressData(prev => ({ ...prev, cep: formatted }));
-                    fetchAddressByCep(formatted);
-                  }}
-                  placeholder="00000-000"
-                />
-              </div>
-              <div className="md:col-span-2">
-                <Label htmlFor="endereco">Endereço *</Label>
-                <Input
-                  id="endereco"
-                  value={addressData.endereco}
-                  onChange={(e) => setAddressData(prev => ({ ...prev, endereco: e.target.value }))}
-                  placeholder="Rua, Avenida, etc."
-                />
-              </div>
-              <div>
-                <Label htmlFor="numero">Número *</Label>
-                <Input
-                  id="numero"
-                  value={addressData.numero}
-                  onChange={(e) => setAddressData(prev => ({ ...prev, numero: e.target.value }))}
-                  placeholder="123"
-                />
-              </div>
-              <div className="md:col-span-2">
-                <Label htmlFor="complemento">Complemento</Label>
-                <Input
-                  id="complemento"
-                  value={addressData.complemento}
-                  onChange={(e) => setAddressData(prev => ({ ...prev, complemento: e.target.value }))}
-                  placeholder="Sala, Andar, Bloco..."
-                />
-              </div>
-              <div>
-                <Label htmlFor="bairro">Bairro *</Label>
-                <Input
-                  id="bairro"
-                  value={addressData.bairro}
-                  onChange={(e) => setAddressData(prev => ({ ...prev, bairro: e.target.value }))}
-                  placeholder="Bairro"
-                />
-              </div>
-              <div>
-                <Label htmlFor="cidade">Cidade *</Label>
-                <Input
-                  id="cidade"
-                  value={addressData.cidade}
-                  onChange={(e) => setAddressData(prev => ({ ...prev, cidade: e.target.value }))}
-                  placeholder="Cidade"
-                />
-              </div>
-              <div>
-                <Label htmlFor="estado">Estado *</Label>
-                <Select 
-                  value={addressData.estado} 
-                  onValueChange={(value) => setAddressData(prev => ({ ...prev, estado: value }))}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="UF" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {["AC","AL","AP","AM","BA","CE","DF","ES","GO","MA","MT","MS","MG","PA","PB","PR","PE","PI","RJ","RN","RS","RO","RR","SC","SP","SE","TO"].map(uf => (
-                      <SelectItem key={uf} value={uf}>{uf}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
-          </div>
-        )}
 
         {/* Step 3: Contacts */}
         {step === 3 && (

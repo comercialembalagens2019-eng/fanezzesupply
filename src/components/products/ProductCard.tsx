@@ -22,7 +22,7 @@ export function ProductCard({ product }: ProductCardProps) {
           Mínimo: {product.minOrderLabel ?? `${product.minOrder} ${product.minOrderUnit}`}
         </div>
         {product.spec && (
-          <div className="absolute top-3 right-3 px-3 py-1.5 rounded-full bg-accent text-accent-foreground text-xs font-semibold">
+          <div className="absolute bottom-3 left-3 px-3 py-1.5 rounded-full bg-accent text-accent-foreground text-xs font-semibold">
             {product.spec}
           </div>
         )}
