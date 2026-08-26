@@ -1,13 +1,13 @@
 import { useState, useEffect, useRef } from "react";
-import { Link, useNavigate, useSearchParams } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { Package, Shield, Loader2, RefreshCw, ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { toast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 
 const ValidarCodigo = () => {
-  const [searchParams] = useSearchParams();
-  const email = searchParams.get("email") || "";
+  const location = useLocation();
+  const email = (location.state as { email?: string } | null)?.email || "";
   const [codigo, setCodigo] = useState(["", "", "", "", "", ""]);
   const [isLoading, setIsLoading] = useState(false);
   const [isResending, setIsResending] = useState(false);
@@ -144,8 +144,11 @@ const ValidarCodigo = () => {
         description: "Agora você pode criar uma nova senha.",
       });
 
-      // Navigate to new password page with reset token
-      navigate(`/redefinir-senha?email=${encodeURIComponent(email)}&token=${data.resetToken}`);
+      // Navigate to new password page with reset token in router state (not the URL)
+      navigate("/redefinir-senha", {
+        state: { email, token: data.resetToken },
+        replace: true,
+      });
     } catch (error) {
       console.error("Code validation error:", error);
       toast({

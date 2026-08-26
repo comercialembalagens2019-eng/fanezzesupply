@@ -46,8 +46,11 @@ const RecuperarSenha = () => {
         description: "Verifique sua caixa de entrada e spam.",
       });
 
-      // Navigate to code validation page
-      navigate(`/validar-codigo?email=${encodeURIComponent(email.toLowerCase().trim())}`);
+      // Navigate to code validation page (email kept in router state, not the URL)
+      navigate("/validar-codigo", {
+        state: { email: email.toLowerCase().trim() },
+        replace: true,
+      });
     } catch (error) {
       console.error("Password reset error:", error);
       toast({
