@@ -1,5 +1,6 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { computeOrderTotalCents } from "../_shared/catalog.ts";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -14,7 +15,8 @@ interface Customer {
 }
 
 interface CreatePaymentRequest {
-  amount: number; // em centavos
+  amount: number; // em centavos (ignorado: recalculado no servidor)
+  items: Array<{ productId: string; quantity: number }>;
   description: string;
   customer: Customer;
   externalId?: string;
@@ -109,14 +111,7 @@ function isValidEmail(email: string): boolean {
 function validateRequest(data: CreatePaymentRequest): ValidationError[] {
   const errors: ValidationError[] = [];
   
-  // Amount validation
-  if (!data.amount || typeof data.amount !== 'number') {
-    errors.push({ field: 'amount', message: 'Valor é obrigatório' });
-  } else if (data.amount < 100) {
-    errors.push({ field: 'amount', message: 'Valor mínimo é R$ 1,00 (100 centavos)' });
-  } else if (data.amount > 100000000) { // Max R$ 1,000,000
-    errors.push({ field: 'amount', message: 'Valor máximo excedido' });
-  }
+  // Amount is NOT trusted from the client: it is recalculated server-side from the catalog.
   
   // Description validation
   if (!data.description || data.description.trim().length === 0) {
@@ -243,12 +238,38 @@ serve(async (req: Request): Promise<Response> => {
       }
     }
 
+    // SECURITY: recompute the authoritative amount from the server-side catalog
+    const totals = computeOrderTotalCents(requestData.items);
+    if ('error' in totals) {
+      console.log('[PIX] Order total rejected:', totals.error);
+      return new Response(
+        JSON.stringify({ error: totals.error }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+    const authoritativeAmount = totals.totalCents;
+    if (authoritativeAmount < 100) {
+      return new Response(
+        JSON.stringify({ error: 'Valor mínimo é R$ 1,00' }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+    if (authoritativeAmount > 100000000) {
+      return new Response(
+        JSON.stringify({ error: 'Valor máximo excedido' }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+    if (typeof requestData.amount === 'number' && requestData.amount !== authoritativeAmount) {
+      console.log('[PIX] Client amount mismatch, using server total');
+    }
+
     // Clean and prepare data
     const cleanTaxId = requestData.customer.taxId.replace(/\D/g, '');
     const cleanCellphone = requestData.customer.cellphone.replace(/\D/g, '');
 
     const pixPayload = {
-      amount: requestData.amount,
+      amount: authoritativeAmount,
       expiresIn: 3600,
       description: requestData.description.trim(),
       customer: {

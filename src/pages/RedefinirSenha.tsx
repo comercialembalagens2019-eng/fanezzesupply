@@ -1,14 +1,15 @@
 import { useState, useEffect } from "react";
-import { Link, useNavigate, useSearchParams } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { Package, Lock, Loader2, Eye, EyeOff, CheckCircle, XCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { toast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 
 const RedefinirSenha = () => {
-  const [searchParams] = useSearchParams();
-  const email = searchParams.get("email") || "";
-  const resetToken = searchParams.get("token") || "";
+  const location = useLocation();
+  const resetState = location.state as { email?: string; token?: string } | null;
+  const email = resetState?.email || "";
+  const resetToken = resetState?.token || "";
   
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
