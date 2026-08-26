@@ -1,4 +1,17 @@
+import { useState } from "react";
+import { ShoppingCart } from "lucide-react";
 import { Product } from "@/types";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { useCart } from "@/contexts/CartContext";
 
 interface ProductCardProps {
   product: Product;
@@ -8,6 +21,29 @@ const formatPrice = (price: number) =>
   new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL", minimumFractionDigits: 2 }).format(price);
 
 export function ProductCard({ product }: ProductCardProps) {
+  const { addToCart } = useCart();
+  const [size, setSize] = useState<string>("");
+  const [color, setColor] = useState<string>(product.colors?.[0] ?? "");
+  const [quantity, setQuantity] = useState<number>(product.minOrder);
+
+  const needsSize = !!product.sizes?.length;
+  const needsColor = !!product.colors?.length;
+  const isValid =
+    quantity >= product.minOrder && (!needsSize || !!size) && (!needsColor || !!color);
+
+  const handleAdd = () => {
+    if (!isValid) return;
+    const suffix = [size, color].filter(Boolean).join(" • ");
+    addToCart(
+      {
+        ...product,
+        id: [product.id, size, color].filter(Boolean).join("-"),
+        name: suffix ? `${product.name} - ${suffix}` : product.name,
+      },
+      quantity
+    );
+  };
+
   return (
     <div className="group bg-card rounded-2xl border border-border overflow-hidden hover:shadow-card hover:border-primary/20 transition-all duration-300 flex flex-col">
       {/* Image */}
@@ -17,7 +53,6 @@ export function ProductCard({ product }: ProductCardProps) {
           alt={product.name}
           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
         />
-        {/* Min Order Badge */}
         <div className="absolute top-3 left-3 px-3 py-1.5 rounded-full bg-primary text-primary-foreground text-xs font-semibold">
           Mínimo: {product.minOrderLabel ?? `${product.minOrder} ${product.minOrderUnit}`}
         </div>
@@ -37,62 +72,87 @@ export function ProductCard({ product }: ProductCardProps) {
           <h3 className="font-display font-semibold text-foreground mt-1 mb-2">
             {product.name}
           </h3>
-          <p className="text-sm text-muted-foreground mb-4">
-            {product.description}
-          </p>
+          <p className="text-sm text-muted-foreground mb-4">{product.description}</p>
         </div>
 
-        {/* Variants */}
-        {product.productVariants && (
-          <div className="space-y-3 mb-4">
-            {product.productVariants.map((variant) => (
-              <div
-                key={variant.name}
-                className="rounded-lg border border-border bg-secondary/30 p-4"
-              >
-                <p className="font-semibold text-sm text-foreground">{variant.name}</p>
-                {variant.price !== undefined && (
-                  <p className="font-display text-lg font-bold text-primary mt-1">
-                    {formatPrice(variant.price)}
-                  </p>
-                )}
-                {variant.sizes && (
-                  <p className="text-xs text-muted-foreground mt-1">
-                    Tamanhos: {variant.sizes.join(" • ")}
-                  </p>
-                )}
-                {variant.minOrderText && (
-                  <p className="text-xs text-muted-foreground mt-1">{variant.minOrderText}</p>
-                )}
-                {variant.note && (
-                  <p className="text-xs text-muted-foreground mt-1">{variant.note}</p>
-                )}
-                {variant.highlight && (
-                  <p className="text-xs font-semibold text-primary mt-2">{variant.highlight}</p>
-                )}
+        {product.quoteOnly ? (
+          <div className="mt-auto rounded-lg border border-border bg-secondary/40 p-4 text-center">
+            <p className="font-display text-lg font-bold text-primary">Sob consulta</p>
+            <p className="text-xs text-muted-foreground mt-1">
+              Fale com nossa equipe para condições e prazos.
+            </p>
+          </div>
+        ) : (
+          <div className="mt-auto space-y-3">
+            <p className="font-display text-xl font-bold text-primary">
+              {formatPrice(product.price)}{" "}
+              <span className="text-sm font-normal text-muted-foreground">
+                / {product.unit}
+              </span>
+            </p>
+
+            {needsSize && (
+              <div className="space-y-1.5">
+                <Label htmlFor={`size-${product.id}`}>Tamanho</Label>
+                <Select value={size} onValueChange={setSize}>
+                  <SelectTrigger id={`size-${product.id}`} className="bg-background">
+                    <SelectValue placeholder="Selecione o tamanho" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {product.sizes!.map((s) => (
+                      <SelectItem key={s} value={s}>
+                        {s}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
-            ))}
+            )}
+
+            {needsColor && (
+              <div className="space-y-1.5">
+                <Label htmlFor={`color-${product.id}`}>Cor</Label>
+                <Select value={color} onValueChange={setColor}>
+                  <SelectTrigger id={`color-${product.id}`} className="bg-background">
+                    <SelectValue placeholder="Selecione a cor" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {product.colors!.map((c) => (
+                      <SelectItem key={c} value={c}>
+                        {c}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
+
+            <div className="space-y-1.5">
+              <Label htmlFor={`qty-${product.id}`}>
+                Quantidade ({product.minOrderUnit})
+              </Label>
+              <Input
+                id={`qty-${product.id}`}
+                type="number"
+                min={product.minOrder}
+                step={1}
+                value={quantity}
+                onChange={(e) => setQuantity(parseInt(e.target.value) || 0)}
+                className="bg-background"
+              />
+              {quantity < product.minOrder && (
+                <p className="text-xs text-destructive">
+                  Pedido mínimo: {product.minOrder} {product.minOrderUnit}
+                </p>
+              )}
+            </div>
+
+            <Button className="w-full gap-2" onClick={handleAdd} disabled={!isValid}>
+              <ShoppingCart className="w-4 h-4" />
+              Adicionar ao carrinho
+            </Button>
           </div>
         )}
-
-        {/* Contact CTA */}
-        <div className="mt-auto">
-          <div className="rounded-lg border border-border bg-secondary/40 p-4 text-center">
-            <p className="font-display text-lg font-bold text-primary mb-1">Consulte-nos</p>
-            <a
-              href="tel:+5547991490027"
-              className="block font-semibold text-primary hover:underline"
-            >
-              (47) 99149-0027
-            </a>
-            <a
-              href="mailto:vendas@fnzsupply.com.br"
-              className="block text-sm text-primary hover:underline mt-1"
-            >
-              vendas@fnzsupply.com.br
-            </a>
-          </div>
-        </div>
       </div>
     </div>
   );

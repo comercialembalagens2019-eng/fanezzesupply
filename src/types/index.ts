@@ -29,6 +29,9 @@ export interface Product {
   hasVariations?: boolean;
   variations?: SizeVariation[];
   productVariants?: ProductVariant[];
+  colors?: string[];
+  sizes?: string[];
+  quoteOnly?: boolean;
 }
 
 
