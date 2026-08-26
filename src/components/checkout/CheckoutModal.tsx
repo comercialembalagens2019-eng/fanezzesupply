@@ -586,6 +586,10 @@ export const CheckoutModal = ({ open, onOpenChange }: CheckoutModalProps) => {
       const { data, error } = await supabase.functions.invoke('create-pix-payment', {
         body: {
           amount: totalInCents,
+          items: items.map(item => ({
+            productId: item.product.id,
+            quantity: item.quantity,
+          })),
           description: description.slice(0, 200), // Limit description length
           customer,
           externalId: company.id,
