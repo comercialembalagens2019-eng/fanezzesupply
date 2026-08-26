@@ -62,8 +62,8 @@ const Login = () => {
   return (
     <div className="min-h-screen bg-secondary flex">
       <SEO
-        title="Entrar — Fanezze Supply"
-        description="Acesse sua conta empresarial na Fanezze Supply para acompanhar pedidos e comprar embalagens no atacado."
+        title="Entrar — FNZ Supply"
+        description="Acesse sua conta empresarial na FNZ Supply para acompanhar pedidos e comprar embalagens no atacado."
         path="/login"
       />
       {/* Left Side - Branding */}
@@ -79,7 +79,7 @@ const Login = () => {
               <Package className="w-7 h-7 text-navy" />
             </div>
             <span className="font-display font-bold text-2xl text-beige">
-              Fanezze Supply
+              FNZ Supply
             </span>
           </Link>
 
@@ -101,7 +101,7 @@ const Login = () => {
               <Package className="w-6 h-6 text-primary-foreground" />
             </div>
             <span className="font-display font-bold text-xl text-foreground">
-              Fanezze Supply
+              FNZ Supply
             </span>
           </Link>
 

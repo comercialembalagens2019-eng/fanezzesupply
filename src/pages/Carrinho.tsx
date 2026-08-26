@@ -49,8 +49,8 @@ const Carrinho = () => {
   return (
     <Layout>
       <SEO
-        title="Carrinho — Fanezze Supply"
-        description="Revise os itens do seu carrinho e finalize seu pedido de embalagens na Fanezze Supply."
+        title="Carrinho — FNZ Supply"
+        description="Revise os itens do seu carrinho e finalize seu pedido de embalagens na FNZ Supply."
         path="/carrinho"
       />
       <section className="section-padding bg-background">
@@ -177,7 +177,7 @@ const Carrinho = () => {
                   </div>
                   <div className="flex justify-between text-sm">
                     <span className="text-muted-foreground">Frete</span>
-                    <span className="text-muted-foreground">Retirada no local</span>
+                    <span className="text-muted-foreground">Grátis para Joinville • R$ 19,90 demais localidades</span>
                   </div>
                 </div>
 

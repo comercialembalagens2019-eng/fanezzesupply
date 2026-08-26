@@ -124,12 +124,12 @@ const Checkout = () => {
                     </h2>
                   </div>
                   <div className="p-4 rounded-lg bg-secondary">
-                    <p className="text-foreground font-medium">Endereço de entrega</p>
+                    <p className="text-foreground font-medium">Envio</p>
                     <p className="text-sm text-muted-foreground mt-1">
-                      Será utilizado o endereço cadastrado na sua conta.
+                      Enviamos o seu pedido para todo o Brasil.
                     </p>
                     <p className="text-sm text-primary mt-2">
-                      Frete a calcular após confirmação do pedido.
+                      Frete grátis para Joinville • R$ 19,90 para demais localidades.
                     </p>
                   </div>
                 </div>
@@ -209,7 +209,7 @@ const Checkout = () => {
                     </div>
                     <div className="flex justify-between text-sm">
                       <span className="text-muted-foreground">Frete</span>
-                      <span className="text-muted-foreground">Retirada no local</span>
+                      <span className="text-muted-foreground">Grátis para Joinville • R$ 19,90 demais localidades</span>
                     </div>
                   </div>
 

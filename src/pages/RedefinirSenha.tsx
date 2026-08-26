@@ -120,7 +120,7 @@ const RedefinirSenha = () => {
               <Package className="w-7 h-7 text-navy" />
             </div>
             <span className="font-display font-bold text-2xl text-beige">
-              Fanezze Supply
+              FNZ Supply
             </span>
           </Link>
 
@@ -142,7 +142,7 @@ const RedefinirSenha = () => {
               <Package className="w-6 h-6 text-primary-foreground" />
             </div>
             <span className="font-display font-bold text-xl text-foreground">
-              Fanezze Supply
+              FNZ Supply
             </span>
           </Link>
 

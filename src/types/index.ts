@@ -3,21 +3,34 @@ export interface SizeVariation {
   sizes: string[];
 }
 
+export interface ProductVariant {
+  name: string;
+  price?: number;
+  sizes?: string[];
+  minOrderText?: string;
+  note?: string;
+  highlight?: string;
+}
+
 export interface Product {
   id: string;
   name: string;
   description: string;
+  spec?: string;
   price: number;
   unit: string;
   minOrder: number;
   minOrderUnit: string;
+  minOrderLabel?: string;
   image: string;
   category: string;
   featured?: boolean;
   stripePriceId?: string;
   hasVariations?: boolean;
   variations?: SizeVariation[];
+  productVariants?: ProductVariant[];
 }
+
 
 export interface CartItem {
   product: Product;

@@ -36,8 +36,8 @@ const Sobre = () => {
   return (
     <Layout>
       <SEO
-        title="Sobre a Fanezze Supply — Distribuição de Embalagens"
-        description="Conheça a Fanezze Supply: 40+ anos de mercado, 500+ clientes ativos. Missão, visão e valores de uma distribuidora de embalagens em Joinville/SC."
+        title="Sobre a FNZ Supply — Distribuição de Embalagens"
+        description="Conheça a FNZ Supply: 40+ anos de mercado, 500+ clientes ativos. Missão, visão e valores de uma distribuidora de embalagens em Joinville/SC."
         path="/sobre"
       />
       {/* Hero */}
@@ -45,7 +45,7 @@ const Sobre = () => {
         <div className="container-custom">
           <div className="max-w-2xl">
             <h1 className="font-display text-3xl md:text-4xl lg:text-5xl font-bold text-beige mb-4">
-              Sobre a Fanezze Supply
+              Sobre a FNZ Supply
             </h1>
             <p className="text-lg text-beige/80">
               Há mais de 40 anos no mercado, somos especialistas em distribuição de embalagens para empresas de todos os portes.
@@ -79,7 +79,7 @@ const Sobre = () => {
             </h2>
             <div className="prose prose-lg text-muted-foreground">
               <p>
-                A Fanezze Supply nasceu da necessidade de oferecer um serviço diferenciado no mercado de embalagens. Fundada em Joinville, começamos atendendo pequenos comerciantes locais e, ao longo de mais de 40 anos, expandimos nossa atuação para atender empresas de diversos segmentos.
+                A FNZ Supply nasceu da necessidade de oferecer um serviço diferenciado no mercado de embalagens. Fundada em Joinville, começamos atendendo pequenos comerciantes locais e, ao longo de mais de 40 anos, expandimos nossa atuação para atender empresas de diversos segmentos.
               </p>
               <p>
                 Nossa trajetória foi construída com base em valores sólidos: compromisso com a qualidade, condições diferenciadas e um atendimento personalizado que entende as necessidades específicas de cada cliente.

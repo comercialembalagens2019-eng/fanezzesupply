@@ -1159,8 +1159,8 @@ export const CheckoutModal = ({ open, onOpenChange }: CheckoutModalProps) => {
             <div className="p-3 rounded-lg bg-amber-50 border border-amber-200 flex items-center gap-3">
               <MapPin className="w-5 h-5 text-amber-600 flex-shrink-0" />
               <div>
-                <p className="font-medium text-amber-800 text-sm">Somente retirada no local</p>
-                <p className="text-amber-700 text-xs">Não realizamos entregas. Retire seu pedido em nosso endereço.</p>
+                <p className="font-medium text-amber-800 text-sm">Frete grátis para Joinville</p>
+                <p className="text-amber-700 text-xs">Demais localidades: R$ 19,90.</p>
               </div>
             </div>
 
