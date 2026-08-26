@@ -111,14 +111,7 @@ function isValidEmail(email: string): boolean {
 function validateRequest(data: CreatePaymentRequest): ValidationError[] {
   const errors: ValidationError[] = [];
   
-  // Amount validation
-  if (!data.amount || typeof data.amount !== 'number') {
-    errors.push({ field: 'amount', message: 'Valor é obrigatório' });
-  } else if (data.amount < 100) {
-    errors.push({ field: 'amount', message: 'Valor mínimo é R$ 1,00 (100 centavos)' });
-  } else if (data.amount > 100000000) { // Max R$ 1,000,000
-    errors.push({ field: 'amount', message: 'Valor máximo excedido' });
-  }
+  // Amount is NOT trusted from the client: it is recalculated server-side from the catalog.
   
   // Description validation
   if (!data.description || data.description.trim().length === 0) {
