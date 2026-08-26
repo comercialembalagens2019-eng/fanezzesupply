@@ -311,8 +311,8 @@ const Cadastro = () => {
   return (
     <div className="min-h-screen bg-secondary">
       <SEO
-        title="Cadastre sua Empresa — Fanezze Supply"
-        description="Crie sua conta empresarial na Fanezze Supply e compre embalagens no atacado com nota fiscal e preços B2B."
+        title="Cadastre sua Empresa — FNZ Supply"
+        description="Crie sua conta empresarial na FNZ Supply e compre embalagens no atacado com nota fiscal e preços B2B."
         path="/cadastro"
       />
       {/* Header */}
@@ -324,7 +324,7 @@ const Cadastro = () => {
                 <Package className="w-6 h-6 text-primary-foreground" />
               </div>
               <span className="font-display font-bold text-xl text-foreground">
-                Fanezze Supply
+                FNZ Supply
               </span>
             </Link>
             <Link to="/login" className="text-sm text-muted-foreground hover:text-foreground transition-colors">

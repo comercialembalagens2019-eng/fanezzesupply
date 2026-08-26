@@ -49,7 +49,7 @@ const Produtos = () => {
   return (
     <Layout>
       <SEO
-        title="Nossos Produtos — Fanezze Supply"
+        title="Nossos Produtos — FNZ Supply"
         description="Catálogo completo de embalagens para empresas: caixas, fitas, papel kraft, plásticos e mais. Pedidos mínimos acessíveis. Consulte-nos."
         path="/produtos"
       />
@@ -57,7 +57,7 @@ const Produtos = () => {
         <script type="application/ld+json">{JSON.stringify({
           "@context": "https://schema.org",
           "@type": "ItemList",
-          "name": "Catálogo Fanezze Supply",
+          "name": "Catálogo FNZ Supply",
           "itemListElement": products.slice(0, 20).map((p, i) => ({
             "@type": "ListItem",
             "position": i + 1,

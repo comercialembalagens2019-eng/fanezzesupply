@@ -30,7 +30,7 @@ export function FeaturesSection() {
         <div className="text-center max-w-2xl mx-auto mb-16">
           <h2 className="font-display text-3xl md:text-4xl font-bold text-foreground mb-4">
             Por que escolher a{" "}
-            <span className="text-primary">Fanezze Supply?</span>
+            <span className="text-primary">FNZ Supply?</span>
           </h2>
           <p className="text-muted-foreground text-lg">
             Somos especialistas em distribuição de embalagens para empresas, com foco em qualidade e atendimento.

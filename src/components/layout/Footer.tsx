@@ -11,7 +11,7 @@ export function Footer() {
                 <Package className="w-6 h-6 text-navy" />
               </div>
               <span className="font-display font-bold text-xl">
-                Fanezze Supply
+                FNZ Supply
               </span>
             </Link>
             <p className="text-beige/80 text-sm leading-relaxed">
@@ -115,7 +115,7 @@ export function Footer() {
             <div className="w-full lg:w-96 h-48 rounded-lg overflow-hidden border border-beige/20">
               <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3578.5!2d-48.8494!3d-26.3044!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x94de907b0a7e5b6f%3A0x0!2sAv.%20Antonio%20Ramos%20Alvim%2C%201084%20-%20Joinville%2C%20SC!5e0!3m2!1spt-BR!2sbr!4v1" width="100%" height="100%" style={{
               border: 0
-            }} allowFullScreen loading="lazy" referrerPolicy="no-referrer-when-downgrade" title="Localização Fanezze Supply" />
+            }} allowFullScreen loading="lazy" referrerPolicy="no-referrer-when-downgrade" title="Localização FNZ Supply" />
             </div>
           </div>
         </div>
@@ -125,7 +125,7 @@ export function Footer() {
       <div className="border-t border-beige/10">
         <div className="container-custom py-6">
           <div className="flex flex-col md:flex-row items-center justify-between gap-4 text-sm text-beige/60">
-            <p>© 2024 Fanezze Supply. Todos os direitos reservados.</p>
+            <p>© 2024 FNZ Supply. Todos os direitos reservados.</p>
             <div className="flex items-center gap-4">
               <Link to="/termos" className="hover:text-beige transition-colors">
                 Termos de Uso

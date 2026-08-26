@@ -36,7 +36,7 @@ export function Header() {
               <Package className="w-6 h-6 text-primary-foreground" />
             </div>
             <span className="font-display font-bold text-xl text-foreground group-hover:text-navy-light transition-colors">
-              Fanezze Supply
+              FNZ Supply
             </span>
           </Link>
 

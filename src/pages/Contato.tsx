@@ -4,8 +4,8 @@ import { Phone, Mail, MapPin, MessageCircle, Clock } from "lucide-react";
 const Contato = () => {
   return <Layout>
       <SEO
-        title="Contato — Fanezze Supply"
-        description="Fale com a Fanezze Supply: telefone, WhatsApp, e-mail e endereço para retirada em Joinville/SC. Solicite seu orçamento de embalagens."
+        title="Contato — FNZ Supply"
+        description="Fale com a FNZ Supply: telefone, WhatsApp, e-mail e endereço para retirada em Joinville/SC. Solicite seu orçamento de embalagens."
         path="/contato"
       />
       {/* Hero */}
@@ -54,7 +54,7 @@ const Contato = () => {
               <a
                 target="_blank"
                 rel="noopener noreferrer"
-                aria-label="Conversar com a Fanezze Supply no WhatsApp"
+                aria-label="Conversar com a FNZ Supply no WhatsApp"
                 className="inline-flex items-center gap-1 text-sm font-medium text-primary hover:underline"
                 href="https://wa.me/5547991490027"
               >
