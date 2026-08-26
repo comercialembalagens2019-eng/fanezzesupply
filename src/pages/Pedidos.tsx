@@ -93,21 +93,10 @@ const getStatusConfig = (status: string) => {
 
 export default function Pedidos() {
   const { user, isLoading: authLoading } = useAuth();
-  const [cnpj, setCnpj] = useState("");
   const [orders, setOrders] = useState<Order[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const [hasSearched, setHasSearched] = useState(false);
   const [companyId, setCompanyId] = useState<string | null>(null);
-
-  const formatCNPJInput = (value: string) => {
-    return value
-      .replace(/\D/g, '')
-      .replace(/^(\d{2})(\d)/, '$1.$2')
-      .replace(/^(\d{2})\.(\d{3})(\d)/, '$1.$2.$3')
-      .replace(/\.(\d{3})(\d)/, '.$1/$2')
-      .replace(/(\d{4})(\d)/, '$1-$2')
-      .slice(0, 18);
-  };
 
   // Track recently paid orders for animation
   const [recentlyPaidOrders, setRecentlyPaidOrders] = useState<Set<string>>(new Set());
