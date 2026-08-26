@@ -3,7 +3,7 @@ import { Package, Phone, Mail, MapPin, Instagram } from "lucide-react";
 export function Footer() {
   return <footer className="bg-primary text-primary-foreground">
       <div className="container-custom section-padding">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-12">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 lg:gap-12">
           {/* Brand */}
           <div className="space-y-4">
             <Link to="/" className="flex items-center gap-2">
@@ -66,32 +66,6 @@ export function Footer() {
               <li className="flex items-center gap-3 text-sm">
                 <Mail className="w-4 h-4 text-beige/60" />
                 <span className="text-beige/80">vendas@fnzsupply.com.br</span>
-              </li>
-              <li className="flex items-start gap-3 text-sm">
-                <MapPin className="w-4 h-4 text-beige/60 mt-0.5" />
-                <span className="text-beige/80">
-                  Avenida Antonio Ramos Alvin, 1084<br />
-                  Joinville - SC
-                </span>
-              </li>
-            </ul>
-          </div>
-
-          {/* Business Hours */}
-          <div className="space-y-4">
-            <h4 className="font-display font-semibold text-lg">Horário de Atendimento</h4>
-            <ul className="space-y-2 text-sm">
-              <li className="flex justify-between text-beige/80">
-                <span>Segunda - Sexta:</span>
-                <span>08h às 18h</span>
-              </li>
-              <li className="flex justify-between text-beige/80">
-                <span>Sábado:</span>
-                <span>08h às 12h</span>
-              </li>
-              <li className="flex justify-between text-beige/80">
-                <span>Domingo:</span>
-                <span>Fechado</span>
               </li>
             </ul>
           </div>
