@@ -6,10 +6,9 @@ import { useCart } from "@/contexts/CartContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { cn } from "@/lib/utils";
 
-const navLinks = [
+const baseNavLinks = [
   { href: "/", label: "Home" },
   { href: "/produtos", label: "Produtos" },
-  { href: "/pedidos", label: "Meus Pedidos" },
   { href: "/sobre", label: "Sobre" },
   { href: "/contato", label: "Contato" },
 ];
@@ -20,6 +19,9 @@ export function Header() {
   const { getItemCount } = useCart();
   const { user, isAdmin, signOut } = useAuth();
   const itemCount = getItemCount();
+  const navLinks = user
+    ? [...baseNavLinks.slice(0, 2), { href: "/pedidos", label: "Meus Pedidos" }, ...baseNavLinks.slice(2)]
+    : baseNavLinks;
 
   const handleSignOut = async () => {
     await signOut();

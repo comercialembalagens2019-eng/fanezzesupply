@@ -1,12 +1,11 @@
 import { useState, useEffect } from "react";
+import { Navigate } from "react-router-dom";
 import { Layout } from "@/components/layout/Layout";
 import { supabase } from "@/integrations/supabase/client";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "@/hooks/use-toast";
-import { Search, Package, Clock, CheckCircle, XCircle, Loader2, Building2, PartyPopper, QrCode, CreditCard, FileText } from "lucide-react";
+import { Package, Clock, CheckCircle, XCircle, Loader2, Building2, PartyPopper, QrCode, CreditCard, FileText } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/contexts/AuthContext";
 
@@ -94,21 +93,10 @@ const getStatusConfig = (status: string) => {
 
 export default function Pedidos() {
   const { user, isLoading: authLoading } = useAuth();
-  const [cnpj, setCnpj] = useState("");
   const [orders, setOrders] = useState<Order[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const [hasSearched, setHasSearched] = useState(false);
   const [companyId, setCompanyId] = useState<string | null>(null);
-
-  const formatCNPJInput = (value: string) => {
-    return value
-      .replace(/\D/g, '')
-      .replace(/^(\d{2})(\d)/, '$1.$2')
-      .replace(/^(\d{2})\.(\d{3})(\d)/, '$1.$2.$3')
-      .replace(/\.(\d{3})(\d)/, '.$1/$2')
-      .replace(/(\d{4})(\d)/, '$1-$2')
-      .slice(0, 18);
-  };
 
   // Track recently paid orders for animation
   const [recentlyPaidOrders, setRecentlyPaidOrders] = useState<Set<string>>(new Set());
@@ -283,79 +271,6 @@ export default function Pedidos() {
     };
   }, [companyId]);
 
-  const searchOrders = async () => {
-    const cleanCnpj = cnpj.replace(/\D/g, '');
-    
-    if (cleanCnpj.length !== 14) {
-      toast({
-        title: "CNPJ inválido",
-        description: "Digite um CNPJ válido com 14 dígitos.",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    setIsLoading(true);
-    setHasSearched(true);
-
-    try {
-      // First find the company by CNPJ
-      const { data: company, error: companyError } = await supabase
-        .from('companies')
-        .select('id')
-        .eq('cnpj', cleanCnpj)
-        .maybeSingle();
-
-      if (companyError) throw companyError;
-
-      if (!company) {
-        setOrders([]);
-        setCompanyId(null);
-        return;
-      }
-
-      setCompanyId(company.id);
-
-      // Then fetch orders for this company
-      const { data: ordersData, error: ordersError } = await supabase
-        .from('orders')
-        .select(`
-          *,
-          companies (
-            nome_fantasia,
-            cnpj
-          )
-        `)
-        .eq('company_id', company.id)
-        .order('created_at', { ascending: false });
-
-      if (ordersError) throw ordersError;
-
-      // Parse items JSON properly
-      const parsedOrders = (ordersData || []).map(order => ({
-        ...order,
-        items: (typeof order.items === 'string' ? JSON.parse(order.items) : order.items) as OrderItem[]
-      })) as Order[];
-
-      setOrders(parsedOrders);
-    } catch (error) {
-      console.error('Error fetching orders:', error);
-      toast({
-        title: "Erro ao buscar pedidos",
-        description: "Tente novamente mais tarde.",
-        variant: "destructive",
-      });
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleKeyPress = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter') {
-      searchOrders();
-    }
-  };
-
   // Show loading state while checking auth
   if (authLoading) {
     return (
@@ -367,6 +282,10 @@ export default function Pedidos() {
     );
   }
 
+  if (!user) {
+    return <Navigate to="/login" replace state={{ from: "/pedidos" }} />;
+  }
+
   return (
     <Layout>
       <div className="min-h-screen bg-background pt-24 pb-16">
@@ -374,46 +293,15 @@ export default function Pedidos() {
           {/* Header */}
           <div className="text-center mb-12">
             <h1 className="font-display text-3xl md:text-4xl font-bold text-foreground mb-4">
-              {user ? "Meus Pedidos" : "Histórico de Pedidos"}
+              Meus Pedidos
             </h1>
             <p className="text-muted-foreground max-w-xl mx-auto">
-              {user 
-                ? "Acompanhe todos os seus pedidos realizados."
-                : "Consulte seus pedidos anteriores informando o CNPJ da sua empresa."
-              }
+              Acompanhe todos os seus pedidos realizados.
             </p>
           </div>
 
-          {/* Search - Only show for non-logged users */}
-          {!user && (
-            <div className="max-w-md mx-auto mb-12">
-              <div className="flex gap-2">
-                <div className="flex-1">
-                  <Input
-                    placeholder="Digite o CNPJ da empresa"
-                    value={cnpj}
-                    onChange={(e) => setCnpj(formatCNPJInput(e.target.value))}
-                    onKeyPress={handleKeyPress}
-                    className="h-12"
-                  />
-                </div>
-                <Button 
-                  onClick={searchOrders} 
-                  disabled={isLoading}
-                  className="h-12 px-6"
-                >
-                  {isLoading ? (
-                    <Loader2 className="w-5 h-5 animate-spin" />
-                  ) : (
-                    <Search className="w-5 h-5" />
-                  )}
-                </Button>
-              </div>
-            </div>
-          )}
-
-          {/* Loading state for logged users */}
-          {user && isLoading && (
+          {/* Loading state */}
+          {isLoading && (
             <div className="flex items-center justify-center py-12">
               <Loader2 className="w-8 h-8 animate-spin text-primary" />
             </div>
@@ -430,10 +318,7 @@ export default function Pedidos() {
                       Nenhum pedido encontrado
                     </h3>
                     <p className="text-muted-foreground">
-                      {user 
-                        ? "Você ainda não realizou nenhum pedido."
-                        : "Não encontramos pedidos para este CNPJ. Verifique se o número está correto."
-                      }
+                      Você ainda não realizou nenhum pedido.
                     </p>
                   </CardContent>
                 </Card>
