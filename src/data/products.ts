@@ -7,7 +7,22 @@ export const products: Product[] = [
     id: "envelope",
     name: "Envelope",
     description:
-      "Envelopes de segurança para e-commerce e logística. Disponíveis sem logo (preto ou branco) ou personalizados com a marca do cliente.",
+      "Envelopes de segurança para e-commerce e logística. Disponíveis nas cores preto ou branco.",
+    price: 0.08,
+    unit: "unidade",
+    minOrder: 2000,
+    minOrderUnit: "unidades",
+    image: sacoPlasticoImg,
+    category: "Envelopes",
+    featured: true,
+    colors: ["Preto", "Branco"],
+    sizes: ["20x30", "20x36", "32x40", "40x60", "30x70"],
+  },
+  {
+    id: "envelope-personalizado",
+    name: "Envelope personalizado",
+    description:
+      "Envelope produzido de acordo com a logomarca e personalização do cliente. Prazo de entrega: 30 dias. A FNZ é fabricante e distribuidora.",
     price: 0,
     unit: "unidade",
     minOrder: 2000,
@@ -16,20 +31,7 @@ export const products: Product[] = [
     image: sacoPlasticoImg,
     category: "Envelopes",
     featured: true,
-    productVariants: [
-      {
-        name: "Envelope sem logo (preto)",
-        price: 0.08,
-        sizes: ["20x30", "20x36", "32x40", "40x60", "30x70"],
-        minOrderText: "Pedido mínimo: 2.000 unidades",
-        note: "Disponível também na cor branca.",
-      },
-      {
-        name: "Envelope personalizado (com logo do cliente)",
-        note: "Envelope produzido de acordo com a logomarca e personalização do cliente. Prazo de entrega: 30 dias.",
-        highlight: "A FNZ é fabricante e distribuidora",
-      },
-    ],
+    quoteOnly: true,
   },
   {
     id: "stretch-4kg",
@@ -45,6 +47,7 @@ export const products: Product[] = [
     image: stretchImg,
     category: "Plásticos",
     featured: true,
+    quoteOnly: true,
   },
 ];
 

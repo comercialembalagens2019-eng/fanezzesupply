@@ -119,7 +119,27 @@ export function Footer() {
             </div>
           </div>
         </div>
+
+
+        {/* Consulte-nos */}
+        <div className="mt-8 pt-8 border-t border-beige/10">
+          <div className="rounded-lg bg-beige/10 p-6 text-center">
+            <p className="font-display text-xl font-bold">Consulte-nos</p>
+            <p className="text-beige/80 text-sm mt-1">
+              Precisa de outros produtos, quantidades maiores ou personalização? Fale com nossa equipe.
+            </p>
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-6 mt-3 text-sm">
+              <a href="tel:+5547991490027" className="font-semibold hover:underline">
+                (47) 99149-0027
+              </a>
+              <a href="mailto:vendas@fnzsupply.com.br" className="font-semibold hover:underline">
+                vendas@fnzsupply.com.br
+              </a>
+            </div>
+          </div>
+        </div>
       </div>
+
 
       {/* Bottom Bar */}
       <div className="border-t border-beige/10">
