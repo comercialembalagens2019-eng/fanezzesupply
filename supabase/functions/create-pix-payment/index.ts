@@ -1,5 +1,6 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { computeOrderTotalCents } from "../_shared/catalog.ts";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -14,7 +15,8 @@ interface Customer {
 }
 
 interface CreatePaymentRequest {
-  amount: number; // em centavos
+  amount: number; // em centavos (ignorado: recalculado no servidor)
+  items: Array<{ productId: string; quantity: number }>;
   description: string;
   customer: Customer;
   externalId?: string;
