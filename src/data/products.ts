@@ -39,15 +39,13 @@ export const products: Product[] = [
     description:
       "Filme stretch em bobina de 4kg, ideal para paletização e unitização de cargas.",
     spec: "Tubete 500g",
-    price: 0,
-    unit: "unidade",
-    minOrder: 1,
-    minOrderUnit: "unidade",
-    minOrderLabel: "conforme fornecido",
+    price: 26.9,
+    unit: "kg",
+    minOrder: 500,
+    minOrderUnit: "kg",
     image: stretchImg,
     category: "Plásticos",
     featured: true,
-    quoteOnly: true,
   },
 ];
 
