@@ -2,12 +2,12 @@
 // Prices are in centavos (BRL cents) per unit.
 export const PRODUCT_UNIT_PRICE_CENTS: Record<string, number> = {
   "envelope": 8,
+  "stretch-4kg": 2690,
 };
 
 // Products that can only be quoted, never purchased online.
 export const QUOTE_ONLY_PRODUCTS = new Set<string>([
   "envelope-personalizado",
-  "stretch-4kg",
 ]);
 
 export interface OrderLine {
