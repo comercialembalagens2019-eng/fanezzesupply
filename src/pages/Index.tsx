@@ -1,6 +1,7 @@
 import { Layout } from "@/components/layout/Layout";
 import { SEO } from "@/components/SEO";
 import { HeroSection } from "@/components/home/HeroSection";
+import { EnvelopeBanner } from "@/components/home/EnvelopeBanner";
 import { FeaturesSection } from "@/components/home/FeaturesSection";
 import { FeaturedProducts } from "@/components/home/FeaturedProducts";
 import { CTASection } from "@/components/home/CTASection";
@@ -14,6 +15,7 @@ const Index = () => {
         path="/"
       />
       <HeroSection />
+      <EnvelopeBanner />
       <FeaturesSection />
       <FeaturedProducts />
       <CTASection />
