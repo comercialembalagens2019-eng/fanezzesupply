@@ -1,8 +1,7 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { Loader2, Eye, EyeOff } from "lucide-react";
+import { Package, Loader2, Eye, EyeOff } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { BrandLogo } from "@/components/BrandLogo";
 import { toast } from "@/hooks/use-toast";
 import { SEO } from "@/components/SEO";
 import { supabase } from "@/integrations/supabase/client";
@@ -83,8 +82,13 @@ const Cadastro = () => {
       <header className="bg-card border-b border-border py-4">
         <div className="container-custom">
           <div className="flex items-center justify-between">
-            <Link to="/" className="flex items-center" aria-label="FNZ Supply — início">
-              <BrandLogo className="w-36 md:w-40" />
+            <Link to="/" className="flex items-center gap-2">
+              <div className="w-10 h-10 rounded-lg bg-primary flex items-center justify-center">
+                <Package className="w-6 h-6 text-primary-foreground" />
+              </div>
+              <span className="font-display font-bold text-xl text-foreground">
+                FNZ Supply
+              </span>
             </Link>
             <Link to="/login" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
               Já tem conta? Entrar
