@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { Fragment, useState } from "react";
 import { ShoppingCart } from "lucide-react";
 import { Product } from "@/types";
 import { Button } from "@/components/ui/button";
@@ -26,6 +26,13 @@ export function ProductCard({ product }: ProductCardProps) {
   const [color, setColor] = useState<string>(product.colors?.[0] ?? "");
   const [quantity, setQuantity] = useState<number>(product.minOrder);
 
+  const sizePricing = product.sizePricing?.find((sp) => sp.size === size);
+  const unitPrice = sizePricing
+    ? [...sizePricing.tiers]
+        .sort((a, b) => a.minQty - b.minQty)
+        .reduce((acc, tier) => (quantity >= tier.minQty ? tier.price : acc), sizePricing.tiers[0].price)
+    : product.price;
+
   const needsSize = !!product.sizes?.length;
   const needsColor = !!product.colors?.length;
   const isValid =
@@ -39,6 +46,7 @@ export function ProductCard({ product }: ProductCardProps) {
         ...product,
         id: [product.id, size, color].filter(Boolean).join("-"),
         name: suffix ? `${product.name} - ${suffix}` : product.name,
+        price: unitPrice,
       },
       quantity
     );
@@ -85,11 +93,29 @@ export function ProductCard({ product }: ProductCardProps) {
         ) : (
           <div className="mt-auto space-y-3">
             <p className="font-display text-xl font-bold text-primary">
-              {formatPrice(product.price)}{" "}
+              {formatPrice(unitPrice)}{" "}
               <span className="text-sm font-normal text-muted-foreground">
                 / {product.unit}
               </span>
             </p>
+
+            {product.sizePricing && (
+              <div className="rounded-lg border border-border bg-secondary/30 p-3">
+                <p className="text-xs font-semibold text-foreground mb-2">Tabela de preços (por unidade)</p>
+                <div className="grid grid-cols-3 gap-1 text-xs">
+                  <span className="font-medium text-muted-foreground">Tamanho (cm)</span>
+                  <span className="font-medium text-muted-foreground text-right">500 un.</span>
+                  <span className="font-medium text-muted-foreground text-right">1.000+ un.</span>
+                  {product.sizePricing.map((sp) => (
+                    <Fragment key={sp.size}>
+                      <span className={sp.size === size ? "font-semibold text-primary" : "text-foreground"}>{sp.size}</span>
+                      <span className="text-right text-foreground">{formatPrice(sp.tiers[0].price)}</span>
+                      <span className="text-right text-foreground">{formatPrice(sp.tiers[sp.tiers.length - 1].price)}</span>
+                    </Fragment>
+                  ))}
+                </div>
+              </div>
+            )}
 
             {needsSize && (
               <div className="space-y-1.5">

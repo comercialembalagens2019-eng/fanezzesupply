@@ -12,6 +12,16 @@ export interface ProductVariant {
   highlight?: string;
 }
 
+export interface PriceTier {
+  minQty: number;
+  price: number;
+}
+
+export interface SizePricing {
+  size: string;
+  tiers: PriceTier[];
+}
+
 export interface Product {
   id: string;
   name: string;
@@ -31,6 +41,7 @@ export interface Product {
   productVariants?: ProductVariant[];
   colors?: string[];
   sizes?: string[];
+  sizePricing?: SizePricing[];
   quoteOnly?: boolean;
 }
 
