@@ -14,6 +14,16 @@ export const SIZE_TIER_PRICES: Record<string, Record<string, { minQty: number; p
     "40x60": [{ minQty: 500, priceCents: 136 }, { minQty: 1000, priceCents: 117 }],
     "50x70": [{ minQty: 500, priceCents: 171 }, { minQty: 1000, priceCents: 146 }],
   },
+  "envelope-cinza": {
+    "20x30": [{ minQty: 500, priceCents: 16 }, { minQty: 1000, priceCents: 14 }],
+    "26x36": [{ minQty: 500, priceCents: 26 }, { minQty: 1000, priceCents: 20 }],
+    "32x40": [{ minQty: 500, priceCents: 36 }, { minQty: 1000, priceCents: 26 }],
+    "40x50": [{ minQty: 500, priceCents: 55 }, { minQty: 1000, priceCents: 46 }],
+    "50x70": [{ minQty: 500, priceCents: 105 }, { minQty: 1000, priceCents: 77 }],
+    "70x60": [{ minQty: 500, priceCents: 120 }, { minQty: 1000, priceCents: 87 }],
+    "40x00": [{ minQty: 500, priceCents: 64 }, { minQty: 1000, priceCents: 55 }],
+    "50x90": [{ minQty: 500, priceCents: 140 }, { minQty: 1000, priceCents: 102 }],
+  },
 };
 
 // Products that can only be quoted, never purchased online.
