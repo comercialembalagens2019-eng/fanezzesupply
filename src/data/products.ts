@@ -40,6 +40,30 @@ export const products: Product[] = [
     ],
   },
   {
+    id: "envelope-cinza",
+    name: "Envelope Cinza",
+    description:
+      "Envelope cinza para envio e-commerce: resistente, impermeável e com privacidade no envio. Preço por unidade conforme o tamanho e a quantidade.",
+    price: 0.16,
+    unit: "unidade",
+    minOrder: 500,
+    minOrderUnit: "unidades",
+    image: sacoPlasticoImg,
+    category: "Envelopes",
+    featured: true,
+    sizes: ["20x30", "26x36", "32x40", "40x50", "50x70", "70x60", "40x00", "50x90"],
+    sizePricing: [
+      { size: "20x30", tiers: [{ minQty: 500, price: 0.16 }, { minQty: 1000, price: 0.14 }] },
+      { size: "26x36", tiers: [{ minQty: 500, price: 0.26 }, { minQty: 1000, price: 0.20 }] },
+      { size: "32x40", tiers: [{ minQty: 500, price: 0.36 }, { minQty: 1000, price: 0.26 }] },
+      { size: "40x50", tiers: [{ minQty: 500, price: 0.55 }, { minQty: 1000, price: 0.46 }] },
+      { size: "50x70", tiers: [{ minQty: 500, price: 1.05 }, { minQty: 1000, price: 0.77 }] },
+      { size: "70x60", tiers: [{ minQty: 500, price: 1.20 }, { minQty: 1000, price: 0.87 }] },
+      { size: "40x00", tiers: [{ minQty: 500, price: 0.64 }, { minQty: 1000, price: 0.55 }] },
+      { size: "50x90", tiers: [{ minQty: 500, price: 1.40 }, { minQty: 1000, price: 1.02 }] },
+    ],
+  },
+  {
     id: "envelope-personalizado",
     name: "Envelope personalizado",
     description:
