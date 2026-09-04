@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import { ArrowRight, Package, Truck, Shield } from "lucide-react";
+import fnzLogoAsset from "@/assets/fnz-logo.png.asset.json";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
 export function HeroSection() {
