@@ -5,6 +5,17 @@ export const PRODUCT_UNIT_PRICE_CENTS: Record<string, number> = {
   "stretch-4kg": 2690,
 };
 
+// Products priced per size, with quantity tiers. Prices in centavos per unit.
+export const SIZE_TIER_PRICES: Record<string, Record<string, { minQty: number; priceCents: number }[]>> = {
+  "envelope-coex": {
+    "19x25": [{ minQty: 500, priceCents: 27 }, { minQty: 1000, priceCents: 24 }],
+    "32x20": [{ minQty: 500, priceCents: 36 }, { minQty: 1000, priceCents: 31 }],
+    "30x40": [{ minQty: 500, priceCents: 66 }, { minQty: 1000, priceCents: 56 }],
+    "40x60": [{ minQty: 500, priceCents: 136 }, { minQty: 1000, priceCents: 117 }],
+    "50x70": [{ minQty: 500, priceCents: 171 }, { minQty: 1000, priceCents: 146 }],
+  },
+};
+
 // Products that can only be quoted, never purchased online.
 export const QUOTE_ONLY_PRODUCTS = new Set<string>([
   "envelope-personalizado",
@@ -21,6 +32,7 @@ export function resolveBaseProductId(productId: string): string | null {
     return null;
   }
   const known = [
+    ...Object.keys(SIZE_TIER_PRICES),
     ...Object.keys(PRODUCT_UNIT_PRICE_CENTS),
     ...QUOTE_ONLY_PRODUCTS,
   ].sort((a, b) => b.length - a.length);
@@ -50,6 +62,22 @@ export function computeOrderTotalCents(
     const quantity = Number(raw?.quantity);
     if (!Number.isInteger(quantity) || quantity < 1 || quantity > 1000000) {
       return { error: "Quantidade inválida" };
+    }
+    const sizeMap = SIZE_TIER_PRICES[baseId];
+    if (sizeMap) {
+      const suffix = raw.productId.slice(baseId.length + 1);
+      const sizeKey = Object.keys(sizeMap).find(
+        (s) => suffix === s || suffix.startsWith(`${s}-`),
+      );
+      if (!sizeKey) return { error: "Tamanho inválido" };
+      const tiers = [...sizeMap[sizeKey]].sort((a, b) => a.minQty - b.minQty);
+      if (quantity < tiers[0].minQty) return { error: "Quantidade abaixo do pedido mínimo" };
+      const unit = tiers.reduce(
+        (acc, t) => (quantity >= t.minQty ? t.priceCents : acc),
+        tiers[0].priceCents,
+      );
+      totalCents += unit * quantity;
+      continue;
     }
     totalCents += PRODUCT_UNIT_PRICE_CENTS[baseId] * quantity;
   }
