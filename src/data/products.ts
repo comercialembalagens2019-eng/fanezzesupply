@@ -19,6 +19,27 @@ export const products: Product[] = [
     sizes: ["20x30", "20x36", "32x40", "40x60", "30x70"],
   },
   {
+    id: "envelope-coex",
+    name: "Envelope COEX",
+    description:
+      "Envelope de segurança COEX: branco por fora e cinza por dentro. Resistente, impermeável e ideal para e-commerce. Preço por unidade conforme o tamanho e a quantidade.",
+    price: 0.27,
+    unit: "unidade",
+    minOrder: 500,
+    minOrderUnit: "unidades",
+    image: sacoPlasticoImg,
+    category: "Envelopes",
+    featured: true,
+    sizes: ["19x25", "32x20", "30x40", "40x60", "50x70"],
+    sizePricing: [
+      { size: "19x25", tiers: [{ minQty: 500, price: 0.27 }, { minQty: 1000, price: 0.24 }] },
+      { size: "32x20", tiers: [{ minQty: 500, price: 0.36 }, { minQty: 1000, price: 0.31 }] },
+      { size: "30x40", tiers: [{ minQty: 500, price: 0.66 }, { minQty: 1000, price: 0.56 }] },
+      { size: "40x60", tiers: [{ minQty: 500, price: 1.36 }, { minQty: 1000, price: 1.17 }] },
+      { size: "50x70", tiers: [{ minQty: 500, price: 1.71 }, { minQty: 1000, price: 1.46 }] },
+    ],
+  },
+  {
     id: "envelope-personalizado",
     name: "Envelope personalizado",
     description:
