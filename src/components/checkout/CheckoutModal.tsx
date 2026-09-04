@@ -1077,11 +1077,11 @@ export const CheckoutModal = ({ open, onOpenChange }: CheckoutModalProps) => {
         {step === 4 && !paymentCreated && (
           <div className="space-y-4">
             {/* Pickup Only Notice */}
-            <div className="p-3 rounded-lg bg-amber-50 border border-amber-200 flex items-center gap-3">
-              <MapPin className="w-5 h-5 text-amber-600 flex-shrink-0" />
+            <div className="p-3 rounded-lg bg-warning-soft border border-warning/30 flex items-center gap-3">
+              <MapPin className="w-5 h-5 text-warning flex-shrink-0" />
               <div>
-                <p className="font-medium text-amber-800 text-sm">Frete grátis para Joinville</p>
-                <p className="text-amber-700 text-xs">Demais localidades: R$ 19,90.</p>
+                <p className="font-medium text-warning-soft-foreground text-sm">Frete grátis para Joinville</p>
+                <p className="text-warning-soft-foreground text-xs">Demais localidades: R$ 19,90.</p>
               </div>
             </div>
 
@@ -1166,8 +1166,8 @@ export const CheckoutModal = ({ open, onOpenChange }: CheckoutModalProps) => {
                 <p className="text-xs text-muted-foreground mt-1">
                   O CPF é obrigatório para emissão do boleto bancário.
                 </p>
-                <div className="mt-3 p-3 bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800 rounded-lg">
-                  <p className="text-sm text-amber-700 dark:text-amber-400 flex items-center gap-2">
+                <div className="mt-3 p-3 bg-warning-soft border border-warning/30 rounded-lg">
+                  <p className="text-sm text-warning-soft-foreground flex items-center gap-2">
                     <FileText className="w-4 h-4 flex-shrink-0" />
                     <span>O boleto vence em <strong>28 dias</strong> após a emissão.</span>
                   </p>
@@ -1183,17 +1183,17 @@ export const CheckoutModal = ({ open, onOpenChange }: CheckoutModalProps) => {
             {/* Payment Confirmed Animation */}
             {paymentConfirmed ? (
               <div className="animate-scale-in">
-                <div className="w-24 h-24 mx-auto bg-green-500/20 rounded-full flex items-center justify-center mb-4 animate-pulse">
-                  <PartyPopper className="w-12 h-12 text-green-500" />
+                <div className="w-24 h-24 mx-auto bg-success/15 rounded-full flex items-center justify-center mb-4 animate-pulse">
+                  <PartyPopper className="w-12 h-12 text-success" />
                 </div>
-                <h3 className="font-display text-2xl font-bold text-green-600 mb-2">
+                <h3 className="font-display text-2xl font-bold text-success mb-2">
                   Pagamento Confirmado!
                 </h3>
                 <p className="text-muted-foreground">
                   Obrigado pela compra! Redirecionando para seus pedidos...
                 </p>
                 <div className="mt-4 flex justify-center">
-                  <div className="w-8 h-8 border-4 border-green-500 border-t-transparent rounded-full animate-spin" />
+                  <div className="w-8 h-8 border-4 border-success border-t-transparent rounded-full animate-spin" />
                 </div>
               </div>
             ) : (
@@ -1296,17 +1296,17 @@ export const CheckoutModal = ({ open, onOpenChange }: CheckoutModalProps) => {
           <div className="text-center space-y-6 py-4">
             {paymentConfirmed ? (
               <div className="animate-scale-in">
-                <div className="w-24 h-24 mx-auto bg-green-500/20 rounded-full flex items-center justify-center mb-4 animate-pulse">
-                  <PartyPopper className="w-12 h-12 text-green-500" />
+                <div className="w-24 h-24 mx-auto bg-success/15 rounded-full flex items-center justify-center mb-4 animate-pulse">
+                  <PartyPopper className="w-12 h-12 text-success" />
                 </div>
-                <h3 className="font-display text-2xl font-bold text-green-600 mb-2">
+                <h3 className="font-display text-2xl font-bold text-success mb-2">
                   Pagamento Confirmado!
                 </h3>
                 <p className="text-muted-foreground">
                   Obrigado pela compra! Redirecionando para seus pedidos...
                 </p>
                 <div className="mt-4 flex justify-center">
-                  <div className="w-8 h-8 border-4 border-green-500 border-t-transparent rounded-full animate-spin" />
+                  <div className="w-8 h-8 border-4 border-success border-t-transparent rounded-full animate-spin" />
                 </div>
               </div>
             ) : (
@@ -1330,7 +1330,7 @@ export const CheckoutModal = ({ open, onOpenChange }: CheckoutModalProps) => {
                   <p className="text-sm text-muted-foreground">vendas@fnzsupply.com.br</p>
                 </div>
 
-                <div className="p-3 rounded-lg bg-amber-50 border border-amber-200 text-amber-800 text-sm">
+                <div className="p-3 rounded-lg bg-warning-soft border border-warning/30 text-warning-soft-foreground text-sm">
                   <strong>Importante:</strong> O boleto vence em 28 dias. Após o pagamento, pode levar até 3 dias úteis para compensação.
                 </div>
                 

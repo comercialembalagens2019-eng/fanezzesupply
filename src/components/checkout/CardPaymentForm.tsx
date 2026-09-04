@@ -193,26 +193,26 @@ export const CardPaymentForm = ({ onSubmit, isLoading, total }: CardPaymentFormP
               placeholder="0000 0000 0000 0000"
               className={cn(
                 "pr-20 font-mono",
-                isCardValid === true && "border-green-500 focus-visible:ring-green-500",
-                isCardValid === false && "border-red-500 focus-visible:ring-red-500"
+                isCardValid === true && "border-success focus-visible:ring-success",
+                isCardValid === false && "border-destructive focus-visible:ring-destructive"
               )}
               maxLength={19}
             />
             <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-2">
               {isCardValid === true && (
-                <CheckCircle className="w-5 h-5 text-green-500" />
+                <CheckCircle className="w-5 h-5 text-success" />
               )}
               {isCardValid === false && (
-                <XCircle className="w-5 h-5 text-red-500" />
+                <XCircle className="w-5 h-5 text-destructive" />
               )}
               <CreditCard className="w-5 h-5 text-muted-foreground" />
             </div>
           </div>
           {isCardValid === false && (
-            <p className="text-xs text-red-500 mt-1">Número de cartão inválido</p>
+            <p className="text-xs text-destructive mt-1">Número de cartão inválido</p>
           )}
           {isCardValid === true && (
-            <p className="text-xs text-green-500 mt-1">Número de cartão válido</p>
+            <p className="text-xs text-success mt-1">Número de cartão válido</p>
           )}
         </div>
 
@@ -238,22 +238,22 @@ export const CardPaymentForm = ({ onSubmit, isLoading, total }: CardPaymentFormP
                 placeholder="MM/AA"
                 className={cn(
                   "font-mono pr-10",
-                  isExpiryValid === true && "border-green-500 focus-visible:ring-green-500",
-                  isExpiryValid === false && "border-red-500 focus-visible:ring-red-500"
+                  isExpiryValid === true && "border-success focus-visible:ring-success",
+                  isExpiryValid === false && "border-destructive focus-visible:ring-destructive"
                 )}
                 maxLength={5}
               />
               <div className="absolute right-3 top-1/2 -translate-y-1/2">
                 {isExpiryValid === true && (
-                  <CheckCircle className="w-4 h-4 text-green-500" />
+                  <CheckCircle className="w-4 h-4 text-success" />
                 )}
                 {isExpiryValid === false && (
-                  <XCircle className="w-4 h-4 text-red-500" />
+                  <XCircle className="w-4 h-4 text-destructive" />
                 )}
               </div>
             </div>
             {isExpiryValid === false && (
-              <p className="text-xs text-red-500 mt-1">Data expirada</p>
+              <p className="text-xs text-destructive mt-1">Data expirada</p>
             )}
           </div>
           <div>

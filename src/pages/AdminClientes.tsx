@@ -85,12 +85,12 @@ const getStatusConfig = (status: string) => {
   switch (status) {
     case 'completed':
     case 'paid':
-      return { label: 'Pago', color: 'bg-green-100 text-green-800' };
+      return { label: 'Pago', color: 'bg-success-soft text-success-soft-foreground' };
     case 'pending':
-      return { label: 'Pendente', color: 'bg-amber-100 text-amber-800' };
+      return { label: 'Pendente', color: 'bg-warning-soft text-warning-soft-foreground' };
     case 'cancelled':
     case 'failed':
-      return { label: 'Cancelado', color: 'bg-red-100 text-red-800' };
+      return { label: 'Cancelado', color: 'bg-destructive-soft text-destructive-soft-foreground' };
     default:
       return { label: status, color: 'bg-muted text-muted-foreground' };
   }
@@ -99,11 +99,11 @@ const getStatusConfig = (status: string) => {
 const getPaymentMethodConfig = (method: string | null) => {
   switch (method) {
     case 'pix':
-      return { label: 'PIX', icon: QrCode, color: 'bg-emerald-100 text-emerald-800' };
+      return { label: 'PIX', icon: QrCode, color: 'bg-success-soft text-success-soft-foreground' };
     case 'card':
       return { label: 'Cartão', icon: CreditCard, color: 'bg-indigo-100 text-indigo-800' };
     case 'boleto':
-      return { label: 'Boleto', icon: FileText, color: 'bg-orange-100 text-orange-800' };
+      return { label: 'Boleto', icon: FileText, color: 'bg-warning-soft text-warning-soft-foreground' };
     default:
       return { label: 'N/A', icon: Package, color: 'bg-muted text-muted-foreground' };
   }

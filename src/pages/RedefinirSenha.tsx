@@ -41,9 +41,9 @@ const RedefinirSenha = () => {
     const checks = [hasMinLength, hasUpperCase, hasNumber];
     const passed = checks.filter(Boolean).length;
     if (passed === 0) return { label: "", color: "" };
-    if (passed === 1) return { label: "Fraca", color: "text-red-500" };
-    if (passed === 2) return { label: "Média", color: "text-yellow-500" };
-    return { label: "Forte", color: "text-green-500" };
+    if (passed === 1) return { label: "Fraca", color: "text-destructive" };
+    if (passed === 2) return { label: "Média", color: "text-warning" };
+    return { label: "Forte", color: "text-success" };
   };
 
   const isValidPassword = hasMinLength && hasUpperCase && hasNumber && passwordsMatch;
@@ -150,8 +150,8 @@ const RedefinirSenha = () => {
           {isSuccess ? (
             // Success State
             <div className="text-center">
-              <div className="w-16 h-16 rounded-full bg-green-100 flex items-center justify-center mx-auto mb-6">
-                <CheckCircle className="w-8 h-8 text-green-600" />
+              <div className="w-16 h-16 rounded-full bg-success-soft flex items-center justify-center mx-auto mb-6">
+                <CheckCircle className="w-8 h-8 text-success" />
               </div>
               <h2 className="font-display text-2xl font-bold text-foreground mb-2">
                 Senha atualizada!
@@ -169,8 +169,8 @@ const RedefinirSenha = () => {
             // Form State
             <>
               <div className="text-center lg:text-left mb-8">
-                <div className="w-16 h-16 rounded-full bg-green-100 flex items-center justify-center mx-auto lg:mx-0 mb-4">
-                  <Lock className="w-8 h-8 text-green-600" />
+                <div className="w-16 h-16 rounded-full bg-success-soft flex items-center justify-center mx-auto lg:mx-0 mb-4">
+                  <Lock className="w-8 h-8 text-success" />
                 </div>
                 <h2 className="font-display text-2xl font-bold text-foreground mb-2">
                   Criar Nova Senha
@@ -244,11 +244,11 @@ const RedefinirSenha = () => {
                   {confirmPassword && (
                     <div className="flex items-center gap-1">
                       {passwordsMatch ? (
-                        <CheckCircle className="w-4 h-4 text-green-500" />
+                        <CheckCircle className="w-4 h-4 text-success" />
                       ) : (
-                        <XCircle className="w-4 h-4 text-red-500" />
+                        <XCircle className="w-4 h-4 text-destructive" />
                       )}
-                      <span className={`text-xs ${passwordsMatch ? "text-green-500" : "text-red-500"}`}>
+                      <span className={`text-xs ${passwordsMatch ? "text-success" : "text-destructive"}`}>
                         {passwordsMatch ? "Senhas coincidem" : "Senhas não coincidem"}
                       </span>
                     </div>
@@ -261,31 +261,31 @@ const RedefinirSenha = () => {
                   <div className="space-y-1">
                     <div className="flex items-center gap-2">
                       {hasMinLength ? (
-                        <CheckCircle className="w-4 h-4 text-green-500" />
+                        <CheckCircle className="w-4 h-4 text-success" />
                       ) : (
                         <XCircle className="w-4 h-4 text-muted-foreground" />
                       )}
-                      <span className={`text-xs ${hasMinLength ? "text-green-600" : "text-muted-foreground"}`}>
+                      <span className={`text-xs ${hasMinLength ? "text-success" : "text-muted-foreground"}`}>
                         Mínimo 8 caracteres
                       </span>
                     </div>
                     <div className="flex items-center gap-2">
                       {hasUpperCase ? (
-                        <CheckCircle className="w-4 h-4 text-green-500" />
+                        <CheckCircle className="w-4 h-4 text-success" />
                       ) : (
                         <XCircle className="w-4 h-4 text-muted-foreground" />
                       )}
-                      <span className={`text-xs ${hasUpperCase ? "text-green-600" : "text-muted-foreground"}`}>
+                      <span className={`text-xs ${hasUpperCase ? "text-success" : "text-muted-foreground"}`}>
                         1 letra maiúscula
                       </span>
                     </div>
                     <div className="flex items-center gap-2">
                       {hasNumber ? (
-                        <CheckCircle className="w-4 h-4 text-green-500" />
+                        <CheckCircle className="w-4 h-4 text-success" />
                       ) : (
                         <XCircle className="w-4 h-4 text-muted-foreground" />
                       )}
-                      <span className={`text-xs ${hasNumber ? "text-green-600" : "text-muted-foreground"}`}>
+                      <span className={`text-xs ${hasNumber ? "text-success" : "text-muted-foreground"}`}>
                         1 número
                       </span>
                     </div>
