@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { Package, Mail, Loader2, ArrowLeft } from "lucide-react";
+import { Mail, Loader2, ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { BrandLogo } from "@/components/BrandLogo";
 import { toast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -73,13 +74,8 @@ const RecuperarSenha = () => {
         </div>
 
         <div className="relative z-10 flex flex-col justify-center p-12 lg:p-16">
-          <Link to="/" className="flex items-center gap-3 mb-12">
-            <div className="w-12 h-12 rounded-xl bg-beige flex items-center justify-center">
-              <Package className="w-7 h-7 text-navy" />
-            </div>
-            <span className="font-display font-bold text-2xl text-beige">
-              FNZ Supply
-            </span>
+          <Link to="/" className="inline-flex mb-12" aria-label="FNZ Supply — início">
+            <BrandLogo className="w-56" />
           </Link>
 
           <h1 className="font-display text-4xl lg:text-5xl font-bold text-beige mb-6">
@@ -95,13 +91,8 @@ const RecuperarSenha = () => {
       <div className="w-full lg:w-1/2 flex items-center justify-center p-6 md:p-12">
         <div className="w-full max-w-md">
           {/* Mobile Logo */}
-          <Link to="/" className="flex lg:hidden items-center gap-2 mb-8 justify-center">
-            <div className="w-10 h-10 rounded-lg bg-primary flex items-center justify-center">
-              <Package className="w-6 h-6 text-primary-foreground" />
-            </div>
-            <span className="font-display font-bold text-xl text-foreground">
-              FNZ Supply
-            </span>
+          <Link to="/" className="flex lg:hidden mb-8 justify-center" aria-label="FNZ Supply — início">
+            <BrandLogo className="w-44" />
           </Link>
 
           <div className="text-center lg:text-left mb-8">
