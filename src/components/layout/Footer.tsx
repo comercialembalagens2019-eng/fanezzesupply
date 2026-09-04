@@ -1,18 +1,14 @@
 import { Link } from "react-router-dom";
-import { Package, Phone, Mail, MapPin, Instagram } from "lucide-react";
+import { Phone, Mail, MapPin } from "lucide-react";
+import { BrandLogo } from "@/components/BrandLogo";
 export function Footer() {
   return <footer className="bg-primary text-primary-foreground">
       <div className="container-custom section-padding">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 lg:gap-12">
           {/* Brand */}
           <div className="space-y-4">
-            <Link to="/" className="flex items-center gap-2">
-              <div className="w-10 h-10 rounded-lg bg-beige flex items-center justify-center">
-                <Package className="w-6 h-6 text-navy" />
-              </div>
-              <span className="font-display font-bold text-xl">
-                FNZ Supply
-              </span>
+            <Link to="/" className="inline-flex" aria-label="FNZ Supply — início">
+              <BrandLogo className="w-44" />
             </Link>
             <p className="text-beige/80 text-sm leading-relaxed">
               Distribuição de embalagens com qualidade para sua empresa.

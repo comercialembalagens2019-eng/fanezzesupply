@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { Menu, X, ShoppingCart, User, Package, LogOut, Users } from "lucide-react";
+import { Menu, X, ShoppingCart, User, LogOut, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { BrandLogo } from "@/components/BrandLogo";
 import { useCart } from "@/contexts/CartContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { cn } from "@/lib/utils";
@@ -33,13 +34,8 @@ export function Header() {
       <div className="container-custom">
         <div className="flex items-center justify-between h-16 md:h-20">
           {/* Logo */}
-          <Link to="/" className="flex items-center gap-2 group">
-            <div className="w-10 h-10 rounded-lg bg-primary flex items-center justify-center">
-              <Package className="w-6 h-6 text-primary-foreground" />
-            </div>
-            <span className="font-display font-bold text-xl text-foreground group-hover:text-navy-light transition-colors">
-              FNZ Supply
-            </span>
+          <Link to="/" className="flex items-center" aria-label="FNZ Supply — início">
+            <BrandLogo className="w-32 md:w-40" />
           </Link>
 
           {/* Desktop Navigation */}
