@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import { ArrowRight, Package, Truck, Shield } from "lucide-react";
+import fnzLogoAsset from "@/assets/fnz-logo.png.asset.json";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
 export function HeroSection() {
@@ -94,15 +95,12 @@ export function HeroSection() {
               </div>
 
               {/* Center Content */}
-              <div className="absolute inset-0 flex items-center justify-center">
-                <div className="text-center space-y-4 p-8">
-                  <div className="w-24 h-24 mx-auto rounded-2xl bg-beige flex items-center justify-center">
-                    <Package className="w-12 h-12 text-navy" />
-                  </div>
-                  <p className="text-beige font-display font-semibold text-lg">
-                    Embalagens de Qualidade
-                  </p>
-                </div>
+              <div className="absolute inset-0 flex items-center justify-center p-8">
+                <img
+                  src={fnzLogoAsset.url}
+                  alt="Logo FNZ Supply"
+                  className="w-full h-full max-w-[280px] max-h-[280px] object-contain drop-shadow-lg"
+                />
               </div>
             </div>
           </div>
