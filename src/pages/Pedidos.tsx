@@ -36,11 +36,11 @@ interface Order {
 const getPaymentMethodConfig = (method: string | null) => {
   switch (method) {
     case 'pix':
-      return { label: 'PIX', icon: QrCode, color: 'bg-emerald-100 text-emerald-800 border-emerald-200' };
+      return { label: 'PIX', icon: QrCode, color: 'bg-success-soft text-success-soft-foreground border-success/30' };
     case 'card':
       return { label: 'Cartão', icon: CreditCard, color: 'bg-indigo-100 text-indigo-800 border-indigo-200' };
     case 'boleto':
-      return { label: 'Boleto', icon: FileText, color: 'bg-orange-100 text-orange-800 border-orange-200' };
+      return { label: 'Boleto', icon: FileText, color: 'bg-warning-soft text-warning-soft-foreground border-warning/30' };
     default:
       return { label: 'Não informado', icon: Package, color: 'bg-muted text-muted-foreground border-border' };
   }
@@ -75,15 +75,15 @@ const getStatusConfig = (status: string) => {
   switch (status) {
     case 'completed':
     case 'paid':
-      return { label: 'Pago', icon: CheckCircle, color: 'bg-green-100 text-green-800 border-green-200' };
+      return { label: 'Pago', icon: CheckCircle, color: 'bg-success-soft text-success-soft-foreground border-success/30' };
     case 'pending':
-      return { label: 'Pendente', icon: Clock, color: 'bg-amber-100 text-amber-800 border-amber-200' };
+      return { label: 'Pendente', icon: Clock, color: 'bg-warning-soft text-warning-soft-foreground border-warning/30' };
     case 'processing':
       return { label: 'Processando', icon: Loader2, color: 'bg-blue-100 text-blue-800 border-blue-200' };
     case 'cancelled':
-      return { label: 'Cancelado', icon: XCircle, color: 'bg-red-100 text-red-800 border-red-200' };
+      return { label: 'Cancelado', icon: XCircle, color: 'bg-destructive-soft text-destructive-soft-foreground border-destructive/30' };
     case 'failed':
-      return { label: 'Falhou', icon: XCircle, color: 'bg-red-100 text-red-800 border-red-200' };
+      return { label: 'Falhou', icon: XCircle, color: 'bg-destructive-soft text-destructive-soft-foreground border-destructive/30' };
     case 'expired':
       return { label: 'Expirado', icon: Clock, color: 'bg-gray-100 text-gray-800 border-gray-200' };
     default:
@@ -354,13 +354,13 @@ export default function Pedidos() {
                         key={order.id} 
                         className={cn(
                           "overflow-hidden transition-all duration-500 relative",
-                          isRecentlyPaid && "ring-2 ring-green-500 ring-offset-2 animate-scale-in"
+                          isRecentlyPaid && "ring-2 ring-success ring-offset-2 animate-scale-in"
                         )}
                       >
                         {/* Payment Confirmed Overlay */}
                         {isRecentlyPaid && (
-                          <div className="absolute inset-0 bg-green-500/10 pointer-events-none animate-fade-in z-10 flex items-center justify-center">
-                            <div className="bg-green-500 text-white px-4 py-2 rounded-full flex items-center gap-2 animate-scale-in shadow-lg">
+                          <div className="absolute inset-0 bg-success/10 pointer-events-none animate-fade-in z-10 flex items-center justify-center">
+                            <div className="bg-success text-success-foreground px-4 py-2 rounded-full flex items-center gap-2 animate-scale-in shadow-lg">
                               <PartyPopper className="w-5 h-5" />
                               <span className="font-semibold">Pagamento Confirmado!</span>
                             </div>
@@ -369,13 +369,13 @@ export default function Pedidos() {
                         
                         <CardHeader className={cn(
                           "bg-muted/50 py-4 transition-colors duration-500",
-                          isRecentlyPaid && "bg-green-100"
+                          isRecentlyPaid && "bg-success-soft"
                         )}>
                           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                             <div className="flex items-center gap-3">
                               <Package className={cn(
                                 "w-5 h-5 text-primary transition-colors duration-500",
-                                isRecentlyPaid && "text-green-600"
+                                isRecentlyPaid && "text-success"
                               )} />
                               <div>
                                 <p className="font-mono text-sm text-muted-foreground">
@@ -390,7 +390,7 @@ export default function Pedidos() {
                               <Badge className={cn(
                                 "gap-1 transition-all duration-500",
                                 isRecentlyPaid 
-                                  ? "bg-green-500 text-white border-green-500 scale-110" 
+                                  ? "bg-success text-success-foreground border-success scale-110" 
                                   : statusConfig.color
                               )}>
                                 <StatusIcon className={cn("w-3 h-3", isRecentlyPaid && "animate-pulse")} />
