@@ -114,7 +114,6 @@ export type Database = {
           id: string
           items: Json
           payment_method: string | null
-          payment_ref: string | null
           payment_url: string | null
           status: string
           total_amount: number
@@ -126,7 +125,6 @@ export type Database = {
           id?: string
           items: Json
           payment_method?: string | null
-          payment_ref?: string | null
           payment_url?: string | null
           status?: string
           total_amount: number
@@ -138,7 +136,6 @@ export type Database = {
           id?: string
           items?: Json
           payment_method?: string | null
-          payment_ref?: string | null
           payment_url?: string | null
           status?: string
           total_amount?: number
@@ -210,8 +207,8 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      get_user_id_by_email: { Args: { p_email: string }; Returns: string }
       cleanup_expired_reset_codes: { Args: never; Returns: undefined }
+      cleanup_old_reset_attempts: { Args: never; Returns: undefined }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
