@@ -77,9 +77,9 @@ export function Header() {
               </Link>
             ))}
             {isAdmin && (
-              <Link to="/admin/clientes" className={cn(linkClass("/admin/clientes"), "flex items-center gap-1")}>
+              <Link to="/admin" className={cn(linkClass("/admin"), "flex items-center gap-1")}>
                 <Users className="w-4 h-4" aria-hidden="true" />
-                Clientes
+                Painel admin
               </Link>
             )}
             {user ? (
@@ -139,12 +139,12 @@ export function Header() {
               ))}
               {isAdmin && (
                 <Link
-                  to="/admin/clientes"
+                  to="/admin"
                   onClick={() => setIsMobileMenuOpen(false)}
                   className="flex items-center gap-2 px-4 py-3 rounded-xl font-semibold text-muted-foreground hover:bg-muted"
                 >
                   <Users className="w-4 h-4" aria-hidden="true" />
-                  Clientes (Admin)
+                  Painel admin
                 </Link>
               )}
               <div className="border-t border-border mt-2 pt-2">

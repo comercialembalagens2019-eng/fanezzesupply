@@ -6,7 +6,7 @@ import { bestTierDiscount, buildCartProduct, formatBRL, getUnitPrice } from "@/l
 import { cn } from "@/lib/utils";
 
 // Only products sold online with a size choice or a flat price.
-const calculatorProducts = products.filter((p) => !p.quoteOnly && !p.colors?.length);
+const calculatorProducts = products.filter((p) => !p.quoteOnly && !p.adminOnly && !p.colors?.length);
 
 const bestTierMinQty = (product: (typeof products)[number]) => {
   const tiers = product.sizePricing?.[0]?.tiers ?? [];

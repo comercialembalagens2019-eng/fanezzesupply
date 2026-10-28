@@ -43,6 +43,8 @@ export interface Product {
   sizes?: string[];
   sizePricing?: SizePricing[];
   quoteOnly?: boolean;
+  /** Only shown to (and purchasable by) admins, e.g. the payment test product. */
+  adminOnly?: boolean;
 }
 
 

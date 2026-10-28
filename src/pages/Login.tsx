@@ -27,7 +27,7 @@ const Login = () => {
       if (redirectTo) {
         navigate(redirectTo, { replace: true });
       } else if (isAdmin) {
-        navigate('/admin/clientes', { replace: true });
+        navigate('/admin', { replace: true });
       } else {
         navigate('/', { replace: true });
       }

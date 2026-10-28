@@ -1,24 +1,31 @@
-import React, { createContext, useContext, useState, useEffect, ReactNode } from "react";
+import React, { createContext, useContext, useState, useEffect, useRef, ReactNode } from "react";
 import { Product, CartItem } from "@/types";
 import { toast } from "@/hooks/use-toast";
 import { getUnitPrice } from "@/lib/pricing";
+import { supabase } from "@/integrations/supabase/client";
+import type { Json } from "@/integrations/supabase/types";
+import { useAuth } from "@/contexts/AuthContext";
 
 const CART_STORAGE_KEY = "fanezze-cart";
 
-// A corrupted or outdated cart in localStorage must not crash the whole app.
-function loadCart(): CartItem[] {
-  try {
-    const saved = localStorage.getItem(CART_STORAGE_KEY);
-    const parsed: unknown = saved ? JSON.parse(saved) : [];
-    if (!Array.isArray(parsed)) return [];
-    return parsed.filter(
+// Shared by localStorage and the server copy; malformed entries are dropped.
+export function parseCartItems(parsed: unknown): CartItem[] {
+  if (!Array.isArray(parsed)) return [];
+  return parsed.filter(
       (item): item is CartItem =>
         !!item &&
         typeof item.product?.id === "string" &&
         typeof item.product?.minOrder === "number" &&
         Number.isInteger(item.quantity) &&
         item.quantity > 0
-    );
+  );
+}
+
+// A corrupted or outdated cart in localStorage must not crash the whole app.
+function loadCart(): CartItem[] {
+  try {
+    const saved = localStorage.getItem(CART_STORAGE_KEY);
+    return parseCartItems(saved ? JSON.parse(saved) : []);
   } catch {
     return [];
   }
@@ -40,6 +47,57 @@ const CartContext = createContext<CartContextType | undefined>(undefined);
 
 export function CartProvider({ children }: { children: ReactNode }) {
   const [items, setItems] = useState<CartItem[]>(loadCart);
+  const { user } = useAuth();
+  const userId = user?.id ?? null;
+  // The server copy is only written after it was read for this user, so an empty
+  // local cart never overwrites a saved one.
+  const [syncedUserId, setSyncedUserId] = useState<string | null>(null);
+  const previousUserId = useRef<string | null>(null);
+
+  useEffect(() => {
+    const previous = previousUserId.current;
+    previousUserId.current = userId;
+    if (!userId) {
+      setSyncedUserId(null);
+      // Signing out leaves the cart saved on the account, not on a shared browser.
+      if (previous) setItems([]);
+      return;
+    }
+
+    let cancelled = false;
+    supabase
+      .from("carts")
+      .select("items")
+      .eq("user_id", userId)
+      .maybeSingle()
+      .then(({ data, error }) => {
+        if (cancelled) return;
+        if (error) {
+          console.warn("Cart sync unavailable:", error.message);
+          return;
+        }
+        const saved = parseCartItems(data?.items);
+        // Items added before logging in win; otherwise restore the saved cart.
+        setItems((local) => (local.length === 0 && saved.length > 0 ? saved : local));
+        setSyncedUserId(userId);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [userId]);
+
+  useEffect(() => {
+    if (!userId || syncedUserId !== userId) return;
+    const timer = setTimeout(() => {
+      supabase
+        .from("carts")
+        .upsert({ user_id: userId, items: items as unknown as Json })
+        .then(({ error }) => {
+          if (error) console.warn("Cart sync failed:", error.message);
+        });
+    }, 800);
+    return () => clearTimeout(timer);
+  }, [items, userId, syncedUserId]);
 
   useEffect(() => {
     try {

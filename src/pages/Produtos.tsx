@@ -6,12 +6,14 @@ import { SEO } from "@/components/SEO";
 import { Helmet } from "react-helmet-async";
 import { ProductCard } from "@/components/products/ProductCard";
 import { products, categories } from "@/data/products";
+import { useAuth } from "@/contexts/AuthContext";
 import { cn } from "@/lib/utils";
 
 type SortOption = "name-asc" | "name-desc";
 
 const Produtos = () => {
   const [searchParams] = useSearchParams();
+  const { isAdmin } = useAuth();
   const [searchTerm, setSearchTerm] = useState(searchParams.get("q") ?? "");
 
   // The header search navigates here with ?q=
@@ -23,7 +25,7 @@ const Produtos = () => {
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
 
   const filteredProducts = useMemo(() => {
-    let result = [...products];
+    let result = products.filter((p) => !p.adminOnly || isAdmin);
 
     // Filter by search term
     if (searchTerm) {
@@ -50,7 +52,7 @@ const Produtos = () => {
     }
 
     return result;
-  }, [searchTerm, selectedCategory, sortBy]);
+  }, [searchTerm, selectedCategory, sortBy, isAdmin]);
 
   return (
     <Layout>
@@ -64,7 +66,7 @@ const Produtos = () => {
           "@context": "https://schema.org",
           "@type": "ItemList",
           "name": "Catálogo FNZ Supply",
-          "itemListElement": products.slice(0, 20).map((p, i) => ({
+          "itemListElement": products.filter((p) => !p.adminOnly).slice(0, 20).map((p, i) => ({
             "@type": "ListItem",
             "position": i + 1,
             "name": p.name,

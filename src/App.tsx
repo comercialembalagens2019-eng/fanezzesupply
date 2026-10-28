@@ -3,7 +3,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { CartProvider } from "@/contexts/CartContext";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { ScrollToTop } from "@/components/ScrollToTop";
@@ -18,7 +18,7 @@ const Sobre = lazy(() => import("./pages/Sobre"));
 const Contato = lazy(() => import("./pages/Contato"));
 const Checkout = lazy(() => import("./pages/Checkout"));
 const Pedidos = lazy(() => import("./pages/Pedidos"));
-const AdminClientes = lazy(() => import("./pages/AdminClientes"));
+const Admin = lazy(() => import("./pages/Admin"));
 const RecuperarSenha = lazy(() => import("./pages/RecuperarSenha"));
 const ValidarCodigo = lazy(() => import("./pages/ValidarCodigo"));
 const RedefinirSenha = lazy(() => import("./pages/RedefinirSenha"));
@@ -57,7 +57,8 @@ const App = () => (
               <Route path="/redefinir-senha" element={<RedefinirSenha />} />
               <Route path="/sobre" element={<Sobre />} />
               <Route path="/contato" element={<Contato />} />
-              <Route path="/admin/clientes" element={<AdminClientes />} />
+              <Route path="/admin" element={<Admin />} />
+              <Route path="/admin/clientes" element={<Navigate to="/admin" replace />} />
               <Route path="/termos" element={<Termos />} />
               <Route path="/privacidade" element={<Privacidade />} />
               <Route path="*" element={<NotFound />} />

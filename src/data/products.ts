@@ -93,6 +93,19 @@ export const products: Product[] = [
     category: "Plásticos",
     featured: true,
   },
+  {
+    id: "produto-teste",
+    name: "Produto teste (admin)",
+    description:
+      "Produto para testar pagamentos. Visível apenas para administradores. 100 unidades = R$ 1,00, o mínimo aceito pelo PIX.",
+    price: unitPrice("produto-teste"),
+    unit: "unidade",
+    minOrder: 100,
+    minOrderUnit: "unidades",
+    image: "/placeholder.svg",
+    category: "Teste",
+    adminOnly: true,
+  },
 ];
 
 export const categories = ["Todos", "Envelopes", "Plásticos"];

@@ -46,7 +46,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     let active = true;
 
     // isLoading stays true until the admin role is known, so guarded pages
-    // (e.g. /admin/clientes) don't redirect admins before the check finishes.
+    // (e.g. /admin) don't redirect admins before the check finishes.
     const applySession = async (session: Session | null) => {
       currentUserId.current = session?.user?.id ?? null;
       setSession(session);
