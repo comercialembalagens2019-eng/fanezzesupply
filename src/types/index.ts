@@ -33,6 +33,8 @@ export interface Product {
   minOrderUnit: string;
   minOrderLabel?: string;
   image: string;
+  /** "cover": the photo is framed for the 4:3 card and fills it edge to edge. */
+  imageFit?: "cover";
   category: string;
   featured?: boolean;
   stripePriceId?: string;

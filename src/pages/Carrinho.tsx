@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { productImageClass } from "@/lib/productImage";
 import { Link } from "react-router-dom";
 import { ShoppingCart, Trash2, Plus, Minus, AlertTriangle, ArrowRight, ArrowLeft } from "lucide-react";
 import { Layout } from "@/components/layout/Layout";
@@ -80,11 +81,11 @@ const Carrinho = () => {
                   >
                     <div className="flex flex-col md:flex-row gap-4">
                       {/* Image */}
-                      <div className="w-full md:w-24 h-24 rounded-2xl bg-card ring-1 ring-black/5 overflow-hidden flex-shrink-0 grid place-items-center">
+                      <div className="relative w-24 h-24 rounded-2xl bg-card ring-1 ring-black/5 overflow-hidden flex-shrink-0">
                         <img
                           src={item.product.image}
                           alt=""
-                          className="h-4/5 w-auto object-contain"
+                          className={productImageClass(item.product)}
                         />
                       </div>
 

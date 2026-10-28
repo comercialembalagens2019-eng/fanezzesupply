@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import { productImageClass } from "@/lib/productImage";
 import { products } from "@/data/products";
 import { formatBRL } from "@/lib/pricing";
 
@@ -16,7 +17,7 @@ export function FeaturedProducts() {
             className="tile p-4 flex flex-col hover:shadow-hover transition-shadow focus-visible:ring-2 focus-visible:ring-ring"
           >
             <div className="rounded-2xl bg-card ring-1 ring-black/5 aspect-[4/3] grid place-items-center relative overflow-hidden">
-              <img src={p.image} alt="" loading="lazy" width={300} height={225} className="h-3/4 w-auto object-contain" />
+              <img src={p.image} alt="" loading="lazy" width={300} height={225} className={productImageClass(p)} />
               {i === 0 && (
                 <span className="absolute top-2 left-2 text-[11px] font-extrabold bg-primary text-primary-foreground px-2 py-1 rounded-lg">
                   Mais vendido

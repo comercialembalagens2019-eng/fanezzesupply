@@ -1,4 +1,5 @@
 import { Fragment, useState } from "react";
+import { productImageClass } from "@/lib/productImage";
 import { ShoppingCart } from "lucide-react";
 import { Product } from "@/types";
 import { Button } from "@/components/ui/button";
@@ -54,7 +55,7 @@ export function ProductCard({ product }: ProductCardProps) {
           loading="lazy"
           width={300}
           height={225}
-          className="h-3/4 w-auto object-contain group-hover:scale-105 transition-transform duration-500"
+          className={`${productImageClass(product)} group-hover:scale-105 transition-transform duration-500`}
         />
         <div className="absolute top-2 left-2 px-2.5 py-1 rounded-lg bg-primary text-primary-foreground text-[11px] font-bold">
           Mínimo: {product.minOrderLabel ?? `${product.minOrder} ${product.minOrderUnit}`}

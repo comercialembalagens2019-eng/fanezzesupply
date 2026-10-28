@@ -10,3 +10,4 @@
   - Foto nova dos envelopes, razão social e CNPJ no site, endereço corrigido para "Alvim"
   - E-mails de pedido (pago/enviado/entregue) aprovados e ligados ao fluxo real
   - Não há dados antigos no Lovable para migrar
+- **2026-10-28 (noite)**: foto dos envelopes refeita em 4:3 com margem, centralizada e sem corte; cards usam `imageFit: "cover"`
