@@ -5,7 +5,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "@/hooks/use-toast";
-import { Package, Clock, CheckCircle, XCircle, Loader2, Building2, PartyPopper, QrCode, CreditCard, FileText } from "lucide-react";
+import { Package, Clock, CheckCircle, XCircle, Loader2, Building2, PartyPopper, QrCode, CreditCard, FileText, Truck, PackageCheck } from "lucide-react";
+import { OrderProgress } from "@/components/orders/OrderProgress";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/contexts/AuthContext";
 
@@ -24,6 +25,9 @@ interface Order {
   payment_url: string | null;
   payment_method: string | null;
   total_amount: number;
+  shipping_amount?: number;
+  shipped_at?: string | null;
+  delivered_at?: string | null;
   status: string;
   items: OrderItem[];
   created_at: string;
@@ -80,6 +84,10 @@ const getStatusConfig = (status: string) => {
       return { label: 'Pendente', icon: Clock, color: 'bg-warning-soft text-warning-soft-foreground border-warning/30' };
     case 'processing':
       return { label: 'Processando', icon: Loader2, color: 'bg-blue-100 text-blue-800 border-blue-200' };
+    case 'shipped':
+      return { label: 'Enviado', icon: Truck, color: 'bg-info-soft text-info-soft-foreground border-info/30' };
+    case 'delivered':
+      return { label: 'Entregue', icon: PackageCheck, color: 'bg-success-soft text-success-soft-foreground border-success/30' };
     case 'cancelled':
       return { label: 'Cancelado', icon: XCircle, color: 'bg-destructive-soft text-destructive-soft-foreground border-destructive/30' };
     case 'failed':
@@ -190,6 +198,8 @@ export default function Pedidos() {
                     ...order, 
                     status: updatedOrder.status,
                     payment_url: updatedOrder.payment_url,
+                    shipped_at: updatedOrder.shipped_at,
+                    delivered_at: updatedOrder.delivered_at,
                     updated_at: updatedOrder.updated_at
                   }
                 : order
@@ -400,8 +410,8 @@ export default function Pedidos() {
                                 <PaymentIcon className="w-3 h-3" />
                                 {paymentMethodConfig.label}
                               </Badge>
-                              <span className="font-display font-bold text-primary">
-                                Consulte-nos
+                              <span className="font-display font-extrabold text-foreground tabular-nums">
+                                {formatPrice(Number(order.total_amount))}
                               </span>
                             </div>
                           </div>
@@ -413,12 +423,23 @@ export default function Pedidos() {
                                 <span className="text-muted-foreground">
                                   {item.productName} x {item.quantity} {item.unit}
                                 </span>
-                                <span className="font-medium text-primary">
-                                  Consulte-nos
+                                <span className="font-medium text-foreground tabular-nums">
+                                  {formatPrice(Number(item.totalPrice))}
                                 </span>
                             </div>
                             ))}
+                            {Number(order.shipping_amount) > 0 && (
+                              <div className="flex justify-between text-sm">
+                                <span className="text-muted-foreground">Frete</span>
+                                <span className="font-medium text-foreground tabular-nums">{formatPrice(Number(order.shipping_amount))}</span>
+                              </div>
+                            )}
                           </div>
+                          {["paid", "shipped", "delivered"].includes(order.status) && (
+                            <div className="mt-5 pt-4 border-t border-border">
+                              <OrderProgress status={order.status} shippedAt={order.shipped_at} deliveredAt={order.delivered_at} />
+                            </div>
+                          )}
 
                         </CardContent>
                       </Card>

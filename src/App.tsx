@@ -23,6 +23,8 @@ const RecuperarSenha = lazy(() => import("./pages/RecuperarSenha"));
 const ValidarCodigo = lazy(() => import("./pages/ValidarCodigo"));
 const RedefinirSenha = lazy(() => import("./pages/RedefinirSenha"));
 const NotFound = lazy(() => import("./pages/NotFound"));
+const Termos = lazy(() => import("./pages/Termos"));
+const Privacidade = lazy(() => import("./pages/Privacidade"));
 
 const PageFallback = () => (
   <div className="min-h-screen grid place-items-center" role="status" aria-label="Carregando">
@@ -56,6 +58,8 @@ const App = () => (
               <Route path="/sobre" element={<Sobre />} />
               <Route path="/contato" element={<Contato />} />
               <Route path="/admin/clientes" element={<AdminClientes />} />
+              <Route path="/termos" element={<Termos />} />
+              <Route path="/privacidade" element={<Privacidade />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
             </Suspense>

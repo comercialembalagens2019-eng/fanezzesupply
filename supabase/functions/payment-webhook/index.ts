@@ -2,7 +2,7 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
 import { Resend } from "https://esm.sh/resend@2.0.0";
-import { isValidUUID, orderAmountCents } from "../_shared/orders.ts";
+import { isValidUUID, orderAmountCents, PAID_STATUSES } from "../_shared/orders.ts";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -207,7 +207,7 @@ serve(async (req: Request): Promise<Response> => {
           console.warn('PIX id does not match order, ignoring:', order.id);
         } else if (amount > 0 && Math.round(Number(amount)) < orderAmountCents(order.total_amount)) {
           console.warn('Paid amount is lower than order total, ignoring:', order.id);
-        } else if (order.status === 'paid') {
+        } else if (PAID_STATUSES.includes(order.status)) {
           console.log('Order already paid:', order.id);
         } else {
           const { error: updateError } = await supabase.rpc('update_order_status', {

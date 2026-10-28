@@ -9,7 +9,7 @@ import { useCart } from "@/contexts/CartContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { getFunctionErrorMessage } from "@/lib/functionErrors";
-import { getUnitPrice } from "@/lib/pricing";
+import { getUnitPrice, shippingFor } from "@/lib/pricing";
 import { toast } from "@/hooks/use-toast";
 import { Loader2, QrCode, Building2, MapPin, Phone, ChevronRight, ChevronLeft, CheckCircle, Copy, Home, ShoppingBag, PartyPopper, CreditCard, LogIn, FileText, ExternalLink } from "lucide-react";
 import { Link } from "react-router-dom";
@@ -364,6 +364,9 @@ export const CheckoutModal = ({ open, onOpenChange }: CheckoutModalProps) => {
       clearInterval(dbIntervalId);
     };
   }, [paymentCreated, currentOrderId, currentPixId, paymentConfirmed, clearCart, onOpenChange, navigate]);
+
+  // Charged by the server from the company's saved address; shown here before paying.
+  const shipping = shippingFor(addressData.cidade, addressData.estado);
 
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat("pt-BR", {
@@ -1064,9 +1067,17 @@ export const CheckoutModal = ({ open, onOpenChange }: CheckoutModalProps) => {
                     </span>
                   </div>
                 ))}
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">
+                    Frete{addressData.cidade ? ` (${addressData.cidade}/${addressData.estado})` : ""}
+                  </span>
+                  <span className="font-medium text-foreground tabular-nums">
+                    {shipping === 0 ? "Grátis" : formatPrice(shipping)}
+                  </span>
+                </div>
                 <div className="border-t pt-2 mt-2 flex justify-between font-bold">
                   <span>Total</span>
-                  <span className="text-foreground tabular-nums">{formatPrice(getTotal())}</span>
+                  <span className="text-foreground tabular-nums">{formatPrice(getTotal() + shipping)}</span>
                 </div>
               </div>
             </div>

@@ -196,6 +196,12 @@ serve(async (req) => {
       },
       quantity: line.quantity,
     }));
+    if (created.shippingCents > 0) {
+      lineItems.push({
+        price_data: { currency: "brl", unit_amount: created.shippingCents, product_data: { name: "Frete" } },
+        quantity: 1,
+      });
+    }
 
     const origin = resolveOrigin(req.headers.get("origin"));
 

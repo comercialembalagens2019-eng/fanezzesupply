@@ -39,6 +39,16 @@ export const PRODUCT_INFO: Record<string, { name: string; unit: string; minQty: 
   "stretch-4kg": { name: "Stretch 4kg", unit: "kg", minQty: 500 },
 };
 
+// Flat delivery fee outside Joinville/SC, in centavos. Shared with the storefront.
+export const SHIPPING_FEE_CENTS = 1990;
+
+const normalizePlace = (value: string | null | undefined) =>
+  (value ?? "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim().toLowerCase();
+
+export function shippingCentsFor(city: string | null | undefined, state: string | null | undefined): number {
+  return normalizePlace(city) === "joinville" && normalizePlace(state) === "sc" ? 0 : SHIPPING_FEE_CENTS;
+}
+
 export interface OrderLine {
   productId: string;
   quantity: number;

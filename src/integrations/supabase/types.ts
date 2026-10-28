@@ -116,6 +116,9 @@ export type Database = {
           payment_method: string | null
           payment_ref: string | null
           payment_url: string | null
+          delivered_at: string | null
+          shipped_at: string | null
+          shipping_amount: number
           status: string
           total_amount: number
           updated_at: string
@@ -128,6 +131,9 @@ export type Database = {
           payment_method?: string | null
           payment_ref?: string | null
           payment_url?: string | null
+          delivered_at?: string | null
+          shipped_at?: string | null
+          shipping_amount?: number
           status?: string
           total_amount: number
           updated_at?: string
@@ -140,6 +146,9 @@ export type Database = {
           payment_method?: string | null
           payment_ref?: string | null
           payment_url?: string | null
+          delivered_at?: string | null
+          shipped_at?: string | null
+          shipping_amount?: number
           status?: string
           total_amount?: number
           updated_at?: string
@@ -210,6 +219,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      admin_set_fulfillment_status: {
+        Args: { p_order_id: string; p_status: string }
+        Returns: undefined
+      }
       cleanup_expired_reset_codes: { Args: never; Returns: undefined }
       get_user_id_by_email: { Args: { p_email: string }; Returns: string }
       has_role: {

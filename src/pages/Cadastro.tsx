@@ -73,17 +73,17 @@ const Cadastro = () => {
   };
 
   return (
-    <div className="min-h-screen bg-secondary">
+    <div className="min-h-screen bg-background">
       <SEO
         title="Criar conta — FNZ Supply"
         description="Crie sua conta na FNZ Supply para comprar embalagens no atacado."
         path="/cadastro"
       />
-      <header className="bg-card border-b border-border py-4">
+      <header className="py-4">
         <div className="container-custom">
           <div className="flex items-center justify-between">
             <Link to="/" className="flex items-center gap-2">
-              <div className="w-10 h-10 rounded-lg bg-primary flex items-center justify-center">
+              <div className="w-10 h-10 rounded-xl bg-primary flex items-center justify-center">
                 <Package className="w-6 h-6 text-primary-foreground" />
               </div>
               <span className="font-display font-bold text-xl text-foreground">
@@ -109,7 +109,7 @@ const Cadastro = () => {
           </div>
 
           <form onSubmit={handleSubmit}>
-            <div className="bg-card rounded-2xl border border-border p-6 md:p-8 space-y-5">
+            <div className="tile p-6 md:p-8 space-y-5">
               <div>
                 <label htmlFor="nome" className="block text-sm font-medium text-foreground mb-2">
                   Nome *
@@ -186,6 +186,11 @@ const Cadastro = () => {
                   "Criar conta"
                 )}
               </Button>
+              <p className="text-xs text-muted-foreground text-center">
+                Ao criar a conta, você concorda com os{" "}
+                <Link to="/termos" className="text-foreground underline underline-offset-2">Termos de Uso</Link> e a{" "}
+                <Link to="/privacidade" className="text-foreground underline underline-offset-2">Política de Privacidade</Link>.
+              </p>
             </div>
           </form>
         </div>

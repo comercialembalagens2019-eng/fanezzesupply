@@ -57,8 +57,12 @@ export function Footer() {
       </div>
 
       <div className="border-t border-border">
-        <div className="container-custom py-5 text-xs text-muted-foreground">
-          © {new Date().getFullYear()} FNZ Supply. Todos os direitos reservados.
+        <div className="container-custom py-5 flex flex-col sm:flex-row gap-3 justify-between text-xs text-muted-foreground">
+          <span>© {new Date().getFullYear()} FNZ Supply. Todos os direitos reservados.</span>
+          <span className="flex gap-4">
+            <Link to="/termos" className="hover:text-foreground transition-colors">Termos de Uso</Link>
+            <Link to="/privacidade" className="hover:text-foreground transition-colors">Política de Privacidade</Link>
+          </span>
         </div>
       </div>
     </footer>
