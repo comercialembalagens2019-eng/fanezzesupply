@@ -3,6 +3,10 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- Baseline hardening that works on any host; script-src is not restricted because the
+         hosting platform may inject its own scripts. Prefer real response headers when available. -->
+    <meta http-equiv="Content-Security-Policy" content="object-src 'none'; base-uri 'self'; form-action 'self'; upgrade-insecure-requests">
+    <meta name="referrer" content="strict-origin-when-cross-origin">
     <title>FNZ Supply - Distribuição de Embalagens B2B</title>
     <meta name="description" content="FNZ Supply - Distribuição de embalagens para empresas. Qualidade, preço justo e entrega rápida. Pedidos mínimos acessíveis e nota fiscal eletrônica.">
     <meta name="author" content="FNZ Supply" />

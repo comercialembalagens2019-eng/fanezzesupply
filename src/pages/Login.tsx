@@ -18,7 +18,9 @@ const Login = () => {
   const location = useLocation();
   // Only same-site paths, so a crafted link can't redirect off the site after login
   const from = (location.state as { from?: unknown } | null)?.from;
-  const redirectTo = typeof from === "string" && from.startsWith("/") && !from.startsWith("//") ? from : null;
+  // Backslashes are rejected too: browsers treat "/\evil.com" like "//evil.com".
+  const redirectTo =
+    typeof from === "string" && /^\/(?![/\\])[^\\]*$/.test(from) ? from : null;
 
   useEffect(() => {
     if (user && !authLoading) {
