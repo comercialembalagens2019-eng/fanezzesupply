@@ -3,6 +3,7 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Eye, EyeOff, Package, Mail, Lock, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { toast } from "@/hooks/use-toast";
+import { translateAuthError } from "@/lib/authErrors";
 import { useAuth } from "@/contexts/AuthContext";
 import { SEO } from "@/components/SEO";
 
@@ -41,15 +42,11 @@ const Login = () => {
     try {
       const { error } = await signIn(email, password);
       if (error) {
-        if (error.message.includes('Invalid login credentials')) {
-          toast({
-            title: "Credenciais inválidas",
-            description: "Email ou senha incorretos.",
-            variant: "destructive",
-          });
-        } else {
-          throw error;
-        }
+        toast({
+          title: "Não foi possível entrar",
+          description: translateAuthError(error),
+          variant: "destructive",
+        });
       } else {
         toast({
           title: "Login realizado!",
@@ -60,7 +57,7 @@ const Login = () => {
       console.error('Auth error:', error);
       toast({
         title: "Erro",
-        description: error instanceof Error ? error.message : "Ocorreu um erro. Tente novamente.",
+        description: translateAuthError(error),
         variant: "destructive",
       });
     } finally {
