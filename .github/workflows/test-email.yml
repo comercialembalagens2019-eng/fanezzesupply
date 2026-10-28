@@ -1,0 +1,26 @@
+# Manually sends sample order e-mails through Resend (uses the RESEND_API_KEY secret).
+name: Test e-mail
+
+on:
+  workflow_dispatch:
+    inputs:
+      to:
+        description: Recipient
+        required: true
+      kind:
+        description: paid, shipped, delivered or all
+        required: false
+        default: all
+
+jobs:
+  send:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Send
+        env:
+          RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
+        run: node --experimental-strip-types scripts/send-test-email.mjs "${{ inputs.to }}" "${{ inputs.kind }}"
