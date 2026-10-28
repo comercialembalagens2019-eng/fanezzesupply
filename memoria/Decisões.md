@@ -6,3 +6,5 @@
 - **Asaas** como provedor de pagamento — ver [[Pagamentos]]
 - **Resend** para todos os e-mails (pedido e conta)
 - **Front Bento / Pedido Rápido** — proposta 4 de 5
+- **Sem migração do Lovable**: nunca houve clientes ou pedidos lá
+- **E-mail de pedido uma vez só**: tabela `order_emails` (chave pedido + tipo) evita duplicar quando webhook e checagem do Pix confirmam juntos

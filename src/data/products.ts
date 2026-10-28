@@ -1,5 +1,5 @@
 import { Product, SizePricing } from "@/types";
-import sacoPlasticoImg from "@/assets/saco_plastico.webp";
+import envelopeImg from "@/assets/envelope.webp";
 import stretchImg from "@/assets/stretch.webp";
 // Single source of truth for prices: the same catalog the edge functions charge from.
 import {
@@ -28,7 +28,7 @@ export const products: Product[] = [
     unit: "unidade",
     minOrder: 2000,
     minOrderUnit: "unidades",
-    image: sacoPlasticoImg,
+    image: envelopeImg,
     category: "Envelopes",
     featured: true,
     colors: ["Preto", "Branco"],
@@ -43,7 +43,7 @@ export const products: Product[] = [
     unit: "unidade",
     minOrder: 500,
     minOrderUnit: "unidades",
-    image: sacoPlasticoImg,
+    image: envelopeImg,
     category: "Envelopes",
     featured: true,
     sizes: ["19x25", "32x20", "30x40", "40x60", "50x70"],
@@ -58,7 +58,7 @@ export const products: Product[] = [
     unit: "unidade",
     minOrder: 500,
     minOrderUnit: "unidades",
-    image: sacoPlasticoImg,
+    image: envelopeImg,
     category: "Envelopes",
     featured: true,
     sizes: ["20x30", "26x36", "32x40", "40x50", "50x70", "70x60", "40x00", "50x90"],
@@ -74,7 +74,7 @@ export const products: Product[] = [
     minOrder: 2000,
     minOrderUnit: "unidades",
     minOrderLabel: "conforme fornecido",
-    image: sacoPlasticoImg,
+    image: envelopeImg,
     category: "Envelopes",
     featured: true,
     quoteOnly: true,

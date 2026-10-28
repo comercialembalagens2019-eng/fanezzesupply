@@ -145,7 +145,7 @@ export function renderOrderEmail(kind: OrderEmailKind, data: OrderEmailData) {
 
         <tr><td style="padding:24px 8px 0;font-size:12px;line-height:1.6;color:${MUTED};text-align:center;">
           Dúvidas? Responda este e-mail, escreva para <a href="mailto:${SUPPORT_EMAIL}" style="color:${NAVY};">${SUPPORT_EMAIL}</a> ou chame no WhatsApp ${WHATSAPP}.<br>
-          FNZ Supply · Av. Antonio Ramos Alvin, 1084 · Joinville/SC
+          FNZ Supply · Av. Antonio Ramos Alvim, 1084 · Joinville/SC
         </td></tr>
       </table>
     </td></tr>

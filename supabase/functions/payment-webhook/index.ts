@@ -3,6 +3,7 @@ import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
 import { Resend } from "https://esm.sh/resend@2.0.0";
 import { isValidUUID, orderAmountCents, PAID_STATUSES } from "../_shared/orders.ts";
+import { sendOrderEmail } from "../_shared/notify.ts";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -222,6 +223,7 @@ serve(async (req: Request): Promise<Response> => {
 
           console.log('Order status updated to paid:', order.id);
           await sendPaymentNotificationEmail(order.id, orderAmountCents(order.total_amount));
+          await sendOrderEmail(supabase, order.id, 'paid');
         }
       }
     }

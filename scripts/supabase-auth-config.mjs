@@ -34,7 +34,7 @@ function template(title, body, button) {
 <a href="{{ .ConfirmationURL }}" style="display:inline-block;background:${NAVY};color:#FFFFFF;text-decoration:none;font-weight:800;font-size:14px;padding:14px 28px;border-radius:12px;">${button}</a>
 <p style="margin:24px 0 0;font-size:12px;line-height:1.6;color:#8A91A3;">Se você não fez essa solicitação, ignore este e-mail.</p>
 </td></tr>
-<tr><td style="padding:20px 8px 0;font-size:12px;color:#8A91A3;text-align:center;">FNZ Supply · Av. Antonio Ramos Alvin, 1084 · Joinville/SC</td></tr>
+<tr><td style="padding:20px 8px 0;font-size:12px;color:#8A91A3;text-align:center;">FNZ Supply · Av. Antonio Ramos Alvim, 1084 · Joinville/SC</td></tr>
 </table></td></tr></table></body></html>`;
 }
 

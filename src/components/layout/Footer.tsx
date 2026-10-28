@@ -42,7 +42,7 @@ export function Footer() {
             </li>
             <li className="flex items-start gap-2">
               <MapPin className="w-4 h-4 mt-0.5 shrink-0" aria-hidden="true" />
-              Av. Antonio Ramos Alvin, 1084 · Joinville/SC
+              Av. Antonio Ramos Alvim, 1084 · Joinville/SC
             </li>
           </ul>
         </div>
@@ -58,7 +58,7 @@ export function Footer() {
 
       <div className="border-t border-border">
         <div className="container-custom py-5 flex flex-col sm:flex-row gap-3 justify-between text-xs text-muted-foreground">
-          <span>© {new Date().getFullYear()} FNZ Supply. Todos os direitos reservados.</span>
+          <span>© {new Date().getFullYear()} FNZ Supply · CNPJ 56.008.033/0001-32. Todos os direitos reservados.</span>
           <span className="flex gap-4">
             <Link to="/termos" className="hover:text-foreground transition-colors">Termos de Uso</Link>
             <Link to="/privacidade" className="hover:text-foreground transition-colors">Política de Privacidade</Link>
