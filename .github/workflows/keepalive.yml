@@ -1,0 +1,22 @@
+# Free Supabase projects pause after a week without activity; this pings the
+# database API every 3 days so the store never goes offline. No secrets needed.
+name: Supabase keep-alive
+
+on:
+  schedule:
+    - cron: "17 11 */3 * *"
+  workflow_dispatch:
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Query the REST API
+        env:
+          URL: https://krmrnoqkkimhlmbcinmd.supabase.co
+          # Public anon key; RLS returns no rows for it.
+          KEY: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtybXJub3Fra2ltaGxtYmNpbm1kIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTMyMDQ4MDYsImV4cCI6MjEwODc4MDgwNn0.vTOvHltI_T1xrexkHTjp-e98SwxLEknhIcOpN3Q4aCM
+        run: |
+          status=$(curl -s -o /dev/null -w "%{http_code}" "$URL/rest/v1/orders?select=id&limit=1" -H "apikey: $KEY" -H "Authorization: Bearer $KEY")
+          echo "HTTP $status"
+          test "$status" = "200"

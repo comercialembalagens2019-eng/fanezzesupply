@@ -1,0 +1,26 @@
+# Checks every pull request and push: lint, types, unit tests and production build.
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci --no-audit --no-fund
+      - run: npx eslint .
+      - run: npx tsc -p tsconfig.app.json --noEmit
+      - run: npm run build
+      - uses: denoland/setup-deno@v2
+        with:
+          deno-version: v2.x
+      - name: Edge function tests
+        run: deno test supabase/functions/_shared/

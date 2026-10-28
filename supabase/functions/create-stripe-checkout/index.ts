@@ -13,6 +13,8 @@ function resolveOrigin(origin: string | null): string {
     const allowed =
       hostname === "fanezzesupply.com.br" ||
       hostname === "www.fanezzesupply.com.br" ||
+      hostname === "fnzsupply.pages.dev" ||
+      hostname.endsWith(".fnzsupply.pages.dev") ||
       hostname.endsWith(".lovable.app") ||
       hostname.endsWith(".lovableproject.com") ||
       hostname === "localhost";
