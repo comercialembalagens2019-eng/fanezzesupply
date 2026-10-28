@@ -141,8 +141,8 @@ serve(async (req: Request): Promise<Response> => {
     if (!currentOrder) {
       return jsonResponse({ error: 'Order not found' }, 404);
     }
-    // deno-lint-ignore no-explicit-any
-    if ((currentOrder as any).companies?.user_id !== authedUserId) {
+    const owner = (currentOrder as { companies?: { user_id?: string } | null }).companies?.user_id;
+    if (owner !== authedUserId) {
       console.warn('[CHECK-PIX] Order ownership mismatch');
       return jsonResponse({ error: 'Forbidden' }, 403);
     }

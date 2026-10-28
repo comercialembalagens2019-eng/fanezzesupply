@@ -1,6 +1,28 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from "react";
 import { Product, CartItem } from "@/types";
 import { toast } from "@/hooks/use-toast";
+import { getUnitPrice } from "@/lib/pricing";
+
+const CART_STORAGE_KEY = "fanezze-cart";
+
+// A corrupted or outdated cart in localStorage must not crash the whole app.
+function loadCart(): CartItem[] {
+  try {
+    const saved = localStorage.getItem(CART_STORAGE_KEY);
+    const parsed: unknown = saved ? JSON.parse(saved) : [];
+    if (!Array.isArray(parsed)) return [];
+    return parsed.filter(
+      (item): item is CartItem =>
+        !!item &&
+        typeof item.product?.id === "string" &&
+        typeof item.product?.minOrder === "number" &&
+        Number.isInteger(item.quantity) &&
+        item.quantity > 0
+    );
+  } catch {
+    return [];
+  }
+}
 
 interface CartContextType {
   items: CartItem[];
@@ -17,13 +39,14 @@ interface CartContextType {
 const CartContext = createContext<CartContextType | undefined>(undefined);
 
 export function CartProvider({ children }: { children: ReactNode }) {
-  const [items, setItems] = useState<CartItem[]>(() => {
-    const saved = localStorage.getItem("fanezze-cart");
-    return saved ? JSON.parse(saved) : [];
-  });
+  const [items, setItems] = useState<CartItem[]>(loadCart);
 
   useEffect(() => {
-    localStorage.setItem("fanezze-cart", JSON.stringify(items));
+    try {
+      localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(items));
+    } catch {
+      // Storage may be full or blocked; the cart still works for this visit.
+    }
   }, [items]);
 
   const addToCart = (product: Product, quantity: number) => {
@@ -36,41 +59,38 @@ export function CartProvider({ children }: { children: ReactNode }) {
       return;
     }
 
-    setItems((prev) => {
-      const existingItem = prev.find((item) => item.product.id === product.id);
-      
-      if (existingItem) {
-        const newQuantity = existingItem.quantity + quantity;
-        toast({
-          title: "Carrinho atualizado",
-          description: `${product.name} atualizado para ${newQuantity} ${product.minOrderUnit}.`,
-        });
-        return prev.map((item) =>
-          item.product.id === product.id
-            ? { ...item, quantity: newQuantity }
-            : item
-        );
-      }
-
+    // Toasts stay outside the state updater, which React may run twice.
+    const existingItem = items.find((item) => item.product.id === product.id);
+    if (existingItem) {
+      const newQuantity = existingItem.quantity + quantity;
+      setItems((prev) =>
+        prev.map((item) =>
+          item.product.id === product.id ? { ...item, quantity: item.quantity + quantity } : item
+        )
+      );
       toast({
-        title: "Produto adicionado",
-        description: `${product.name} foi adicionado ao carrinho.`,
+        title: "Carrinho atualizado",
+        description: `${product.name} atualizado para ${newQuantity} ${product.minOrderUnit}.`,
       });
-      return [...prev, { product, quantity }];
+      return;
+    }
+
+    setItems((prev) => [...prev, { product, quantity }]);
+    toast({
+      title: "Produto adicionado",
+      description: `${product.name} foi adicionado ao carrinho.`,
     });
   };
 
   const removeFromCart = (productId: string) => {
-    setItems((prev) => {
-      const item = prev.find((i) => i.product.id === productId);
-      if (item) {
-        toast({
-          title: "Produto removido",
-          description: `${item.product.name} foi removido do carrinho.`,
-        });
-      }
-      return prev.filter((item) => item.product.id !== productId);
-    });
+    const item = items.find((i) => i.product.id === productId);
+    setItems((prev) => prev.filter((i) => i.product.id !== productId));
+    if (item) {
+      toast({
+        title: "Produto removido",
+        description: `${item.product.name} foi removido do carrinho.`,
+      });
+    }
   };
 
   const updateQuantity = (productId: string, quantity: number) => {
@@ -91,7 +111,8 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
   const getTotal = () => {
     return items.reduce(
-      (total, item) => total + item.product.price * item.quantity,
+      // Tier prices depend on the current quantity, so recompute instead of using the add-time price.
+      (total, item) => total + getUnitPrice(item.product.id, item.quantity, item.product.price) * item.quantity,
       0
     );
   };

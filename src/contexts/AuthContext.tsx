@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useEffect, ReactNode } from "react";
+import { createContext, useContext, useState, useEffect, useRef, ReactNode } from "react";
 import { User, Session } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -19,6 +19,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [session, setSession] = useState<Session | null>(null);
   const [isAdmin, setIsAdmin] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const currentUserId = useRef<string | null>(null);
 
   const checkAdminRole = async (userId: string) => {
     try {
@@ -42,35 +43,40 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   useEffect(() => {
+    let active = true;
+
+    // isLoading stays true until the admin role is known, so guarded pages
+    // (e.g. /admin/clientes) don't redirect admins before the check finishes.
+    const applySession = async (session: Session | null) => {
+      currentUserId.current = session?.user?.id ?? null;
+      setSession(session);
+      setUser(session?.user ?? null);
+      const admin = session?.user ? await checkAdminRole(session.user.id) : false;
+      if (!active) return;
+      setIsAdmin(admin);
+      setIsLoading(false);
+    };
+
     // Set up auth state listener FIRST
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (event, session) => {
-        setSession(session);
-        setUser(session?.user ?? null);
-        
-        // Defer admin check with setTimeout to avoid deadlock
-        if (session?.user) {
-          setTimeout(() => {
-            checkAdminRole(session.user.id).then(setIsAdmin);
-          }, 0);
-        } else {
-          setIsAdmin(false);
-        }
+        if (event === 'INITIAL_SESSION') return; // handled by getSession below
+        // Token refreshes keep the same user; only a new user needs a fresh role check.
+        if (session?.user && session.user.id !== currentUserId.current) setIsLoading(true);
+        // Defer the role query with setTimeout to avoid a deadlock inside the auth callback
+        setTimeout(() => {
+          applySession(session);
+        }, 0);
       }
     );
 
     // THEN check for existing session
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-      setUser(session?.user ?? null);
-      
-      if (session?.user) {
-        checkAdminRole(session.user.id).then(setIsAdmin);
-      }
-      setIsLoading(false);
-    });
+    supabase.auth.getSession().then(({ data: { session } }) => applySession(session));
 
-    return () => subscription.unsubscribe();
+    return () => {
+      active = false;
+      subscription.unsubscribe();
+    };
   }, []);
 
   const signIn = async (email: string, password: string) => {
@@ -99,8 +105,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     // Then call the actual signOut (may fail if session already expired, that's ok)
     try {
       await supabase.auth.signOut();
-    } catch (error) {
-      console.log('SignOut completed (session may have been expired)');
+    } catch {
+      // Session may already have expired; local state is cleared above.
     }
   };
 

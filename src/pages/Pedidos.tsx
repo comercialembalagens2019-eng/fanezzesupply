@@ -96,7 +96,7 @@ export default function Pedidos() {
   const [orders, setOrders] = useState<Order[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [hasSearched, setHasSearched] = useState(false);
-  const [companyId, setCompanyId] = useState<string | null>(null);
+  const [companyIds, setCompanyIds] = useState<string[]>([]);
 
   // Track recently paid orders for animation
   const [recentlyPaidOrders, setRecentlyPaidOrders] = useState<Set<string>>(new Set());
@@ -115,25 +115,25 @@ export default function Pedidos() {
     setHasSearched(true);
 
     try {
-      // Find company associated with this user
-      const { data: company, error: companyError } = await supabase
+      // A user can own more than one company (one per CNPJ used at checkout)
+      const { data: companies, error: companyError } = await supabase
         .from('companies')
         .select('id')
-        .eq('user_id', user!.id)
-        .maybeSingle();
+        .eq('user_id', user!.id);
 
       if (companyError) throw companyError;
 
-      if (!company) {
+      const ids = (companies || []).map(c => c.id);
+      if (ids.length === 0) {
         setOrders([]);
-        setCompanyId(null);
+        setCompanyIds([]);
         setIsLoading(false);
         return;
       }
 
-      setCompanyId(company.id);
+      setCompanyIds(ids);
 
-      // Fetch orders for this company
+      // Fetch orders for these companies
       const { data: ordersData, error: ordersError } = await supabase
         .from('orders')
         .select(`
@@ -143,7 +143,7 @@ export default function Pedidos() {
             cnpj
           )
         `)
-        .eq('company_id', company.id)
+        .in('company_id', ids)
         .order('created_at', { ascending: false });
 
       if (ordersError) throw ordersError;
@@ -169,7 +169,7 @@ export default function Pedidos() {
 
   // Realtime subscription for order status updates
   useEffect(() => {
-    if (!companyId) return;
+    if (companyIds.length === 0) return;
 
     const channel = supabase
       .channel('orders-status-updates')
@@ -179,10 +179,10 @@ export default function Pedidos() {
           event: 'UPDATE',
           schema: 'public',
           table: 'orders',
-          filter: `company_id=eq.${companyId}`
+          filter: `company_id=in.(${companyIds.join(',')})`
         },
         (payload) => {
-          const updatedOrder = payload.new as any;
+          const updatedOrder = payload.new as Order & { updated_at: string };
           setOrders(prevOrders => 
             prevOrders.map(order => 
               order.id === updatedOrder.id 
@@ -222,11 +222,11 @@ export default function Pedidos() {
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [companyId]);
+  }, [companyIds]);
 
   // Also subscribe for new orders (INSERT) when user is logged in
   useEffect(() => {
-    if (!companyId) return;
+    if (companyIds.length === 0) return;
 
     const channel = supabase
       .channel('orders-new-orders')
@@ -236,10 +236,10 @@ export default function Pedidos() {
           event: 'INSERT',
           schema: 'public',
           table: 'orders',
-          filter: `company_id=eq.${companyId}`
+          filter: `company_id=in.(${companyIds.join(',')})`
         },
         async (payload) => {
-          const newOrder = payload.new as any;
+          const newOrder = payload.new as Pick<Order, 'id'>;
           
           // Fetch the complete order with company data
           const { data: orderData, error } = await supabase
@@ -269,7 +269,7 @@ export default function Pedidos() {
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [companyId]);
+  }, [companyIds]);
 
   // Show loading state while checking auth
   if (authLoading) {

@@ -4,6 +4,7 @@ import { priceOrder, type PricedOrderLine } from "./catalog.ts";
 
 // Functions pin different supabase-js versions, so accept any client structurally.
 // deno-lint-ignore no-explicit-any
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 type SupabaseClient = { from: (table: string) => any };
 
 export type PaymentMethod = "pix" | "card" | "boleto";

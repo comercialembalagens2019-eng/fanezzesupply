@@ -8,6 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useCart } from "@/contexts/CartContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
+import { getFunctionErrorMessage } from "@/lib/functionErrors";
 import { toast } from "@/hooks/use-toast";
 import { Loader2, QrCode, Building2, MapPin, Phone, ChevronRight, ChevronLeft, CheckCircle, Copy, Home, ShoppingBag, PartyPopper, CreditCard, LogIn, FileText, ExternalLink } from "lucide-react";
 import { Link } from "react-router-dom";
@@ -114,7 +115,7 @@ export const CheckoutModal = ({ open, onOpenChange }: CheckoutModalProps) => {
       sum += parseInt(cpfClean[i]) * (10 - i);
     }
     let remainder = (sum * 10) % 11;
-    let firstDigit = remainder === 10 ? 0 : remainder;
+    const firstDigit = remainder === 10 ? 0 : remainder;
     
     if (parseInt(cpfClean[9]) !== firstDigit) return false;
     
@@ -124,7 +125,7 @@ export const CheckoutModal = ({ open, onOpenChange }: CheckoutModalProps) => {
       sum += parseInt(cpfClean[i]) * (11 - i);
     }
     remainder = (sum * 10) % 11;
-    let secondDigit = remainder === 10 ? 0 : remainder;
+    const secondDigit = remainder === 10 ? 0 : remainder;
     
     return parseInt(cpfClean[10]) === secondDigit;
   };
@@ -169,6 +170,8 @@ export const CheckoutModal = ({ open, onOpenChange }: CheckoutModalProps) => {
           .from('companies')
           .select('*')
           .eq('user_id', user.id)
+          .order('updated_at', { ascending: false })
+          .limit(1)
           .maybeSingle();
 
         if (error) {
@@ -518,6 +521,10 @@ export const CheckoutModal = ({ open, onOpenChange }: CheckoutModalProps) => {
         .select()
         .single();
 
+      // The CNPJ is unique; another account's company is invisible here because of RLS.
+      if (error?.code === '23505') {
+        throw new Error('Este CNPJ já está cadastrado em outra conta. Entre em contato conosco para vincular.');
+      }
       if (error) throw error;
       return data;
     }
@@ -570,7 +577,7 @@ export const CheckoutModal = ({ open, onOpenChange }: CheckoutModalProps) => {
       });
 
       if (error) {
-        throw new Error(error.message || 'Erro ao criar pagamento');
+        throw new Error(await getFunctionErrorMessage(error, 'Erro ao criar pagamento'));
       }
 
       // The response should contain the QR code data and the server-created order
@@ -641,7 +648,7 @@ export const CheckoutModal = ({ open, onOpenChange }: CheckoutModalProps) => {
       });
 
       if (error) {
-        throw new Error(error.message || 'Erro ao criar checkout');
+        throw new Error(await getFunctionErrorMessage(error, 'Erro ao criar checkout'));
       }
 
       if (data?.url) {
@@ -693,7 +700,7 @@ export const CheckoutModal = ({ open, onOpenChange }: CheckoutModalProps) => {
       });
 
       if (error) {
-        throw new Error(error.message || 'Erro ao criar boleto');
+        throw new Error(await getFunctionErrorMessage(error, 'Erro ao criar boleto'));
       }
 
       if (data?.boleto_url) {
@@ -835,7 +842,7 @@ export const CheckoutModal = ({ open, onOpenChange }: CheckoutModalProps) => {
             </div>
             <div className="flex flex-col sm:flex-row gap-3 w-full max-w-sm">
               <Button asChild className="flex-1">
-                <Link to="/login" onClick={() => onOpenChange(false)}>
+                <Link to="/login" state={{ from: "/carrinho" }} onClick={() => onOpenChange(false)}>
                   <LogIn className="w-4 h-4 mr-2" />
                   Fazer Login
                 </Link>
