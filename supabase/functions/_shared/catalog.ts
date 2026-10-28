@@ -31,9 +31,34 @@ export const QUOTE_ONLY_PRODUCTS = new Set<string>([
   "envelope-personalizado",
 ]);
 
+// Display data for order records. Names come from here, never from the client.
+export const PRODUCT_INFO: Record<string, { name: string; unit: string; minQty: number }> = {
+  "envelope": { name: "Envelope", unit: "unidade", minQty: 2000 },
+  "envelope-coex": { name: "Envelope COEX", unit: "unidade", minQty: 500 },
+  "envelope-cinza": { name: "Envelope Cinza", unit: "unidade", minQty: 500 },
+  "stretch-4kg": { name: "Stretch 4kg", unit: "kg", minQty: 500 },
+};
+
 export interface OrderLine {
   productId: string;
   quantity: number;
+}
+
+export interface PricedOrderLine {
+  productId: string;
+  productName: string;
+  quantity: number;
+  unit: string;
+  unitPriceCents: number;
+  totalCents: number;
+}
+
+// Variant suffixes (size/color) are shown in the product name, so keep them to a safe charset.
+function variantLabel(productId: string, baseId: string): string | null {
+  const suffix = productId.slice(baseId.length + 1);
+  if (suffix.length === 0) return "";
+  if (!/^[\p{L}\p{N} x-]{1,40}$/u.test(suffix)) return null;
+  return suffix.split("-").join(" ");
 }
 
 // Cart ids may carry a variant suffix (e.g. "envelope-20x30").
@@ -52,9 +77,9 @@ export function resolveBaseProductId(productId: string): string | null {
   return null;
 }
 
-export function computeOrderTotalCents(
+export function priceOrder(
   items: unknown,
-): { totalCents: number } | { error: string } {
+): { lines: PricedOrderLine[]; totalCents: number } | { error: string } {
   if (!Array.isArray(items) || items.length === 0) {
     return { error: "Itens do pedido são obrigatórios" };
   }
@@ -62,6 +87,7 @@ export function computeOrderTotalCents(
     return { error: "Muitos itens no pedido" };
   }
 
+  const lines: PricedOrderLine[] = [];
   let totalCents = 0;
   for (const raw of items as OrderLine[]) {
     const baseId = resolveBaseProductId(raw?.productId);
@@ -69,10 +95,16 @@ export function computeOrderTotalCents(
     if (QUOTE_ONLY_PRODUCTS.has(baseId)) {
       return { error: "Produto disponível apenas sob consulta" };
     }
+    const info = PRODUCT_INFO[baseId];
+    const label = variantLabel(raw.productId, baseId);
+    if (!info || label === null) return { error: "Produto inválido" };
     const quantity = Number(raw?.quantity);
     if (!Number.isInteger(quantity) || quantity < 1 || quantity > 1000000) {
       return { error: "Quantidade inválida" };
     }
+    if (quantity < info.minQty) return { error: "Quantidade abaixo do pedido mínimo" };
+
+    let unitPriceCents: number;
     const sizeMap = SIZE_TIER_PRICES[baseId];
     if (sizeMap) {
       const suffix = raw.productId.slice(baseId.length + 1);
@@ -82,16 +114,33 @@ export function computeOrderTotalCents(
       if (!sizeKey) return { error: "Tamanho inválido" };
       const tiers = [...sizeMap[sizeKey]].sort((a, b) => a.minQty - b.minQty);
       if (quantity < tiers[0].minQty) return { error: "Quantidade abaixo do pedido mínimo" };
-      const unit = tiers.reduce(
+      unitPriceCents = tiers.reduce(
         (acc, t) => (quantity >= t.minQty ? t.priceCents : acc),
         tiers[0].priceCents,
       );
-      totalCents += unit * quantity;
-      continue;
+    } else {
+      unitPriceCents = PRODUCT_UNIT_PRICE_CENTS[baseId];
     }
-    totalCents += PRODUCT_UNIT_PRICE_CENTS[baseId] * quantity;
+
+    const lineTotal = unitPriceCents * quantity;
+    totalCents += lineTotal;
+    lines.push({
+      productId: raw.productId,
+      productName: label ? `${info.name} - ${label}` : info.name,
+      quantity,
+      unit: info.unit,
+      unitPriceCents,
+      totalCents: lineTotal,
+    });
   }
 
   if (totalCents <= 0) return { error: "Total do pedido inválido" };
-  return { totalCents };
+  return { lines, totalCents };
+}
+
+export function computeOrderTotalCents(
+  items: unknown,
+): { totalCents: number } | { error: string } {
+  const priced = priceOrder(items);
+  return "error" in priced ? priced : { totalCents: priced.totalCents };
 }

@@ -2,6 +2,7 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { Resend } from "https://esm.sh/resend@2.0.0";
+import { isValidUUID, orderAmountCents } from "../_shared/orders.ts";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -180,43 +181,48 @@ serve(async (req: Request): Promise<Response> => {
         amount = paymentData.amount || 0;
       }
 
-      console.log('External ID (company_id):', externalId);
+      const pixId: string | null = paymentData.pixQrCode?.id ?? null;
 
-      if (externalId) {
-        // Update order status to paid
-        const { data: orders, error: selectError } = await supabase
+      // externalId is the order id (set by create-pix-payment). Older charges used the
+      // company id; those are not trusted to pick an order and are only logged.
+      if (!isValidUUID(externalId)) {
+        console.log('No valid order id in payment data');
+      } else {
+        const { data: order, error: selectError } = await supabase
           .from('orders')
-          .select('id, total_amount')
-          .eq('company_id', externalId)
-          .eq('status', 'pending')
-          .order('created_at', { ascending: false })
-          .limit(1);
+          .select('id, status, total_amount, payment_method, payment_ref')
+          .eq('id', externalId)
+          .maybeSingle();
 
         if (selectError) {
-          console.error('Error finding order:', selectError);
-        } else if (orders && orders.length > 0) {
-          const orderId = orders[0].id;
-          const orderAmount = orders[0].total_amount;
-          
-          // Use secure RPC function instead of direct update
+          console.error('Error finding order:', selectError.message);
+          throw new Error('Order lookup failed');
+        }
+
+        if (!order) {
+          console.log('No order found for external id');
+        } else if (order.payment_method !== 'pix') {
+          console.warn('Order is not a PIX order, ignoring:', order.id);
+        } else if (pixId && order.payment_ref && pixId !== order.payment_ref) {
+          console.warn('PIX id does not match order, ignoring:', order.id);
+        } else if (amount > 0 && Math.round(Number(amount)) < orderAmountCents(order.total_amount)) {
+          console.warn('Paid amount is lower than order total, ignoring:', order.id);
+        } else if (order.status === 'paid') {
+          console.log('Order already paid:', order.id);
+        } else {
           const { error: updateError } = await supabase.rpc('update_order_status', {
-            p_order_id: orderId,
+            p_order_id: order.id,
             p_new_status: 'paid'
           });
 
           if (updateError) {
-            console.error('Error updating order status:', updateError);
-          } else {
-            console.log('Order status updated to paid:', orderId);
-            
-            // Send payment notification email
-            await sendPaymentNotificationEmail(orderId, Math.round(orderAmount * 100));
+            console.error('Error updating order status:', updateError.message);
+            throw new Error('Order update failed');
           }
-        } else {
-          console.log('No pending order found for company:', externalId);
+
+          console.log('Order status updated to paid:', order.id);
+          await sendPaymentNotificationEmail(order.id, orderAmountCents(order.total_amount));
         }
-      } else {
-        console.log('No external ID found in payment data');
       }
     }
 
@@ -225,10 +231,9 @@ serve(async (req: Request): Promise<Response> => {
       { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
   } catch (error: unknown) {
-    console.error('Error processing webhook:', error);
-    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    console.error('Error processing webhook:', error instanceof Error ? error.message : error);
     return new Response(
-      JSON.stringify({ error: errorMessage }),
+      JSON.stringify({ error: 'Webhook processing failed' }),
       { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
   }

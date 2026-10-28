@@ -8,13 +8,20 @@ const corsHeaders = {
 
 const MAX_ATTEMPTS = 5;
 
-// Simple hash function matching the one in request-password-reset
+// SHA-256 hex, matching request-password-reset and reset-password-with-code
 async function hashCode(code: string): Promise<string> {
   const encoder = new TextEncoder();
   const data = encoder.encode(code);
   const hashBuffer = await crypto.subtle.digest('SHA-256', data);
   const hashArray = Array.from(new Uint8Array(hashBuffer));
   return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+}
+
+function constantTimeEqual(a: string, b: string): boolean {
+  if (a.length !== b.length) return false;
+  let diff = 0;
+  for (let i = 0; i < a.length; i++) diff |= a.charCodeAt(i) ^ b.charCodeAt(i);
+  return diff === 0;
 }
 
 serve(async (req: Request): Promise<Response> => {
@@ -29,7 +36,7 @@ serve(async (req: Request): Promise<Response> => {
 
     const { email, code } = await req.json();
 
-    if (!email || !code) {
+    if (typeof email !== "string" || typeof code !== "string") {
       return new Response(
         JSON.stringify({ error: "Email e código são obrigatórios" }),
         { status: 400, headers: { "Content-Type": "application/json", ...corsHeaders } }
@@ -54,6 +61,7 @@ serve(async (req: Request): Promise<Response> => {
       .select('*')
       .eq('email', normalizedEmail)
       .eq('used', false)
+      .gte('attempts', 0) // skip codes that were already validated
       .order('created_at', { ascending: false })
       .limit(1)
       .single();
@@ -97,7 +105,7 @@ serve(async (req: Request): Promise<Response> => {
     // Verify the code
     const inputHash = await hashCode(normalizedCode);
     
-    if (inputHash !== codeData.code_hash) {
+    if (!constantTimeEqual(inputHash, codeData.code_hash)) {
       console.log("Invalid code");
       const newAttempts = codeData.attempts + 1;
       await supabase
@@ -118,14 +126,22 @@ serve(async (req: Request): Promise<Response> => {
     // Code is valid - generate a temporary token for password reset
     const resetToken = crypto.randomUUID();
     
-    // Store the token by updating the code record
-    await supabase
+    // Store only a hash of the token, reusing the code_hash field
+    const { error: tokenError } = await supabase
       .from('password_reset_codes')
-      .update({ 
-        code_hash: resetToken, // Reuse field to store reset token
+      .update({
+        code_hash: await hashCode(resetToken),
         attempts: -1 // Mark as validated
       })
       .eq('id', codeData.id);
+
+    if (tokenError) {
+      console.error("Error storing reset token:", tokenError.message);
+      return new Response(
+        JSON.stringify({ error: "Erro interno do servidor" }),
+        { status: 500, headers: { "Content-Type": "application/json", ...corsHeaders } }
+      );
+    }
 
     console.log("Code validated successfully");
 

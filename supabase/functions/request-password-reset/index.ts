@@ -11,9 +11,23 @@ const RATE_LIMIT_MAX_ATTEMPTS = 3;
 const RATE_LIMIT_WINDOW_HOURS = 1;
 const CODE_EXPIRY_MINUTES = 15;
 
-// Generate 6-digit code
+const GENERIC_SUCCESS = "Se o email estiver cadastrado, você receberá um código.";
+
+// Generate 6-digit code with a CSPRNG (rejection sampling avoids modulo bias)
 function generateCode(): string {
-  return Math.floor(100000 + Math.random() * 900000).toString();
+  const buf = new Uint32Array(1);
+  const limit = Math.floor(0x100000000 / 900000) * 900000;
+  do {
+    crypto.getRandomValues(buf);
+  } while (buf[0] >= limit);
+  return (100000 + (buf[0] % 900000)).toString();
+}
+
+function genericSuccess(): Response {
+  return new Response(
+    JSON.stringify({ success: true, message: GENERIC_SUCCESS }),
+    { status: 200, headers: { "Content-Type": "application/json", ...corsHeaders } }
+  );
 }
 
 // Simple hash function for code storage
@@ -58,53 +72,45 @@ serve(async (req: Request): Promise<Response> => {
     const normalizedEmail = email.toLowerCase().trim();
     console.log(`Password reset request for: ${normalizedEmail.substring(0, 3)}***`);
 
-    // Check if user exists
-    const { data: userData, error: userError } = await supabase.auth.admin.listUsers();
-    
-    if (userError) {
-      console.error("Error checking user:", userError);
-      return new Response(
-        JSON.stringify({ success: true, message: "Se o email estiver cadastrado, você receberá um código." }),
-        { status: 200, headers: { "Content-Type": "application/json", ...corsHeaders } }
-      );
+    if (normalizedEmail.length > 254) {
+      return genericSuccess();
     }
 
-    const userExists = userData.users.some(u => u.email?.toLowerCase() === normalizedEmail);
-    
-    if (!userExists) {
+    // Look up the user directly (listUsers only returns the first page of users).
+    const { data: userId, error: userError } = await supabase.rpc('get_user_id_by_email', {
+      p_email: normalizedEmail,
+    });
+
+    // Every outcome below returns the same response, so the endpoint does not reveal
+    // whether an email is registered or rate limited.
+    if (userError) {
+      console.error("Error checking user:", userError.message);
+      return genericSuccess();
+    }
+
+    if (!userId) {
       console.log("User with this email not found");
-      return new Response(
-        JSON.stringify({ success: true, message: "Se o email estiver cadastrado, você receberá um código." }),
-        { status: 200, headers: { "Content-Type": "application/json", ...corsHeaders } }
-      );
+      return genericSuccess();
     }
 
     // Rate limiting - check recent attempts
     const rateLimitTime = new Date();
     rateLimitTime.setHours(rateLimitTime.getHours() - RATE_LIMIT_WINDOW_HOURS);
 
-    const { data: recentAttempts, error: rateError } = await supabase
+    const { count: attemptCount, error: rateError } = await supabase
       .from('password_reset_codes')
-      .select('id')
+      .select('id', { count: 'exact', head: true })
       .eq('email', normalizedEmail)
       .gte('created_at', rateLimitTime.toISOString());
 
     if (rateError) {
-      console.error("Error checking rate limit:", rateError);
+      console.error("Error checking rate limit:", rateError.message);
+      return genericSuccess();
     }
 
-    const attemptCount = recentAttempts?.length || 0;
-    console.log(`Rate limit check: ${attemptCount}/${RATE_LIMIT_MAX_ATTEMPTS} attempts in last ${RATE_LIMIT_WINDOW_HOURS}h`);
-
-    if (attemptCount >= RATE_LIMIT_MAX_ATTEMPTS) {
+    if ((attemptCount ?? 0) >= RATE_LIMIT_MAX_ATTEMPTS) {
       console.log("Rate limit exceeded");
-      return new Response(
-        JSON.stringify({ 
-          error: "Muitas tentativas. Aguarde 1 hora antes de solicitar novamente.",
-          rateLimited: true 
-        }),
-        { status: 429, headers: { "Content-Type": "application/json", ...corsHeaders } }
-      );
+      return genericSuccess();
     }
 
     // Generate 6-digit code
@@ -130,11 +136,8 @@ serve(async (req: Request): Promise<Response> => {
       });
 
     if (insertError) {
-      console.error("Error storing code:", insertError);
-      return new Response(
-        JSON.stringify({ error: "Erro ao gerar código" }),
-        { status: 500, headers: { "Content-Type": "application/json", ...corsHeaders } }
-      );
+      console.error("Error storing code:", insertError.message);
+      return genericSuccess();
     }
 
     console.log("Code generated successfully, sending email...");
@@ -220,14 +223,9 @@ serve(async (req: Request): Promise<Response> => {
       `,
     });
 
-    console.log("Email result:", emailResult);
-
     if (emailResult.error) {
-      console.error("Error sending email:", emailResult.error);
-      return new Response(
-        JSON.stringify({ error: "Erro ao enviar email. Verifique se o domínio está verificado no Resend." }),
-        { status: 500, headers: { "Content-Type": "application/json", ...corsHeaders } }
-      );
+      console.error("Error sending email:", emailResult.error.message);
+      return genericSuccess();
     }
 
     // Cleanup old codes (probabilistic, 10% chance)
@@ -236,10 +234,7 @@ serve(async (req: Request): Promise<Response> => {
       await supabase.rpc('cleanup_expired_reset_codes');
     }
 
-    return new Response(
-      JSON.stringify({ success: true, message: "Código enviado com sucesso!" }),
-      { status: 200, headers: { "Content-Type": "application/json", ...corsHeaders } }
-    );
+    return genericSuccess();
 
   } catch (error) {
     console.error("Unexpected error:", error);

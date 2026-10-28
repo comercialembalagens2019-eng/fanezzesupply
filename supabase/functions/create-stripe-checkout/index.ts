@@ -1,19 +1,37 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import Stripe from "https://esm.sh/stripe@18.5.0";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
+import { createPendingOrder } from "../_shared/orders.ts";
+
+const DEFAULT_ORIGIN = "https://fanezzesupply.com.br";
+
+// Stripe redirects back to this origin, so only accept the site's own hosts.
+function resolveOrigin(origin: string | null): string {
+  if (!origin) return DEFAULT_ORIGIN;
+  try {
+    const { protocol, hostname } = new URL(origin);
+    const allowed =
+      hostname === "fanezzesupply.com.br" ||
+      hostname === "www.fanezzesupply.com.br" ||
+      hostname.endsWith(".lovable.app") ||
+      hostname.endsWith(".lovableproject.com") ||
+      hostname === "localhost";
+    if (allowed && (protocol === "https:" || hostname === "localhost")) return origin;
+  } catch {
+    // fall through
+  }
+  return DEFAULT_ORIGIN;
+}
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
+// Only productId and quantity are used; names and prices come from the server catalog.
 interface CartItem {
   productId: string;
-  productName: string;
   quantity: number;
-  unit: string;
-  unitPrice: number;
-  stripePriceId?: string;
 }
 
 interface CheckoutRequest {
@@ -52,27 +70,6 @@ function validateCheckoutRequest(data: CheckoutRequest): ValidationError[] {
 
   if (data.items.length > 50) {
     errors.push({ field: 'items', message: 'Too many items in cart' });
-  }
-
-  // Validate each item
-  for (let i = 0; i < data.items.length; i++) {
-    const item = data.items[i];
-    
-    if (!item.productId || item.productId.length > 100) {
-      errors.push({ field: `items[${i}].productId`, message: 'Invalid product ID' });
-    }
-    
-    if (!item.productName || item.productName.length > 200) {
-      errors.push({ field: `items[${i}].productName`, message: 'Invalid product name' });
-    }
-    
-    if (!item.quantity || item.quantity < 1 || item.quantity > 10000) {
-      errors.push({ field: `items[${i}].quantity`, message: 'Invalid quantity' });
-    }
-    
-    if (!item.unitPrice || item.unitPrice < 0 || item.unitPrice > 1000000) {
-      errors.push({ field: `items[${i}].unitPrice`, message: 'Invalid price' });
-    }
   }
 
   // Company ID validation
@@ -153,37 +150,29 @@ serve(async (req) => {
       );
     }
 
-    const { items, companyId, customerEmail, customerName } = requestData;
+    const { items, companyId, customerEmail } = requestData;
 
-    // SECURITY: Verify user owns the company before creating order
+    // SECURITY: the order is created and priced server-side; the user must own the company.
     const supabaseServiceClient = createClient(
       supabaseUrl,
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? ""
     );
 
-    const { data: company, error: companyError } = await supabaseServiceClient
-      .from("companies")
-      .select("user_id")
-      .eq("id", companyId)
-      .single();
-
-    if (companyError || !company) {
-      console.log("[STRIPE] Company not found:", companyId.substring(0, 8) + '...');
+    const created = await createPendingOrder(supabaseServiceClient, {
+      userId: user.id,
+      companyId,
+      items,
+      method: "card",
+    });
+    if ("error" in created) {
       return new Response(
-        JSON.stringify({ error: 'Company not found' }),
-        { status: 404, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        JSON.stringify({ error: created.error }),
+        { status: created.status, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
+    const order = { id: created.orderId };
 
-    if (company.user_id !== user.id) {
-      console.log("[STRIPE] Unauthorized: user does not own company");
-      return new Response(
-        JSON.stringify({ error: 'Unauthorized' }),
-        { status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      );
-    }
-
-    console.log("[STRIPE] Processing checkout, items:", items.length, "companyId:", companyId.substring(0, 8) + '...');
+    console.log("[STRIPE] Order created:", order.id);
 
     const stripe = new Stripe(stripeKey, {
       apiVersion: "2025-08-27.basil",
@@ -199,108 +188,16 @@ serve(async (req) => {
       }
     }
 
-    // SECURITY: server-side allowlist of productId -> Stripe Price ID.
-    // Never trust client-supplied stripePriceId or unitPrice.
-    const PRODUCT_PRICE_MAP: Record<string, string> = {
-      "1": "price_1ScwuDAndfpC5YIBpp9VoACm",
-      "2": "price_1ScwuKAndfpC5YIBr26jz3UX",
-      "3": "price_1ScwuLAndfpC5YIBgg1A9Qhz",
-      "4": "price_1ScwuMAndfpC5YIB5vdKBZRg",
-      "5": "price_1ScwuNAndfpC5YIBA15X71Lu",
-      "6": "price_1ScwuOAndfpC5YIB5kvSLv46",
-      "7": "price_1ScwuQAndfpC5YIBkUwYWJWd",
-      "8": "price_1ScwuRAndfpC5YIBiqDuZ8xx",
-      "9": "price_1ScwuSAndfpC5YIB6Xh3nzjy",
-      "10": "price_1ScwuTAndfpC5YIB4wytsXff",
-      "11": "price_1ScwuUAndfpC5YIBPQU4ASpI",
-      "12": "price_1ScwuVAndfpC5YIBzRjvVLcN",
-      "13": "price_1ScwuWAndfpC5YIBJfpishZc",
-      "14": "price_1ScwuXAndfpC5YIBBDl7gfK3",
-      "15": "price_1ScwuYAndfpC5YIBxv99FeiT",
-    };
-
-    // Resolve Stripe price IDs server-side and fetch authoritative unit amounts.
-    const resolvedItems: Array<{
-      productId: string;
-      productName: string;
-      quantity: number;
-      unit: string;
-      priceId: string;
-      unitAmount: number; // in cents (BRL)
-    }> = [];
-
-    for (const item of items) {
-      const priceId = PRODUCT_PRICE_MAP[item.productId];
-      if (!priceId) {
-        console.log("[STRIPE] Unknown productId:", item.productId);
-        return new Response(
-          JSON.stringify({ error: `Invalid product: ${item.productId}` }),
-          { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-        );
-      }
-
-      const stripePrice = await stripe.prices.retrieve(priceId);
-      if (!stripePrice.active || stripePrice.currency !== "brl" || stripePrice.unit_amount == null) {
-        console.log("[STRIPE] Invalid Stripe price for product:", item.productId);
-        return new Response(
-          JSON.stringify({ error: 'Product unavailable' }),
-          { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-        );
-      }
-
-      resolvedItems.push({
-        productId: item.productId,
-        productName: item.productName,
-        quantity: item.quantity,
-        unit: item.unit,
-        priceId,
-        unitAmount: stripePrice.unit_amount,
-      });
-    }
-
-    const lineItems = resolvedItems.map((item) => ({
-      price: item.priceId,
-      quantity: item.quantity,
+    const lineItems = created.lines.map((line) => ({
+      price_data: {
+        currency: "brl",
+        unit_amount: line.unitPriceCents,
+        product_data: { name: line.productName },
+      },
+      quantity: line.quantity,
     }));
 
-    // Authoritative total computed from Stripe-resolved amounts (BRL)
-    const totalAmount = resolvedItems.reduce(
-      (sum, item) => sum + (item.unitAmount / 100) * item.quantity,
-      0
-    );
-
-    // Create order items for database using server-resolved prices
-    const orderItems = resolvedItems.map(item => ({
-      productId: item.productId,
-      productName: item.productName,
-      quantity: item.quantity,
-      unit: item.unit,
-      unitPrice: item.unitAmount / 100,
-      totalPrice: (item.unitAmount / 100) * item.quantity,
-    }));
-
-    // Create the order (service client already initialized above)
-    const { data: order, error: orderError } = await supabaseServiceClient
-      .from("orders")
-      .insert({
-        company_id: companyId,
-        total_amount: totalAmount,
-        status: "pending",
-        items: orderItems,
-        payment_url: "stripe_pending",
-        payment_method: "card",
-      })
-      .select()
-      .single();
-
-    if (orderError) {
-      console.error("[STRIPE] Order creation failed");
-      throw new Error("Failed to create order");
-    }
-
-    console.log("[STRIPE] Order created:", order.id);
-
-    const origin = req.headers.get("origin") || "https://stzsmhpaixxjgdrrqvmi.lovable.app";
+    const origin = resolveOrigin(req.headers.get("origin"));
 
     // Create checkout session
     const session = await stripe.checkout.sessions.create({
@@ -326,10 +223,13 @@ serve(async (req) => {
     console.log("[STRIPE] Checkout session created:", session.id);
 
     // Update order with payment session info
-    await supabaseServiceClient
+    const { error: bindError } = await supabaseServiceClient
       .from("orders")
-      .update({ payment_url: session.url })
+      .update({ payment_url: session.url, payment_ref: session.id })
       .eq("id", order.id);
+    if (bindError) {
+      console.error("[STRIPE] Failed to bind session to order:", bindError.message);
+    }
 
     return new Response(
       JSON.stringify({ 
@@ -343,10 +243,9 @@ serve(async (req) => {
       }
     );
   } catch (error) {
-    const errorMessage = error instanceof Error ? error.message : String(error);
-    console.error("[STRIPE] Error:", errorMessage);
+    console.error("[STRIPE] Error:", error instanceof Error ? error.message : String(error));
     return new Response(
-      JSON.stringify({ error: errorMessage }),
+      JSON.stringify({ error: "Erro interno ao criar checkout" }),
       {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
         status: 500,

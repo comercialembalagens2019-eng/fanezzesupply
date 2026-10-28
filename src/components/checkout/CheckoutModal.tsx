@@ -302,7 +302,7 @@ export const CheckoutModal = ({ open, onOpenChange }: CheckoutModalProps) => {
       try {
         console.log('Checking PIX status via AbacatePay API...');
         const { data, error } = await supabase.functions.invoke('check-pix-status', {
-          body: { pixId: currentPixId, orderId: currentOrderId },
+          body: { orderId: currentOrderId },
         });
 
         if (error) {
@@ -523,33 +523,6 @@ export const CheckoutModal = ({ open, onOpenChange }: CheckoutModalProps) => {
     }
   };
 
-  const saveOrder = async (companyId: string, paymentUrl: string, method: 'pix' | 'card' | 'boleto') => {
-    const orderItems = items.map(item => ({
-      productId: item.product.id,
-      productName: item.product.name,
-      quantity: item.quantity,
-      unit: item.product.unit,
-      unitPrice: item.product.price,
-      totalPrice: item.product.price * item.quantity,
-    }));
-
-    const { data, error } = await supabase
-      .from('orders')
-      .insert({
-        company_id: companyId,
-        payment_url: paymentUrl,
-        total_amount: getTotal(),
-        status: 'pending',
-        items: orderItems,
-        payment_method: method,
-      })
-      .select()
-      .single();
-
-    if (error) throw error;
-    return data;
-  };
-
   const handleCreatePayment = async () => {
     setIsLoading(true);
     try {
@@ -600,10 +573,8 @@ export const CheckoutModal = ({ open, onOpenChange }: CheckoutModalProps) => {
         throw new Error(error.message || 'Erro ao criar pagamento');
       }
 
-      console.log('AbacatePay response:', data);
-
-      // The response should contain the QR code data
-      if (data?.data) {
+      // The response should contain the QR code data and the server-created order
+      if (data?.data && data.orderId) {
         const paymentData = data.data;
         
         // Save company ID
@@ -614,10 +585,8 @@ export const CheckoutModal = ({ open, onOpenChange }: CheckoutModalProps) => {
           setCurrentPixId(paymentData.id);
         }
         
-        // Save order with brCode for reference and get order ID
-        const savedOrder = await saveOrder(company.id, paymentData.brCode || paymentData.id, 'pix');
-        console.log('Saved order:', savedOrder);
-        setCurrentOrderId(savedOrder.id);
+        // The order is created server-side together with the PIX charge
+        setCurrentOrderId(data.orderId);
         
         // Set QR Code image (base64) and brCode for copy
         if (paymentData.brCodeBase64) {
@@ -656,14 +625,10 @@ export const CheckoutModal = ({ open, onOpenChange }: CheckoutModalProps) => {
       const company = await saveCompanyData();
       setExistingCompanyId(company.id);
 
-      // Build cart items for Stripe
+      // Prices and product names are resolved server-side
       const cartItems = items.map(item => ({
         productId: item.product.id,
-        productName: item.product.name,
         quantity: item.quantity,
-        unit: item.product.unit,
-        unitPrice: item.product.price,
-        stripePriceId: item.product.stripePriceId,
       }));
 
       const { data, error } = await supabase.functions.invoke('create-stripe-checkout', {
@@ -704,20 +669,17 @@ export const CheckoutModal = ({ open, onOpenChange }: CheckoutModalProps) => {
       const company = await saveCompanyData();
       setExistingCompanyId(company.id);
 
-      // Calculate total in cents (minimum R$5.00 for boleto)
-      const totalInCents = Math.max(500, Math.round(getTotal() * 100));
-
-      // Save order first
-      const savedOrder = await saveOrder(company.id, 'boleto-pending', 'boleto');
-      setCurrentOrderId(savedOrder.id);
-
+      // The order is created and priced server-side together with the boleto
       const { data, error } = await supabase.functions.invoke('create-boleto-payment', {
         body: {
-          amount: totalInCents,
+          items: items.map(item => ({
+            productId: item.product.id,
+            quantity: item.quantity,
+          })),
+          company_id: company.id,
           customer_email: contactData.email,
           customer_name: companyData.nomeFantasia || companyData.razaoSocial,
           customer_cpf: boletoCpf.replace(/\D/g, ''),
-          order_id: savedOrder.id,
           address: {
             line1: addressData.endereco
               ? `${addressData.endereco}, ${addressData.numero}`
@@ -735,15 +697,10 @@ export const CheckoutModal = ({ open, onOpenChange }: CheckoutModalProps) => {
       }
 
       if (data?.boleto_url) {
+        setCurrentOrderId(data.order_id);
         setBoletoUrl(data.boleto_url);
         setPaymentCreated(true);
         setStep(5);
-        
-        // Update order with payment intent ID
-        await supabase
-          .from('orders')
-          .update({ payment_url: data.boleto_url })
-          .eq('id', savedOrder.id);
 
         toast({
           title: "Boleto gerado!",

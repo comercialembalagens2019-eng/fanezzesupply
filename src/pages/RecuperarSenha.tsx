@@ -23,15 +23,6 @@ const RecuperarSenha = () => {
 
       if (error) throw error;
 
-      if (data?.rateLimited) {
-        toast({
-          title: "Limite excedido",
-          description: "Muitas tentativas. Aguarde 1 hora antes de tentar novamente.",
-          variant: "destructive",
-        });
-        return;
-      }
-
       if (data?.error) {
         toast({
           title: "Erro",
@@ -42,8 +33,8 @@ const RecuperarSenha = () => {
       }
 
       toast({
-        title: "Código enviado!",
-        description: "Verifique sua caixa de entrada e spam.",
+        title: "Solicitação recebida",
+        description: "Se o email estiver cadastrado, você receberá um código. Verifique a caixa de entrada e o spam.",
       });
 
       // Navigate to code validation page (email kept in router state, not the URL)
