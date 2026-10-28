@@ -64,7 +64,7 @@ const Contato = () => {
         <div className="md:col-span-3 lg:col-span-4 tile p-6">
           <MapPin className="w-6 h-6" aria-hidden="true" />
           <b className="mt-4 text-lg font-extrabold block">Endereço</b>
-          <span className="text-muted-foreground">Av. Antonio Ramos Alvin, 1084 · Joinville/SC</span>
+          <span className="text-muted-foreground">Av. Antonio Ramos Alvim, 1084 · Joinville/SC</span>
         </div>
         <div className="md:col-span-6 lg:col-span-4 tile p-6">
           <Clock className="w-6 h-6" aria-hidden="true" />

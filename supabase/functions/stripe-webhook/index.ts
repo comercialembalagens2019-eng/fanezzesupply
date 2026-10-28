@@ -3,6 +3,7 @@ import Stripe from "https://esm.sh/stripe@18.5.0";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
 import { Resend } from "https://esm.sh/resend@2.0.0";
 import { PAID_STATUSES } from "../_shared/orders.ts";
+import { sendOrderEmail } from "../_shared/notify.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -163,6 +164,7 @@ serve(async (req) => {
 
         if (result === "updated") {
           await sendPaymentNotificationEmail(orderId, session.amount_total || 0, "Cartão de Crédito");
+          await sendOrderEmail(supabaseClient, orderId, "paid");
         }
       } else {
         console.log("[STRIPE-WEBHOOK] Order ID not found in metadata or payment not completed");
@@ -187,6 +189,7 @@ serve(async (req) => {
         if (result === "updated") {
           const paymentMethodType = paymentIntent.payment_method_types?.includes("boleto") ? "Boleto" : "Cartão";
           await sendPaymentNotificationEmail(orderId, paymentIntent.amount, paymentMethodType);
+          await sendOrderEmail(supabaseClient, orderId, "paid");
         }
       }
     }

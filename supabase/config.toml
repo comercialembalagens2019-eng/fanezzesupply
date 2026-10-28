@@ -26,3 +26,6 @@ verify_jwt = false
 
 [functions.reset-password-with-code]
 verify_jwt = false
+
+[functions.notify-order-status]
+verify_jwt = true

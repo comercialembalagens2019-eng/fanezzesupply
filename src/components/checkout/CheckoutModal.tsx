@@ -694,7 +694,7 @@ export const CheckoutModal = ({ open, onOpenChange }: CheckoutModalProps) => {
           address: {
             line1: addressData.endereco
               ? `${addressData.endereco}, ${addressData.numero}`
-              : 'Avenida Antonio Ramos Alvin, 1084',
+              : 'Avenida Antonio Ramos Alvim, 1084',
             line2: addressData.complemento || undefined,
             city: addressData.cidade || 'Joinville',
             state: addressData.estado || 'SC',

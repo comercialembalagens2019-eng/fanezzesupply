@@ -94,6 +94,10 @@ function FulfillmentControl({ order, onChanged }: { order: OrderRow; onChanged: 
       return;
     }
     toast({ title: "Pedido atualizado", description: STATUS[status]?.label });
+    // E-mails the customer; a failure here does not undo the status change.
+    if (status === "shipped" || status === "delivered") {
+      supabase.functions.invoke("notify-order-status", { body: { orderId: order.id } }).catch(() => undefined);
+    }
     onChanged();
   };
 

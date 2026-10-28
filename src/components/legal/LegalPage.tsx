@@ -3,12 +3,12 @@ import { Link } from "react-router-dom";
 import { Layout } from "@/components/layout/Layout";
 import { SEO } from "@/components/SEO";
 
-// Identification shown on legal pages. Fill in razão social and CNPJ to complete them.
+// Identification shown on legal pages (from the SEF/SC contributor record).
 export const COMPANY = {
   name: "FNZ Supply",
-  legalName: null as string | null,
-  cnpj: null as string | null,
-  address: "Av. Antonio Ramos Alvin, 1084 · Joinville/SC",
+  legalName: "FNZ Supply Embalagens para Indústria e Comércio Ltda" as string | null,
+  cnpj: "56.008.033/0001-32" as string | null,
+  address: "Av. Antonio Ramos Alvim, 1084, 2º andar, sala 3 · Floresta · Joinville/SC · CEP 89211-460",
   email: "vendas@fnzsupply.com.br",
   phone: "(47) 99149-0027",
 };
