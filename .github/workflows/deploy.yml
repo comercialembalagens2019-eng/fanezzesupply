@@ -31,6 +31,29 @@ jobs:
             echo "::error::Add the SUPABASE_ACCESS_TOKEN repository secret to enable deploys."
             exit 1
           fi
+      # Provider keys live only in GitHub secrets; copy the ones that exist to the
+      # edge-function environment so there is a single place to manage them.
+      - name: Sync edge function secrets
+        env:
+          RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
+          ABACATEPAY_API_KEY: ${{ secrets.ABACATEPAY_API_KEY }}
+          ABACATEPAY_PUBLIC_KEY: ${{ secrets.ABACATEPAY_PUBLIC_KEY }}
+          ABACATEPAY_WEBHOOK_SECRET: ${{ secrets.ABACATEPAY_WEBHOOK_SECRET }}
+          STRIPE_SECRET_KEY: ${{ secrets.STRIPE_SECRET_KEY }}
+          STRIPE_WEBHOOK_SECRET: ${{ secrets.STRIPE_WEBHOOK_SECRET }}
+          ASAAS_API_KEY: ${{ secrets.ASAAS_API_KEY }}
+          ASAAS_WEBHOOK_TOKEN: ${{ secrets.ASAAS_WEBHOOK_TOKEN }}
+        run: |
+          args=()
+          for name in RESEND_API_KEY ABACATEPAY_API_KEY ABACATEPAY_PUBLIC_KEY ABACATEPAY_WEBHOOK_SECRET \
+                      STRIPE_SECRET_KEY STRIPE_WEBHOOK_SECRET ASAAS_API_KEY ASAAS_WEBHOOK_TOKEN; do
+            if [ -n "${!name}" ]; then args+=("$name=${!name}"); echo "will set $name"; fi
+          done
+          if [ ${#args[@]} -gt 0 ]; then
+            npx -y supabase@2.122.0 secrets set --project-ref "$SUPABASE_PROJECT_REF" "${args[@]}"
+          else
+            echo "No provider secrets in GitHub yet."
+          fi
       # Migrations run before functions: new function code may depend on new columns.
       - name: Apply database migrations
         run: node scripts/supabase-migrate.mjs
