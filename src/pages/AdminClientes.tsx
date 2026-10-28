@@ -206,14 +206,17 @@ export default function AdminClientes() {
   );
 
   const totalOrders = companies.reduce((acc, c) => acc + c.orders.length, 0);
-  const totalRevenue = companies.reduce((acc, c) => 
-    acc + c.orders.reduce((orderAcc, order) => orderAcc + Number(order.total_amount), 0), 0
+  // Only paid orders count as revenue; pending/failed/cancelled ones were never received.
+  const totalRevenue = companies.reduce((acc, c) =>
+    acc + c.orders
+      .filter(order => order.status === 'paid')
+      .reduce((orderAcc, order) => orderAcc + Number(order.total_amount), 0), 0
   );
 
   if (authLoading || (!isAdmin && user)) {
     return (
       <Layout>
-        <div className="min-h-screen bg-background pt-24 pb-16 flex items-center justify-center">
+        <div className="min-h-screen bg-background pt-8 pb-16 flex items-center justify-center">
           <Loader2 className="w-8 h-8 animate-spin text-primary" />
         </div>
       </Layout>
@@ -222,7 +225,7 @@ export default function AdminClientes() {
 
   return (
     <Layout>
-      <div className="min-h-screen bg-background pt-24 pb-16">
+      <div className="min-h-screen bg-background pt-8 pb-16">
         <div className="container-custom">
           {/* Header */}
           <div className="mb-8">

@@ -12,6 +12,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useCart } from "@/contexts/CartContext";
+import { buildCartProduct } from "@/lib/pricing";
 
 interface ProductCardProps {
   product: Product;
@@ -40,51 +41,45 @@ export function ProductCard({ product }: ProductCardProps) {
 
   const handleAdd = () => {
     if (!isValid) return;
-    const suffix = [size, color].filter(Boolean).join(" • ");
-    addToCart(
-      {
-        ...product,
-        id: [product.id, size, color].filter(Boolean).join("-"),
-        name: suffix ? `${product.name} - ${suffix}` : product.name,
-        price: unitPrice,
-      },
-      quantity
-    );
+    addToCart(buildCartProduct(product, quantity, size || undefined, color || undefined), quantity);
   };
 
   return (
-    <div className="group bg-card rounded-2xl border border-border overflow-hidden hover:shadow-card hover:border-primary/20 transition-all duration-300 flex flex-col">
+    <div className="group tile p-3 hover:shadow-hover transition-shadow duration-300 flex flex-col">
       {/* Image */}
-      <div className="relative aspect-square bg-secondary overflow-hidden">
+      <div className="relative aspect-[4/3] rounded-2xl bg-card ring-1 ring-black/5 overflow-hidden grid place-items-center">
         <img
           src={product.image}
           alt={product.name}
-          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+          loading="lazy"
+          width={300}
+          height={225}
+          className="h-3/4 w-auto object-contain group-hover:scale-105 transition-transform duration-500"
         />
-        <div className="absolute top-3 left-3 px-3 py-1.5 rounded-full bg-primary text-primary-foreground text-xs font-semibold">
+        <div className="absolute top-2 left-2 px-2.5 py-1 rounded-lg bg-primary text-primary-foreground text-[11px] font-bold">
           Mínimo: {product.minOrderLabel ?? `${product.minOrder} ${product.minOrderUnit}`}
         </div>
         {product.spec && (
-          <div className="absolute bottom-3 left-3 px-3 py-1.5 rounded-full bg-accent text-accent-foreground text-xs font-semibold">
+          <div className="absolute bottom-2 left-2 px-2.5 py-1 rounded-lg bg-accent text-accent-foreground text-[11px] font-bold">
             {product.spec}
           </div>
         )}
       </div>
 
       {/* Content */}
-      <div className="p-5 flex-1 flex flex-col">
+      <div className="px-2 pt-4 pb-2 flex-1 flex flex-col">
         <div>
           <span className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
             {product.category}
           </span>
-          <h3 className="font-display font-semibold text-foreground mt-1 mb-2">
+          <h3 className="font-display font-extrabold text-lg text-foreground mt-1 mb-1">
             {product.name}
           </h3>
           <p className="text-sm text-muted-foreground mb-4">{product.description}</p>
         </div>
 
         {product.quoteOnly ? (
-          <div className="mt-auto rounded-lg border border-border bg-secondary/40 p-4 text-center">
+          <div className="mt-auto rounded-2xl bg-muted p-4 text-center">
             <p className="font-display text-lg font-bold text-primary">Sob consulta</p>
             <p className="text-xs text-muted-foreground mt-1">
               Fale com nossa equipe para condições e prazos.
@@ -92,7 +87,7 @@ export function ProductCard({ product }: ProductCardProps) {
           </div>
         ) : (
           <div className="mt-auto space-y-3">
-            <p className="font-display text-xl font-bold text-primary">
+            <p className="font-display text-2xl font-extrabold text-foreground">
               {formatPrice(unitPrice)}{" "}
               <span className="text-sm font-normal text-muted-foreground">
                 / {product.unit}
@@ -100,7 +95,7 @@ export function ProductCard({ product }: ProductCardProps) {
             </p>
 
             {product.sizePricing && (
-              <div className="rounded-lg border border-border bg-secondary/30 p-3">
+              <div className="rounded-2xl bg-muted p-3">
                 <p className="text-xs font-semibold text-foreground mb-2">Tabela de preços (por unidade)</p>
                 <div className="grid grid-cols-3 gap-1 text-xs">
                   <span className="font-medium text-muted-foreground">Tamanho (cm)</span>
@@ -173,7 +168,7 @@ export function ProductCard({ product }: ProductCardProps) {
               )}
             </div>
 
-            <Button className="w-full gap-2" onClick={handleAdd} disabled={!isValid}>
+            <Button className="w-full gap-2 h-11 rounded-xl font-bold" onClick={handleAdd} disabled={!isValid}>
               <ShoppingCart className="w-4 h-4" />
               Adicionar ao carrinho
             </Button>

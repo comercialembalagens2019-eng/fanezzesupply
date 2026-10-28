@@ -2,8 +2,8 @@ import { Layout } from "@/components/layout/Layout";
 import { SEO } from "@/components/SEO";
 import { HeroSection } from "@/components/home/HeroSection";
 import { EnvelopeBanner } from "@/components/home/EnvelopeBanner";
-import { FeaturesSection } from "@/components/home/FeaturesSection";
 import { FeaturedProducts } from "@/components/home/FeaturedProducts";
+import { QuickOrder } from "@/components/home/QuickOrder";
 import { CTASection } from "@/components/home/CTASection";
 
 const Index = () => {
@@ -11,14 +11,14 @@ const Index = () => {
     <Layout>
       <SEO
         title="FNZ Supply — Distribuição de Embalagens B2B em Joinville/SC"
-        description="Distribuidora de embalagens para empresas: caixas, fitas, papel kraft e mais. Nota fiscal e entrega. Frete grátis em Joinville/SC."
+        description="Distribuidora B2B de envelopes de segurança e filme stretch. Preço por faixa de quantidade, nota fiscal e frete grátis em Joinville/SC."
         path="/"
       />
       <HeroSection />
-      <EnvelopeBanner />
-      <FeaturesSection />
       <FeaturedProducts />
+      <QuickOrder />
       <CTASection />
+      <EnvelopeBanner />
     </Layout>
   );
 };

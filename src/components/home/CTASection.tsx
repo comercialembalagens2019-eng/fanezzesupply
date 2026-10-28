@@ -1,58 +1,39 @@
 import { Link } from "react-router-dom";
-import { ArrowRight, CheckCircle2 } from "lucide-react";
-import { Button } from "@/components/ui/button";
-
-const benefits = [
-  "Condições exclusivas para atacado",
-  "Nota fiscal eletrônica em todas as compras",
-  "Condições especiais de pagamento",
-  "Atendimento personalizado",
-];
+import { ArrowRight, CreditCard, Package, Sparkles } from "lucide-react";
 
 export function CTASection() {
   return (
-    <section className="section-padding bg-primary relative overflow-hidden">
-      {/* Background Elements */}
-      <div className="absolute inset-0 opacity-10">
-        <div className="absolute top-0 right-0 w-96 h-96 rounded-full bg-beige blur-3xl" />
-        <div className="absolute bottom-0 left-0 w-72 h-72 rounded-full bg-beige blur-3xl" />
+    <section className="container-custom mt-10 grid gap-4 md:grid-cols-3" aria-label="Condições para empresas">
+      <div className="md:col-span-2 rounded-3xl bg-primary text-primary-foreground p-8 flex flex-col md:flex-row md:items-center justify-between gap-6">
+        <div>
+          <span className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-beige">
+            <Sparkles className="w-4 h-4" aria-hidden="true" /> Envelope personalizado
+          </span>
+          <h2 className="mt-3 text-2xl md:text-3xl font-extrabold text-primary-foreground">Envelope com a sua logomarca</h2>
+          <p className="mt-2 text-white/75">Produção em 30 dias, a partir de 2.000 unidades. A FNZ é fabricante e distribuidora.</p>
+        </div>
+        <Link
+          to="/contato"
+          className="inline-flex justify-center items-center gap-2 bg-beige text-navy font-bold px-6 py-3.5 rounded-xl hover:bg-beige-light transition-colors shrink-0"
+        >
+          Pedir orçamento <ArrowRight className="w-4 h-4" aria-hidden="true" />
+        </Link>
       </div>
-
-      <div className="container-custom relative z-10">
-        <div className="max-w-3xl mx-auto text-center">
-          <h2 className="font-display text-3xl md:text-4xl lg:text-5xl font-bold text-beige mb-6">
-            Pronto para economizar nas suas embalagens?
-          </h2>
-          <p className="text-lg md:text-xl text-beige/80 mb-8">
-            Cadastre sua empresa agora e tenha acesso a condições exclusivas para atacado.
-          </p>
-
-          <div className="flex flex-wrap justify-center gap-4 mb-10">
-            {benefits.map((benefit) => (
-              <div
-                key={benefit}
-                className="flex items-center gap-2 px-4 py-2 rounded-full bg-beige/10 border border-beige/20"
-              >
-                <CheckCircle2 className="w-4 h-4 text-beige" />
-                <span className="text-sm text-beige">{benefit}</span>
-              </div>
-            ))}
-          </div>
-
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link to="/cadastro">
-              <Button variant="hero" size="xl" className="w-full sm:w-auto group">
-                Cadastrar minha empresa
-                <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-              </Button>
-            </Link>
-            <Link to="/contato">
-              <Button variant="hero-outline" size="xl" className="w-full sm:w-auto">
-                Falar com um consultor
-              </Button>
-            </Link>
+      <div className="grid gap-4">
+        <div className="tile p-6 flex items-start gap-4">
+          <Package className="w-6 h-6 shrink-0" aria-hidden="true" />
+          <div>
+            <b className="font-extrabold block">Pedido mínimo acessível</b>
+            <span className="text-sm text-muted-foreground">A partir de 500 unidades por tamanho.</span>
           </div>
         </div>
+        <Link to="/cadastro" className="tile p-6 flex items-start gap-4 hover:shadow-hover transition-shadow">
+          <CreditCard className="w-6 h-6 shrink-0" aria-hidden="true" />
+          <div>
+            <b className="font-extrabold block">Cadastre sua empresa</b>
+            <span className="text-sm text-muted-foreground">Compre com CNPJ e acompanhe seus pedidos.</span>
+          </div>
+        </Link>
       </div>
     </section>
   );

@@ -2,11 +2,19 @@ import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import Stripe from "https://esm.sh/stripe@18.5.0";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
 import { computeOrderTotalCents } from "../_shared/catalog.ts";
+import { createPendingOrder, discardOrder } from "../_shared/orders.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
+
+function jsonResponse(body: unknown, status: number): Response {
+  return new Response(JSON.stringify(body), {
+    status,
+    headers: { ...corsHeaders, "Content-Type": "application/json" },
+  });
+}
 
 // Input validation helpers
 const isValidEmail = (email: string): boolean => {
@@ -58,186 +66,162 @@ serve(async (req) => {
 
     const authHeader = req.headers.get("Authorization");
     if (!authHeader) {
-      throw new Error("Authorization header required");
+      return jsonResponse({ error: "Unauthorized" }, 401);
     }
 
     const token = authHeader.replace("Bearer ", "");
     const { data: userData, error: userError } = await supabaseClient.auth.getUser(token);
     if (userError || !userData.user) {
-      throw new Error("User not authenticated");
+      return jsonResponse({ error: "Unauthorized" }, 401);
     }
 
     console.log("[BOLETO] User authenticated:", userData.user.id.slice(0, 8) + "***");
 
     const body = await req.json();
-    const { 
-      customer_email, 
-      customer_name, 
-      customer_cpf, 
-      order_id,
-      address 
+    const {
+      customer_email,
+      customer_name,
+      customer_cpf,
+      company_id,
+      address
     } = body;
 
-    let orderItems: unknown = body.items;
-
-    // SECURITY: Verify user owns the order before processing payment
-    if (order_id) {
-      const supabaseServiceClient = createClient(
-        Deno.env.get("SUPABASE_URL") ?? "",
-        Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? ""
-      );
-
-      const { data: order, error: orderError } = await supabaseServiceClient
-        .from("orders")
-        .select("company_id, items, companies!inner(user_id)")
-        .eq("id", order_id)
-        .single();
-
-      if (orderError || !order) {
-        console.log("[BOLETO] Order not found:", order_id?.slice(0, 8) + "***");
-        return new Response(
-          JSON.stringify({ error: "Order not found" }),
-          { status: 404, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-        );
-      }
-
-      const companyUserId = (order as any).companies?.user_id;
-      if (companyUserId !== userData.user.id) {
-        console.log("[BOLETO] Unauthorized: user does not own order");
-        return new Response(
-          JSON.stringify({ error: "Unauthorized" }),
-          { status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-        );
-      }
-
-      if (Array.isArray((order as any).items)) {
-        orderItems = (order as any).items;
-      }
-    }
-
-    // SECURITY: amount is recalculated server-side from the trusted catalog,
-    // never taken from the client payload.
-    const totals = computeOrderTotalCents(orderItems);
-    if ("error" in totals) {
-      console.log("[BOLETO] Order total rejected:", totals.error);
-      return new Response(
-        JSON.stringify({ error: totals.error }),
-        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      );
-    }
-    const amount = totals.totalCents;
-
-    if (amount < 500) {
-      throw new Error("Minimum amount for boleto is R$5.00 (500 centavos)");
-    }
-
-    if (amount > 100000000) {
-      throw new Error("Maximum amount exceeded");
-    }
-
     if (!customer_email || !isValidEmail(customer_email)) {
-      throw new Error("Valid customer email is required");
+      return jsonResponse({ error: "Valid customer email is required" }, 400);
     }
 
     if (!customer_name || customer_name.trim().length < 2) {
-      throw new Error("Customer name is required");
+      return jsonResponse({ error: "Customer name is required" }, 400);
     }
 
     // Validate CPF for Boleto (required by Stripe)
     const cpfDigits = (customer_cpf || "").replace(/\D/g, "");
     if (!cpfDigits || !isValidCPF(cpfDigits)) {
-      throw new Error("CPF válido é obrigatório para pagamento via Boleto");
+      return jsonResponse({ error: "CPF válido é obrigatório para pagamento via Boleto" }, 400);
     }
 
     // Validate address (required by Stripe for Boleto)
     if (!address || !address.line1 || !address.city || !address.state || !address.postal_code) {
-      throw new Error("Endereço completo é obrigatório para pagamento via Boleto");
+      return jsonResponse({ error: "Endereço completo é obrigatório para pagamento via Boleto" }, 400);
     }
 
-    console.log("[BOLETO] Creating payment:", { 
-      amount, 
+    // SECURITY: amount is recalculated server-side from the trusted catalog,
+    // never taken from the client payload.
+    const totals = computeOrderTotalCents(body.items);
+    if ("error" in totals) {
+      console.log("[BOLETO] Order total rejected:", totals.error);
+      return jsonResponse({ error: totals.error }, 400);
+    }
+    if (totals.totalCents < 500) {
+      return jsonResponse({ error: "O valor mínimo para boleto é R$ 5,00" }, 400);
+    }
+    if (totals.totalCents > 100000000) {
+      return jsonResponse({ error: "Valor máximo excedido" }, 400);
+    }
+
+    // SECURITY: the order is created here (never by the client), owned by the caller's company.
+    const supabaseServiceClient = createClient(
+      Deno.env.get("SUPABASE_URL") ?? "",
+      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? ""
+    );
+    const created = await createPendingOrder(supabaseServiceClient, {
+      userId: userData.user.id,
+      companyId: company_id,
+      items: body.items,
+      method: "boleto",
+    });
+    if ("error" in created) {
+      return jsonResponse({ error: created.error }, created.status);
+    }
+    const amount = created.totalCents;
+    const order_id = created.orderId;
+
+    console.log("[BOLETO] Creating payment:", {
+      amount,
       email: maskEmail(customer_email),
-      orderId: order_id?.slice(0, 8) + "***"
+      orderId: order_id.slice(0, 8) + "***"
     });
 
     const stripe = new Stripe(stripeKey, {
       apiVersion: "2025-08-27.basil",
     });
 
-    // Create and confirm PaymentIntent with boleto in one step
-    const paymentIntent = await stripe.paymentIntents.create({
-      amount: amount,
-      currency: "brl",
-      payment_method_types: ["boleto"],
-      receipt_email: customer_email,
-      description: "Pagamento via Boleto - Fanezze Supply",
-      metadata: {
-        order_id: order_id || "",
-        user_id: userData.user.id,
-      },
-      payment_method_options: {
-        boleto: {
-          expires_after_days: 28,
+    let paymentIntent: Stripe.PaymentIntent;
+    try {
+      // Create and confirm PaymentIntent with boleto in one step
+      paymentIntent = await stripe.paymentIntents.create({
+        amount: amount,
+        currency: "brl",
+        payment_method_types: ["boleto"],
+        receipt_email: customer_email,
+        description: "Pagamento via Boleto - Fanezze Supply",
+        metadata: {
+          order_id,
+          user_id: userData.user.id,
         },
-      },
-      // Provide payment method data to confirm immediately
-      payment_method_data: {
-        type: "boleto",
-        boleto: {
-          tax_id: cpfDigits,
-        },
-        billing_details: {
-          name: customer_name,
-          email: customer_email,
-          address: {
-            line1: address.line1,
-            line2: address.line2 || undefined,
-            city: address.city,
-            state: address.state,
-            postal_code: address.postal_code,
-            country: "BR",
+        payment_method_options: {
+          boleto: {
+            expires_after_days: 28,
           },
         },
-      },
-      confirm: true, // Confirm immediately to generate boleto
-    });
+        // Provide payment method data to confirm immediately
+        payment_method_data: {
+          type: "boleto",
+          boleto: {
+            tax_id: cpfDigits,
+          },
+          billing_details: {
+            name: customer_name,
+            email: customer_email,
+            address: {
+              line1: address.line1,
+              line2: address.line2 || undefined,
+              city: address.city,
+              state: address.state,
+              postal_code: address.postal_code,
+              country: "BR",
+            },
+          },
+        },
+        confirm: true, // Confirm immediately to generate boleto
+      });
+    } catch (stripeError) {
+      console.error("[BOLETO] Stripe error:", stripeError instanceof Error ? stripeError.message : stripeError);
+      await discardOrder(supabaseServiceClient, order_id);
+      return jsonResponse({ error: "Não foi possível gerar o boleto. Verifique os dados e tente novamente." }, 502);
+    }
 
     console.log("[BOLETO] PaymentIntent created and confirmed:", paymentIntent.id);
     console.log("[BOLETO] Status:", paymentIntent.status);
-    console.log("[BOLETO] Next action type:", paymentIntent.next_action?.type);
 
     // Get boleto details from next_action
     const boletoDetails = paymentIntent.next_action?.boleto_display_details;
-    
+
     if (!boletoDetails?.hosted_voucher_url) {
-      console.error("[BOLETO] No boleto URL in response:", JSON.stringify(paymentIntent.next_action));
-      throw new Error("Não foi possível gerar o boleto. Tente novamente.");
+      console.error("[BOLETO] No boleto URL in response, next action:", paymentIntent.next_action?.type);
+      return jsonResponse({ error: "Não foi possível gerar o boleto. Tente novamente." }, 502);
+    }
+
+    const { error: bindError } = await supabaseServiceClient
+      .from("orders")
+      .update({ payment_ref: paymentIntent.id, payment_url: boletoDetails.hosted_voucher_url })
+      .eq("id", order_id);
+    if (bindError) {
+      console.error("[BOLETO] Failed to bind boleto to order:", bindError.message);
     }
 
     console.log("[BOLETO] Boleto URL generated successfully");
 
-    return new Response(
-      JSON.stringify({
-        success: true,
-        payment_intent_id: paymentIntent.id,
-        boleto_url: boletoDetails.hosted_voucher_url,
-        number: boletoDetails.number || null,
-        expires_at: boletoDetails.expires_at || null,
-      }),
-      {
-        status: 200,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      }
-    );
+    return jsonResponse({
+      success: true,
+      order_id,
+      payment_intent_id: paymentIntent.id,
+      boleto_url: boletoDetails.hosted_voucher_url,
+      number: boletoDetails.number || null,
+      expires_at: boletoDetails.expires_at || null,
+    }, 200);
   } catch (error) {
-    const errorMessage = error instanceof Error ? error.message : String(error);
-    console.error("[BOLETO] Error:", errorMessage);
-    return new Response(
-      JSON.stringify({ error: errorMessage }),
-      {
-        status: 500,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      }
-    );
+    console.error("[BOLETO] Error:", error instanceof Error ? error.message : String(error));
+    return jsonResponse({ error: "Erro interno ao gerar boleto" }, 500);
   }
 });

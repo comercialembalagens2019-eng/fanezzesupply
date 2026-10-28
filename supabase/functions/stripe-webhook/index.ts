@@ -64,6 +64,28 @@ async function sendPaymentNotificationEmail(orderId: string, amount: number, pay
   }
 }
 
+// Card payments send both checkout.session.completed and payment_intent.succeeded;
+// only the first one that changes the order should notify, so check before updating.
+// deno-lint-ignore no-explicit-any
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+async function markOrderPaid(supabaseClient: any, orderId: string): Promise<"updated" | "already_paid"> {
+  const { data: order, error: selectError } = await supabaseClient
+    .from("orders")
+    .select("status")
+    .eq("id", orderId)
+    .maybeSingle();
+  if (selectError) throw new Error("Order lookup failed");
+  if (!order) throw new Error("Order not found");
+  if (order.status === "paid") return "already_paid";
+
+  const { error } = await supabaseClient.rpc("update_order_status", {
+    p_order_id: orderId,
+    p_new_status: "paid",
+  });
+  if (error) throw new Error("Order update failed");
+  return "updated";
+}
+
 serve(async (req) => {
   // Handle CORS preflight requests
   if (req.method === "OPTIONS") {
@@ -129,29 +151,18 @@ serve(async (req) => {
       
       console.log("[STRIPE-WEBHOOK] Checkout session completed:", session.id);
       console.log("[STRIPE-WEBHOOK] Payment status:", session.payment_status);
-      console.log("[STRIPE-WEBHOOK] Metadata:", session.metadata);
 
       const orderId = session.metadata?.order_id;
 
       if (orderId && session.payment_status === "paid") {
         console.log("[STRIPE-WEBHOOK] Updating order:", orderId);
 
-        // Use secure RPC function instead of direct update
-        const { error } = await supabaseClient.rpc('update_order_status', {
-          p_order_id: orderId,
-          p_new_status: 'paid'
-        });
+        const result = await markOrderPaid(supabaseClient, orderId);
+        console.log("[STRIPE-WEBHOOK] Order", result, orderId);
 
-        if (error) {
-          console.error("[STRIPE-WEBHOOK] Error updating order:", error);
-          throw new Error(`Failed to update order: ${error.message}`);
+        if (result === "updated") {
+          await sendPaymentNotificationEmail(orderId, session.amount_total || 0, "Cartão de Crédito");
         }
-
-        console.log("[STRIPE-WEBHOOK] Order updated successfully:", orderId);
-        
-        // Send payment notification email
-        const amountTotal = session.amount_total || 0;
-        await sendPaymentNotificationEmail(orderId, amountTotal, "Cartão de Crédito");
       } else {
         console.log("[STRIPE-WEBHOOK] Order ID not found in metadata or payment not completed");
       }
@@ -163,25 +174,16 @@ serve(async (req) => {
       
       console.log("[STRIPE-WEBHOOK] Payment intent succeeded:", paymentIntent.id);
       console.log("[STRIPE-WEBHOOK] Payment method types:", paymentIntent.payment_method_types);
-      console.log("[STRIPE-WEBHOOK] Metadata:", paymentIntent.metadata);
 
       const orderId = paymentIntent.metadata?.order_id;
 
       if (orderId) {
         console.log("[STRIPE-WEBHOOK] Updating order from payment_intent:", orderId);
 
-        // Use secure RPC function instead of direct update
-        const { error } = await supabaseClient.rpc('update_order_status', {
-          p_order_id: orderId,
-          p_new_status: 'paid'
-        });
+        const result = await markOrderPaid(supabaseClient, orderId);
+        console.log("[STRIPE-WEBHOOK] Order", result, orderId);
 
-        if (error) {
-          console.error("[STRIPE-WEBHOOK] Error updating order:", error);
-        } else {
-          console.log("[STRIPE-WEBHOOK] Order updated successfully:", orderId);
-          
-          // Determine payment method
+        if (result === "updated") {
           const paymentMethodType = paymentIntent.payment_method_types?.includes("boleto") ? "Boleto" : "Cartão";
           await sendPaymentNotificationEmail(orderId, paymentIntent.amount, paymentMethodType);
         }
@@ -245,10 +247,9 @@ serve(async (req) => {
       }
     );
   } catch (error) {
-    const errorMessage = error instanceof Error ? error.message : String(error);
-    console.error("[STRIPE-WEBHOOK] Error:", errorMessage);
+    console.error("[STRIPE-WEBHOOK] Error:", error instanceof Error ? error.message : String(error));
     return new Response(
-      JSON.stringify({ error: errorMessage }),
+      JSON.stringify({ error: "Webhook processing failed" }),
       { 
         status: 500, 
         headers: { ...corsHeaders, "Content-Type": "application/json" } 

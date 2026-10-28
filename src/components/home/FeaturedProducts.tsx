@@ -1,43 +1,41 @@
 import { Link } from "react-router-dom";
-import { ArrowRight } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { ProductCard } from "@/components/products/ProductCard";
 import { products } from "@/data/products";
+import { formatBRL } from "@/lib/pricing";
 
 export function FeaturedProducts() {
-  const featuredProducts = products.filter((p) => p.featured).slice(0, 4);
+  const featured = products.filter((p) => p.featured && !p.quoteOnly).slice(0, 4);
 
   return (
-    <section className="section-padding bg-secondary">
-      <div className="container-custom">
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-12">
-          <div>
-            <h2 className="font-display text-3xl md:text-4xl font-bold text-foreground mb-2">
-              Produtos em Destaque
-            </h2>
-            <p className="text-muted-foreground text-lg">
-              Conheça nossos produtos mais vendidos
-            </p>
-          </div>
-          <Link to="/produtos">
-            <Button variant="outline" className="gap-2 group">
-              Ver todos os produtos
-              <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-            </Button>
-          </Link>
-        </div>
-
-        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          {featuredProducts.map((product, index) => (
-            <div
-              key={product.id}
-              className="animate-slide-up"
-              style={{ animationDelay: `${index * 0.1}s` }}
-            >
-              <ProductCard product={product} />
+    <section className="container-custom mt-4" aria-labelledby="featured-heading">
+      <h2 id="featured-heading" className="sr-only">Produtos em destaque</h2>
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        {featured.map((p, i) => (
+          <Link
+            key={p.id}
+            to={`/produtos?q=${encodeURIComponent(p.name)}`}
+            className="tile p-4 flex flex-col hover:shadow-hover transition-shadow focus-visible:ring-2 focus-visible:ring-ring"
+          >
+            <div className="rounded-2xl bg-card ring-1 ring-black/5 aspect-[4/3] grid place-items-center relative overflow-hidden">
+              <img src={p.image} alt="" loading="lazy" width={300} height={225} className="h-3/4 w-auto object-contain" />
+              {i === 0 && (
+                <span className="absolute top-2 left-2 text-[11px] font-extrabold bg-primary text-primary-foreground px-2 py-1 rounded-lg">
+                  Mais vendido
+                </span>
+              )}
             </div>
-          ))}
-        </div>
+            <h3 className="mt-3 font-extrabold text-base">{p.name}</h3>
+            <div className="flex flex-col sm:flex-row sm:items-baseline sm:justify-between gap-0.5 mt-1">
+              <span className="font-extrabold text-lg whitespace-nowrap">
+                {p.sizePricing ? <span className="text-xs font-semibold text-muted-foreground">a partir de </span> : null}
+                {formatBRL(p.sizePricing ? Math.min(...p.sizePricing.flatMap((sp) => sp.tiers.map((t) => t.price))) : p.price)}
+                <span className="text-xs text-muted-foreground font-semibold">/{p.unit === "kg" ? "kg" : "un."}</span>
+              </span>
+              <span className="text-xs text-muted-foreground">
+                mín. {p.minOrder.toLocaleString("pt-BR")} {p.unit === "kg" ? "kg" : "un."}
+              </span>
+            </div>
+          </Link>
+        ))}
       </div>
     </section>
   );

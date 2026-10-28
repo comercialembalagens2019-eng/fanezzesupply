@@ -1,11 +1,19 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
 import { computeOrderTotalCents } from "../_shared/catalog.ts";
+import { createPendingOrder, discardOrder } from "../_shared/orders.ts";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
+
+function jsonResponse(body: unknown, status: number): Response {
+  return new Response(JSON.stringify(body), {
+    status,
+    headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+  });
+}
 
 interface Customer {
   name: string;
@@ -19,7 +27,7 @@ interface CreatePaymentRequest {
   items: Array<{ productId: string; quantity: number }>;
   description: string;
   customer: Customer;
-  externalId?: string;
+  externalId: string; // company id; the order itself is created server-side
 }
 
 interface ValidationError {
@@ -222,47 +230,31 @@ serve(async (req: Request): Promise<Response> => {
       );
     }
 
-    // Verify externalId (company_id) belongs to authenticated user, if provided
-    if (requestData.externalId) {
-      const serviceClient = createClient(supabaseUrl, Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!);
-      const { data: company } = await serviceClient
-        .from('companies')
-        .select('user_id')
-        .eq('id', requestData.externalId)
-        .maybeSingle();
-      if (company && company.user_id !== authedUserId) {
-        return new Response(
-          JSON.stringify({ error: 'Forbidden' }),
-          { status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-        );
-      }
-    }
-
     // SECURITY: recompute the authoritative amount from the server-side catalog
     const totals = computeOrderTotalCents(requestData.items);
     if ('error' in totals) {
       console.log('[PIX] Order total rejected:', totals.error);
-      return new Response(
-        JSON.stringify({ error: totals.error }),
-        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
+      return jsonResponse({ error: totals.error }, 400);
     }
-    const authoritativeAmount = totals.totalCents;
-    if (authoritativeAmount < 100) {
-      return new Response(
-        JSON.stringify({ error: 'Valor mínimo é R$ 1,00' }),
-        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
+    if (totals.totalCents < 100) {
+      return jsonResponse({ error: 'Valor mínimo é R$ 1,00' }, 400);
     }
-    if (authoritativeAmount > 100000000) {
-      return new Response(
-        JSON.stringify({ error: 'Valor máximo excedido' }),
-        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
+    if (totals.totalCents > 100000000) {
+      return jsonResponse({ error: 'Valor máximo excedido' }, 400);
     }
-    if (typeof requestData.amount === 'number' && requestData.amount !== authoritativeAmount) {
-      console.log('[PIX] Client amount mismatch, using server total');
+
+    // SECURITY: the order is created here (never by the client), owned by the caller's company.
+    const serviceClient = createClient(supabaseUrl, Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!);
+    const created = await createPendingOrder(serviceClient, {
+      userId: authedUserId,
+      companyId: requestData.externalId,
+      items: requestData.items,
+      method: 'pix',
+    });
+    if ('error' in created) {
+      return jsonResponse({ error: created.error }, created.status);
     }
+    const authoritativeAmount = created.totalCents;
 
     // Clean and prepare data
     const cleanTaxId = requestData.customer.taxId.replace(/\D/g, '');
@@ -278,8 +270,9 @@ serve(async (req: Request): Promise<Response> => {
         email: requestData.customer.email.trim().toLowerCase(),
         taxId: cleanTaxId,
       },
+      // The webhook resolves the order from this id.
       metadata: {
-        externalId: requestData.externalId || Date.now().toString(),
+        externalId: created.orderId,
       },
     };
 
@@ -299,31 +292,33 @@ serve(async (req: Request): Promise<Response> => {
 
     if (!response.ok) {
       console.error('[PIX] AbacatePay error, status:', response.status);
-      return new Response(
-        JSON.stringify({ error: 'Failed to create PIX QR Code', details: 'Payment provider error' }),
-        { 
-          status: response.status, 
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
-        }
-      );
+      await discardOrder(serviceClient, created.orderId);
+      return jsonResponse({ error: 'Failed to create PIX QR Code', details: 'Payment provider error' }, 502);
     }
 
     const data = JSON.parse(responseText);
-    console.log('[PIX] Payment created successfully, id:', data?.data?.id);
-    
-    return new Response(JSON.stringify(data), {
-      status: 200,
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-    });
+    const pixId = data?.data?.id;
+    if (typeof pixId !== 'string' || pixId.length === 0) {
+      console.error('[PIX] AbacatePay response missing id');
+      await discardOrder(serviceClient, created.orderId);
+      return jsonResponse({ error: 'Resposta de pagamento inválida' }, 502);
+    }
+
+    // Bind the PIX charge to the order so status checks can only confirm this charge.
+    const { error: bindError } = await serviceClient
+      .from('orders')
+      .update({ payment_ref: pixId, payment_url: data.data.brCode || pixId })
+      .eq('id', created.orderId);
+    if (bindError) {
+      console.error('[PIX] Failed to bind PIX to order:', bindError.message);
+      return jsonResponse({ error: 'Erro ao registrar pagamento' }, 500);
+    }
+
+    console.log('[PIX] Payment created successfully, id:', pixId);
+
+    return jsonResponse({ ...data, orderId: created.orderId }, 200);
   } catch (error: unknown) {
     console.error('[PIX] Error:', error instanceof Error ? error.message : 'Unknown error');
-    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-    return new Response(
-      JSON.stringify({ error: errorMessage }),
-      { 
-        status: 500, 
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
-      }
-    );
+    return jsonResponse({ error: 'Erro interno ao criar pagamento' }, 500);
   }
 });

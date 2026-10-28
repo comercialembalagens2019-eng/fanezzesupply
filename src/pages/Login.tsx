@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Eye, EyeOff, Package, Mail, Lock, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { toast } from "@/hooks/use-toast";
@@ -12,18 +12,27 @@ const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const { signIn, user, isAdmin } = useAuth();
+  const { signIn, user, isAdmin, isLoading: authLoading } = useAuth();
   const navigate = useNavigate();
 
+  const location = useLocation();
+  // Only same-site paths, so a crafted link can't redirect off the site after login
+  const from = (location.state as { from?: unknown } | null)?.from;
+  // Backslashes are rejected too: browsers treat "/\evil.com" like "//evil.com".
+  const redirectTo =
+    typeof from === "string" && /^\/(?![/\\])[^\\]*$/.test(from) ? from : null;
+
   useEffect(() => {
-    if (user) {
-      if (isAdmin) {
-        navigate('/admin/clientes');
+    if (user && !authLoading) {
+      if (redirectTo) {
+        navigate(redirectTo, { replace: true });
+      } else if (isAdmin) {
+        navigate('/admin/clientes', { replace: true });
       } else {
-        navigate('/');
+        navigate('/', { replace: true });
       }
     }
-  }, [user, isAdmin, navigate]);
+  }, [user, isAdmin, authLoading, redirectTo, navigate]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

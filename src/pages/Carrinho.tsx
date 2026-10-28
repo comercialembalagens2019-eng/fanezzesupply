@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { useCart } from "@/contexts/CartContext";
 import { cn } from "@/lib/utils";
 import { CheckoutModal } from "@/components/checkout/CheckoutModal";
+import { getUnitPrice } from "@/lib/pricing";
 import { SEO } from "@/components/SEO";
 const Carrinho = () => {
   const { items, removeFromCart, updateQuantity, getTotal, clearCart, isMinOrderMet, allMinOrdersMet } = useCart();
@@ -21,7 +22,7 @@ const Carrinho = () => {
   if (items.length === 0) {
     return (
       <Layout>
-        <section className="section-padding bg-background">
+        <section className="pt-6 pb-16">
           <div className="container-custom">
             <div className="max-w-lg mx-auto text-center py-16">
               <div className="w-20 h-20 mx-auto mb-6 rounded-full bg-secondary flex items-center justify-center">
@@ -53,7 +54,7 @@ const Carrinho = () => {
         description="Revise os itens do seu carrinho e finalize seu pedido de embalagens na FNZ Supply."
         path="/carrinho"
       />
-      <section className="section-padding bg-background">
+      <section className="pt-6 pb-16">
         <div className="container-custom">
           <div className="flex items-center justify-between mb-8">
             <h1 className="font-display text-2xl md:text-3xl font-bold text-foreground">
@@ -73,17 +74,17 @@ const Carrinho = () => {
                   <div
                     key={item.product.id}
                     className={cn(
-                      "bg-card rounded-xl border p-4 md:p-6 transition-all",
+                      "bg-card rounded-3xl border p-4 md:p-6 transition-all",
                       minMet ? "border-border" : "border-destructive/50 bg-destructive/5"
                     )}
                   >
                     <div className="flex flex-col md:flex-row gap-4">
                       {/* Image */}
-                      <div className="w-full md:w-24 h-24 rounded-lg bg-secondary overflow-hidden flex-shrink-0">
+                      <div className="w-full md:w-24 h-24 rounded-2xl bg-card ring-1 ring-black/5 overflow-hidden flex-shrink-0 grid place-items-center">
                         <img
                           src={item.product.image}
-                          alt={item.product.name}
-                          className="w-full h-full object-cover"
+                          alt=""
+                          className="h-4/5 w-auto object-contain"
                         />
                       </div>
 
@@ -94,12 +95,13 @@ const Carrinho = () => {
                             <h3 className="font-display font-semibold text-foreground">
                               {item.product.name}
                             </h3>
-                            <p className="text-sm text-primary font-medium mt-1">
-                              Consulte-nos
+                            <p className="text-sm text-muted-foreground font-medium mt-1">
+                              {formatPrice(getUnitPrice(item.product.id, item.quantity, item.product.price))} / {item.product.unit}
                             </p>
                           </div>
                           <button
                             onClick={() => removeFromCart(item.product.id)}
+                            aria-label={`Remover ${item.product.name}`}
                             className="p-2 text-muted-foreground hover:text-destructive transition-colors"
                           >
                             <Trash2 className="w-5 h-5" />
@@ -113,6 +115,7 @@ const Carrinho = () => {
                               variant="outline"
                               size="icon"
                               onClick={() => updateQuantity(item.product.id, item.quantity - 1)}
+                              aria-label={`Diminuir quantidade de ${item.product.name}`}
                               disabled={item.quantity <= 1}
                               className="h-9 w-9"
                             >
@@ -120,6 +123,7 @@ const Carrinho = () => {
                             </Button>
                             <input
                               type="number"
+                              aria-label={`Quantidade de ${item.product.name}`}
                               value={item.quantity}
                               onChange={(e) =>
                                 updateQuantity(
@@ -133,6 +137,7 @@ const Carrinho = () => {
                               variant="outline"
                               size="icon"
                               onClick={() => updateQuantity(item.product.id, item.quantity + 1)}
+                              aria-label={`Aumentar quantidade de ${item.product.name}`}
                               className="h-9 w-9"
                             >
                               <Plus className="w-4 h-4" />
@@ -141,7 +146,7 @@ const Carrinho = () => {
 
                           {/* Subtotal */}
                           <p className="font-display font-bold text-lg text-primary">
-                            Consulte-nos
+                            {formatPrice(getUnitPrice(item.product.id, item.quantity, item.product.price) * item.quantity)}
                           </p>
                         </div>
 
@@ -163,7 +168,7 @@ const Carrinho = () => {
 
             {/* Order Summary */}
             <div className="lg:col-span-1">
-              <div className="bg-card rounded-xl border border-border p-6 sticky top-28">
+              <div className="tile p-6 sticky top-20">
                 <h2 className="font-display font-semibold text-lg text-foreground mb-4">
                   Resumo do Pedido
                 </h2>
@@ -171,20 +176,20 @@ const Carrinho = () => {
                 <div className="space-y-3 pb-4 border-b border-border">
                   <div className="flex justify-between text-sm">
                     <span className="text-muted-foreground">Subtotal</span>
-                    <span className="text-foreground font-medium">
-                      Consulte-nos
+                    <span className="text-foreground font-medium tabular-nums">
+                      {formatPrice(getTotal())}
                     </span>
                   </div>
                   <div className="flex justify-between text-sm">
-                    <span className="text-muted-foreground">Frete</span>
-                    <span className="text-muted-foreground">Grátis para Joinville • R$ 19,90 demais localidades</span>
+                    <span className="text-muted-foreground shrink-0 mr-4">Frete</span>
+                    <span className="text-muted-foreground text-right">Grátis para Joinville · R$ 19,90 demais localidades</span>
                   </div>
                 </div>
 
                 <div className="flex justify-between py-4">
                   <span className="font-semibold text-foreground">Total</span>
-                  <span className="font-display font-bold text-xl text-primary">
-                    Consulte-nos
+                  <span className="font-display font-extrabold text-xl text-foreground tabular-nums">
+                    {formatPrice(getTotal())}
                   </span>
                 </div>
 

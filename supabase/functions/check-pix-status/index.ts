@@ -1,6 +1,7 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
 import { Resend } from "https://esm.sh/resend@2.0.0";
+import { isValidUUID } from "../_shared/orders.ts";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -8,8 +9,14 @@ const corsHeaders = {
 };
 
 interface CheckPixRequest {
-  pixId: string;
-  orderId?: string;
+  orderId: string;
+}
+
+function jsonResponse(body: unknown, status: number): Response {
+  return new Response(JSON.stringify(body), {
+    status,
+    headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+  });
 }
 
 // Validate pixId format (basic alphanumeric check)
@@ -110,23 +117,46 @@ serve(async (req: Request): Promise<Response> => {
       throw new Error('API key not configured');
     }
 
-    const { pixId, orderId }: CheckPixRequest = await req.json();
-    
-    if (!pixId) {
-      return new Response(
-        JSON.stringify({ error: 'pixId is required' }),
-        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
+    const { orderId }: CheckPixRequest = await req.json();
+
+    if (!isValidUUID(orderId)) {
+      return jsonResponse({ error: 'orderId is required' }, 400);
     }
 
-    if (!isValidPixId(pixId)) {
-      return new Response(
-        JSON.stringify({ error: 'Invalid pixId format' }),
-        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
+    const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
+    const supabase = createClient(supabaseUrl, supabaseServiceKey);
+
+    // SECURITY: the PIX id comes from the order record, never from the client,
+    // so a paid charge can only ever confirm the order it was created for.
+    const { data: currentOrder, error: selectError } = await supabase
+      .from('orders')
+      .select('status, total_amount, payment_method, payment_ref, companies!inner(user_id)')
+      .eq('id', orderId)
+      .maybeSingle();
+
+    if (selectError) {
+      console.error('[CHECK-PIX] Error fetching order:', selectError.message);
+      return jsonResponse({ error: 'Failed to check PIX status' }, 500);
+    }
+    if (!currentOrder) {
+      return jsonResponse({ error: 'Order not found' }, 404);
+    }
+    const owner = (currentOrder as { companies?: { user_id?: string } | null }).companies?.user_id;
+    if (owner !== authedUserId) {
+      console.warn('[CHECK-PIX] Order ownership mismatch');
+      return jsonResponse({ error: 'Forbidden' }, 403);
     }
 
-    console.log('[CHECK-PIX] Checking status for pixId:', pixId.substring(0, 8) + '...', 'orderId:', orderId);
+    const pixId = currentOrder.payment_ref;
+    if (currentOrder.payment_method !== 'pix' || !pixId || !isValidPixId(pixId)) {
+      return jsonResponse({ error: 'Order has no PIX charge' }, 400);
+    }
+
+    if (currentOrder.status === 'paid') {
+      return jsonResponse({ data: { status: 'PAID' }, orderUpdated: false }, 200);
+    }
+
+    console.log('[CHECK-PIX] Checking status for order:', orderId);
 
     const response = await fetch(`https://api.abacatepay.com/v1/pixQrCode/check?id=${encodeURIComponent(pixId)}`, {
       method: 'GET',
@@ -135,91 +165,35 @@ serve(async (req: Request): Promise<Response> => {
       },
     });
 
-    const responseText = await response.text();
     console.log('[CHECK-PIX] Response status:', response.status);
 
     if (!response.ok) {
       console.error('[CHECK-PIX] API error, status:', response.status);
-      return new Response(
-        JSON.stringify({ error: 'Failed to check PIX status' }),
-        { 
-          status: response.status, 
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
-        }
-      );
+      return jsonResponse({ error: 'Failed to check PIX status' }, 502);
     }
 
-    const data = JSON.parse(responseText);
+    const data = await response.json();
     const pixStatus = data?.data?.status;
     console.log('[CHECK-PIX] Status retrieved:', pixStatus);
-    
-    // If payment is PAID and we have an orderId, update the order in the database
-    if (pixStatus === 'PAID' && orderId) {
-      console.log('[CHECK-PIX] Payment confirmed, updating order:', orderId);
-      
-      const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
-      const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
-      const supabase = createClient(supabaseUrl, supabaseServiceKey);
-      
-      // Verify the order belongs to the authenticated user's company
-      const { data: currentOrder, error: selectError } = await supabase
-        .from('orders')
-        .select('status, total_amount, companies!inner(user_id)')
-        .eq('id', orderId)
-        .maybeSingle();
-      
-      if (selectError) {
-        console.error('[CHECK-PIX] Error fetching order:', selectError);
-      } else if (!currentOrder) {
-        return new Response(
-          JSON.stringify({ error: 'Order not found' }),
-          { status: 404, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-        );
-      } else if ((currentOrder as any).companies?.user_id !== authedUserId) {
-        console.warn('[CHECK-PIX] Order ownership mismatch');
-        return new Response(
-          JSON.stringify({ error: 'Forbidden' }),
-          { status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-        );
-      } else if (currentOrder.status !== 'paid') {
-        // Update order status using RPC
-        const { error: updateError } = await supabase.rpc('update_order_status', {
-          p_order_id: orderId,
-          p_new_status: 'paid'
-        });
 
-        if (updateError) {
-          console.error('[CHECK-PIX] Error updating order status:', updateError);
-        } else {
-          console.log('[CHECK-PIX] Order status updated to paid successfully');
-          
-          // Send payment notification email
-          await sendPaymentNotificationEmail(orderId, currentOrder.total_amount);
-          
-          // Add orderUpdated flag to response
-          return new Response(JSON.stringify({ ...data, orderUpdated: true }), {
-            status: 200,
-            headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-          });
-        }
-      } else if (currentOrder?.status === 'paid') {
-        console.log('[CHECK-PIX] Order already marked as paid');
+    if (pixStatus === 'PAID') {
+      const { error: updateError } = await supabase.rpc('update_order_status', {
+        p_order_id: orderId,
+        p_new_status: 'paid'
+      });
+
+      if (updateError) {
+        console.error('[CHECK-PIX] Error updating order status:', updateError.message);
+      } else {
+        console.log('[CHECK-PIX] Order status updated to paid successfully');
+        await sendPaymentNotificationEmail(orderId, currentOrder.total_amount);
+        return jsonResponse({ ...data, orderUpdated: true }, 200);
       }
     }
-    
-    return new Response(JSON.stringify(data), {
-      status: 200,
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-    });
+
+    return jsonResponse(data, 200);
   } catch (error: unknown) {
     console.error('[CHECK-PIX] Error:', error instanceof Error ? error.message : 'Unknown error');
-    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-    return new Response(
-      JSON.stringify({ error: errorMessage }),
-      { 
-        status: 500, 
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
-      }
-    );
+    return jsonResponse({ error: 'Failed to check PIX status' }, 500);
   }
 });

@@ -1,3 +1,4 @@
+import { lazy, Suspense } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -7,19 +8,27 @@ import { CartProvider } from "@/contexts/CartContext";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { ScrollToTop } from "@/components/ScrollToTop";
 import Index from "./pages/Index";
-import Produtos from "./pages/Produtos";
-import Carrinho from "./pages/Carrinho";
-import Login from "./pages/Login";
-import Cadastro from "./pages/Cadastro";
-import Sobre from "./pages/Sobre";
-import Contato from "./pages/Contato";
-import Checkout from "./pages/Checkout";
-import Pedidos from "./pages/Pedidos";
-import AdminClientes from "./pages/AdminClientes";
-import RecuperarSenha from "./pages/RecuperarSenha";
-import ValidarCodigo from "./pages/ValidarCodigo";
-import RedefinirSenha from "./pages/RedefinirSenha";
-import NotFound from "./pages/NotFound";
+
+// Home loads eagerly; every other page is split into its own chunk.
+const Produtos = lazy(() => import("./pages/Produtos"));
+const Carrinho = lazy(() => import("./pages/Carrinho"));
+const Login = lazy(() => import("./pages/Login"));
+const Cadastro = lazy(() => import("./pages/Cadastro"));
+const Sobre = lazy(() => import("./pages/Sobre"));
+const Contato = lazy(() => import("./pages/Contato"));
+const Checkout = lazy(() => import("./pages/Checkout"));
+const Pedidos = lazy(() => import("./pages/Pedidos"));
+const AdminClientes = lazy(() => import("./pages/AdminClientes"));
+const RecuperarSenha = lazy(() => import("./pages/RecuperarSenha"));
+const ValidarCodigo = lazy(() => import("./pages/ValidarCodigo"));
+const RedefinirSenha = lazy(() => import("./pages/RedefinirSenha"));
+const NotFound = lazy(() => import("./pages/NotFound"));
+
+const PageFallback = () => (
+  <div className="min-h-screen grid place-items-center" role="status" aria-label="Carregando">
+    <div className="w-8 h-8 rounded-full border-2 border-primary border-t-transparent animate-spin" />
+  </div>
+);
 
 const queryClient = new QueryClient();
 
@@ -32,6 +41,7 @@ const App = () => (
           <Sonner />
           <BrowserRouter>
             <ScrollToTop />
+            <Suspense fallback={<PageFallback />}>
             <Routes>
               <Route path="/" element={<Index />} />
               <Route path="/produtos" element={<Produtos />} />
@@ -48,6 +58,7 @@ const App = () => (
               <Route path="/admin/clientes" element={<AdminClientes />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
+            </Suspense>
           </BrowserRouter>
         </CartProvider>
       </AuthProvider>
