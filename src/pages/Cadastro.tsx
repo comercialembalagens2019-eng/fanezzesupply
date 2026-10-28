@@ -4,6 +4,7 @@ import { Package, Loader2, Eye, EyeOff } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { toast } from "@/hooks/use-toast";
 import { SEO } from "@/components/SEO";
+import { translateAuthError } from "@/lib/authErrors";
 import { supabase } from "@/integrations/supabase/client";
 
 const maskPhone = (value: string) =>
@@ -34,17 +35,22 @@ const Cadastro = () => {
       return;
     }
 
-    if (senha.length < 6) {
-      toast({
-        title: "Senha muito curta",
-        description: "A senha deve ter pelo menos 6 caracteres.",
-        variant: "destructive",
-      });
+    // Same rule as the password-reset function.
+    const passwordProblem =
+      senha.length < 8
+        ? "A senha deve ter pelo menos 8 caracteres."
+        : !/[A-Z]/.test(senha)
+          ? "A senha deve ter pelo menos uma letra maiúscula."
+          : !/[0-9]/.test(senha)
+            ? "A senha deve ter pelo menos um número."
+            : null;
+    if (passwordProblem) {
+      toast({ title: "Senha fraca", description: passwordProblem, variant: "destructive" });
       return;
     }
 
     setIsLoading(true);
-    const { error } = await supabase.auth.signUp({
+    const { data, error } = await supabase.auth.signUp({
       email: email.trim(),
       password: senha,
       options: {
@@ -57,11 +63,19 @@ const Cadastro = () => {
     if (error) {
       toast({
         title: "Erro no cadastro",
-        description: error.message.includes("already registered")
-          ? "Este e-mail já está cadastrado."
-          : error.message,
+        description: translateAuthError(error),
         variant: "destructive",
       });
+      return;
+    }
+
+    // With e-mail confirmation on, signUp returns no session until the link is clicked.
+    if (!data.session) {
+      toast({
+        title: "Confirme seu e-mail",
+        description: `Enviamos um link de confirmação para ${email.trim()}. Verifique também o spam.`,
+      });
+      navigate("/login");
       return;
     }
 
@@ -163,7 +177,7 @@ const Cadastro = () => {
                     value={senha}
                     onChange={(e) => setSenha(e.target.value)}
                     className="w-full px-4 py-3 pr-12 rounded-lg border border-border bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
-                    placeholder="Mínimo 6 caracteres"
+                    placeholder="8+ caracteres, com maiúscula e número"
                   />
                   <button
                     type="button"

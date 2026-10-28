@@ -57,6 +57,10 @@ jobs:
       # Migrations run before functions: new function code may depend on new columns.
       - name: Apply database migrations
         run: node scripts/supabase-migrate.mjs
+      - name: Apply auth settings (redirects, Resend SMTP, PT-BR e-mails)
+        env:
+          RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
+        run: node scripts/supabase-auth-config.mjs
       - name: Deploy edge functions
         run: npx -y supabase@2.122.0 functions deploy --project-ref "$SUPABASE_PROJECT_REF" --use-api
 
