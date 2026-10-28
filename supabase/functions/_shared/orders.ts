@@ -1,6 +1,6 @@
 // Server-side order creation. Clients cannot insert orders directly (see RLS),
 // so every order is priced from the trusted catalog here.
-import { priceOrder, shippingCentsFor, type PricedOrderLine } from "./catalog.ts";
+import { hasAdminOnlyProduct, priceOrder, shippingCentsFor, type PricedOrderLine } from "./catalog.ts";
 
 // Functions pin different supabase-js versions, so accept any client structurally.
 // deno-lint-ignore no-explicit-any
@@ -51,6 +51,16 @@ export async function createPendingOrder(
   const priced = priceOrder(params.items);
   if ("error" in priced) {
     return { error: priced.error, status: 400 };
+  }
+
+  if (hasAdminOnlyProduct(priced.lines)) {
+    const { data: role } = await serviceClient
+      .from("user_roles")
+      .select("role")
+      .eq("user_id", params.userId)
+      .eq("role", "admin")
+      .maybeSingle();
+    if (!role) return { error: "Produto inválido", status: 400 };
   }
 
   const shippingCents = shippingCentsFor(company.cidade, company.estado);

@@ -3,6 +3,8 @@
 export const PRODUCT_UNIT_PRICE_CENTS: Record<string, number> = {
   "envelope": 8,
   "stretch-4kg": 2690,
+  // Payment test product, visible and purchasable only by admins.
+  "produto-teste": 1,
 };
 
 // Products priced per size, with quantity tiers. Prices in centavos per unit.
@@ -37,7 +39,19 @@ export const PRODUCT_INFO: Record<string, { name: string; unit: string; minQty: 
   "envelope-coex": { name: "Envelope COEX", unit: "unidade", minQty: 500 },
   "envelope-cinza": { name: "Envelope Cinza", unit: "unidade", minQty: 500 },
   "stretch-4kg": { name: "Stretch 4kg", unit: "kg", minQty: 500 },
+  // 100 × R$ 0,01 = R$ 1,00, the minimum a PIX charge accepts.
+  "produto-teste": { name: "Produto teste (admin)", unit: "unidade", minQty: 100 },
 };
+
+// Products only admins may buy (createPendingOrder checks the role).
+export const ADMIN_ONLY_PRODUCTS = new Set<string>(["produto-teste"]);
+
+export function hasAdminOnlyProduct(items: { productId: string }[]): boolean {
+  return items.some((item) => {
+    const baseId = resolveBaseProductId(item.productId);
+    return baseId !== null && ADMIN_ONLY_PRODUCTS.has(baseId);
+  });
+}
 
 // Flat delivery fee outside Joinville/SC, in centavos. Shared with the storefront.
 export const SHIPPING_FEE_CENTS = 1990;

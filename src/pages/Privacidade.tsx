@@ -24,6 +24,7 @@ const sections = [
         <li><b className="text-foreground">Endereço e contato:</b> CEP, endereço, cidade, estado, telefone, WhatsApp e e-mail comercial.</li>
         <li><b className="text-foreground">Pagamento por boleto:</b> CPF do pagador, exigido pela emissão do boleto.</li>
         <li><b className="text-foreground">Pedidos:</b> produtos, quantidades, valores, forma de pagamento, status e datas de envio e entrega.</li>
+        <li><b className="text-foreground">Carrinho:</b> quando você está logado, os itens do carrinho ficam salvos na sua conta, para você continuar a compra em outro aparelho e para nossa equipe poder ajudar no atendimento.</li>
         <li><b className="text-foreground">Recuperação de senha:</b> códigos de verificação temporários, guardados de forma cifrada e apagados após o uso ou a expiração.</li>
         <li><b className="text-foreground">Dados técnicos:</b> registros de acesso mantidos pelos provedores de hospedagem, como endereço IP, data e hora.</li>
       </ul>
@@ -77,7 +78,8 @@ const sections = [
       <p>
         Não usamos cookies de publicidade nem de rastreamento. O site guarda no seu navegador apenas o necessário para
         funcionar: a sessão de login e os itens do carrinho. Você pode apagá-los a qualquer momento nas configurações do
-        navegador; isso encerra a sessão e esvazia o carrinho.
+        navegador; isso encerra a sessão e esvazia o carrinho neste aparelho. Se você estiver logado, o carrinho também
+        fica salvo na sua conta até você esvaziá-lo.
       </p>
     ),
   },

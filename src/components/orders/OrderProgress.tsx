@@ -2,7 +2,7 @@ import { CheckCircle2, PackageCheck, Truck } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const STEPS = [
-  { status: "paid", label: "Pago", icon: CheckCircle2 },
+  { status: "paid", label: "Recebido", icon: CheckCircle2 },
   { status: "shipped", label: "Enviado", icon: Truck },
   { status: "delivered", label: "Entregue", icon: PackageCheck },
 ];
