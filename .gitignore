@@ -29,3 +29,7 @@ __pycache__/
 
 # Supabase CLI local state
 supabase/.temp/
+
+# Obsidian per-device state
+memoria/.obsidian/workspace*.json
+memoria/.trash/
