@@ -5,6 +5,7 @@ Atualizado em: 2026-10-28
 ## Pronto
 - [x] Fase 1 — Segurança: pedidos e preços calculados no servidor, webhooks validam id/valor/método, reset de senha com código forte e token guardado como hash, RLS revisado
 - [x] Fase 2 — Bugs: frete (R$ 19,90, grátis só em Joinville/SC), e-mail duplicado do Stripe, carrinho limpo no logout
+- [x] Token Supabase antigo revogado (o secret do GitHub tem um novo)
 - [x] Fase 3 — Infra: CI, deploy automático, keep-alive, backup semanal (ver [[Infraestrutura]])
 - [x] Fase 4 — Front novo "Bento / Pedido Rápido" (proposta 4 escolhida)
 - [x] Painel admin (`/admin`): pedidos com Recebido/Enviado/Entregue, cadastros, carrinhos
@@ -21,4 +22,3 @@ Atualizado em: 2026-10-28
 - [ ] **Asaas**: O dono cria contas sandbox e produção e coloca `ASAAS_API_KEY` e `ASAAS_WEBHOOK_TOKEN` nos secrets do GitHub → integrar Pix, boleto e cartão
 - [ ] **Fotos dos outros produtos** (stretch e demais): o dono vai mandar
 - [ ] Fase 5: mais testes, refatorar `CheckoutModal`
-- [ ] Revogar o token Supabase que foi colado no chat e gerar outro no secret `SUPABASE_ACCESS_TOKEN`
