@@ -111,12 +111,12 @@ export type Database = {
         Row: {
           company_id: string | null
           created_at: string
+          delivered_at: string | null
           id: string
           items: Json
           payment_method: string | null
           payment_ref: string | null
           payment_url: string | null
-          delivered_at: string | null
           shipped_at: string | null
           shipping_amount: number
           status: string
@@ -126,12 +126,12 @@ export type Database = {
         Insert: {
           company_id?: string | null
           created_at?: string
+          delivered_at?: string | null
           id?: string
           items: Json
           payment_method?: string | null
           payment_ref?: string | null
           payment_url?: string | null
-          delivered_at?: string | null
           shipped_at?: string | null
           shipping_amount?: number
           status?: string
@@ -141,12 +141,12 @@ export type Database = {
         Update: {
           company_id?: string | null
           created_at?: string
+          delivered_at?: string | null
           id?: string
           items?: Json
           payment_method?: string | null
           payment_ref?: string | null
           payment_url?: string | null
-          delivered_at?: string | null
           shipped_at?: string | null
           shipping_amount?: number
           status?: string
