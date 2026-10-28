@@ -1,5 +1,11 @@
 import { products } from "@/data/products";
 import type { Product } from "@/types";
+import { SHIPPING_FEE_CENTS, shippingCentsFor } from "../../supabase/functions/_shared/catalog.ts";
+
+export const SHIPPING_FEE = SHIPPING_FEE_CENTS / 100;
+
+// Same rule the edge functions charge: free in Joinville/SC, flat fee elsewhere.
+export const shippingFor = (city: string, state: string) => shippingCentsFor(city, state) / 100;
 
 // Mirrors supabase/functions/_shared/catalog.ts, which is what is actually charged.
 const productsByIdLength = [...products].sort((a, b) => b.id.length - a.id.length);

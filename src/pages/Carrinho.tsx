@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { useCart } from "@/contexts/CartContext";
 import { cn } from "@/lib/utils";
 import { CheckoutModal } from "@/components/checkout/CheckoutModal";
-import { getUnitPrice } from "@/lib/pricing";
+import { getUnitPrice, SHIPPING_FEE } from "@/lib/pricing";
 import { SEO } from "@/components/SEO";
 const Carrinho = () => {
   const { items, removeFromCart, updateQuantity, getTotal, clearCart, isMinOrderMet, allMinOrdersMet } = useCart();
@@ -182,12 +182,12 @@ const Carrinho = () => {
                   </div>
                   <div className="flex justify-between text-sm">
                     <span className="text-muted-foreground shrink-0 mr-4">Frete</span>
-                    <span className="text-muted-foreground text-right">Grátis para Joinville · R$ 19,90 demais localidades</span>
+                    <span className="text-muted-foreground text-right">Grátis em Joinville · {formatPrice(SHIPPING_FEE)} demais cidades (calculado no checkout)</span>
                   </div>
                 </div>
 
                 <div className="flex justify-between py-4">
-                  <span className="font-semibold text-foreground">Total</span>
+                  <span className="font-semibold text-foreground">Total <span className="text-xs font-normal text-muted-foreground">(sem frete)</span></span>
                   <span className="font-display font-extrabold text-xl text-foreground tabular-nums">
                     {formatPrice(getTotal())}
                   </span>

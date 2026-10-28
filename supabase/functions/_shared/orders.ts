@@ -1,6 +1,6 @@
 // Server-side order creation. Clients cannot insert orders directly (see RLS),
 // so every order is priced from the trusted catalog here.
-import { priceOrder, type PricedOrderLine } from "./catalog.ts";
+import { priceOrder, shippingCentsFor, type PricedOrderLine } from "./catalog.ts";
 
 // Functions pin different supabase-js versions, so accept any client structurally.
 // deno-lint-ignore no-explicit-any
@@ -15,9 +15,14 @@ export function isValidUUID(value: unknown): value is string {
   return typeof value === "string" && UUID_RE.test(value);
 }
 
+// An order counts as paid once payment is confirmed, including after fulfillment steps.
+export const PAID_STATUSES = ["paid", "shipped", "delivered"];
+
 export interface CreatedOrder {
   orderId: string;
+  /** Items plus shipping: the amount to charge. */
   totalCents: number;
+  shippingCents: number;
   lines: PricedOrderLine[];
 }
 
@@ -31,7 +36,7 @@ export async function createPendingOrder(
 
   const { data: company, error: companyError } = await serviceClient
     .from("companies")
-    .select("user_id")
+    .select("user_id, cidade, estado")
     .eq("id", params.companyId)
     .maybeSingle();
 
@@ -48,6 +53,9 @@ export async function createPendingOrder(
     return { error: priced.error, status: 400 };
   }
 
+  const shippingCents = shippingCentsFor(company.cidade, company.estado);
+  const totalCents = priced.totalCents + shippingCents;
+
   const orderItems = priced.lines.map((line) => ({
     productId: line.productId,
     productName: line.productName,
@@ -61,7 +69,8 @@ export async function createPendingOrder(
     .from("orders")
     .insert({
       company_id: params.companyId,
-      total_amount: priced.totalCents / 100,
+      total_amount: totalCents / 100,
+      shipping_amount: shippingCents / 100,
       status: "pending",
       items: orderItems,
       payment_method: params.method,
@@ -74,7 +83,7 @@ export async function createPendingOrder(
     return { error: "Erro ao criar pedido", status: 500 };
   }
 
-  return { orderId: order.id, totalCents: priced.totalCents, lines: priced.lines };
+  return { orderId: order.id, totalCents, shippingCents, lines: priced.lines };
 }
 
 // Used when the payment provider rejects the charge, so no orphan pending order remains.

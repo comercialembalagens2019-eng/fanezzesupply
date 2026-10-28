@@ -22,9 +22,14 @@ import {
   ChevronUp,
   QrCode,
   CreditCard,
-  FileText
+  FileText,
+  Truck,
+  PackageCheck,
+  Undo2
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { toast } from "@/hooks/use-toast";
+import { OrderProgress } from "@/components/orders/OrderProgress";
 
 interface OrderItem {
   productId: string;
@@ -40,6 +45,9 @@ interface Order {
   payment_url: string | null;
   payment_method: string | null;
   total_amount: number;
+  shipping_amount?: number;
+  shipped_at?: string | null;
+  delivered_at?: string | null;
   status: string;
   items: OrderItem[];
   created_at: string;
@@ -88,6 +96,10 @@ const getStatusConfig = (status: string) => {
       return { label: 'Pago', color: 'bg-success-soft text-success-soft-foreground' };
     case 'pending':
       return { label: 'Pendente', color: 'bg-warning-soft text-warning-soft-foreground' };
+    case 'shipped':
+      return { label: 'Enviado', color: 'bg-info-soft text-info-soft-foreground' };
+    case 'delivered':
+      return { label: 'Entregue', color: 'bg-success-soft text-success-soft-foreground' };
     case 'cancelled':
     case 'failed':
       return { label: 'Cancelado', color: 'bg-destructive-soft text-destructive-soft-foreground' };
@@ -108,6 +120,51 @@ const getPaymentMethodConfig = (method: string | null) => {
       return { label: 'N/A', icon: Package, color: 'bg-muted text-muted-foreground' };
   }
 };
+
+// Next fulfillment step for a paid order. Customer e-mails (Resend) will hook in here later.
+const FULFILLMENT_NEXT: Record<string, { status: string; label: string; icon: typeof Truck } | undefined> = {
+  paid: { status: "shipped", label: "Marcar como enviado", icon: Truck },
+  shipped: { status: "delivered", label: "Marcar como entregue", icon: PackageCheck },
+};
+const FULFILLMENT_PREV: Record<string, string | undefined> = { shipped: "paid", delivered: "shipped" };
+
+function FulfillmentActions({ order, onChanged }: { order: Order; onChanged: () => void }) {
+  const [saving, setSaving] = useState(false);
+  const next = FULFILLMENT_NEXT[order.status];
+  const prev = FULFILLMENT_PREV[order.status];
+  if (!next && !prev) return null;
+
+  const setStatus = async (status: string) => {
+    setSaving(true);
+    const { error } = await supabase.rpc("admin_set_fulfillment_status", { p_order_id: order.id, p_status: status });
+    setSaving(false);
+    if (error) {
+      toast({ title: "Não foi possível atualizar o pedido", description: error.message, variant: "destructive" });
+      return;
+    }
+    toast({ title: "Pedido atualizado", description: `Status: ${getStatusConfig(status).label}` });
+    onChanged();
+  };
+
+  return (
+    <div className="mt-3 pt-3 border-t border-border space-y-3">
+      <OrderProgress status={order.status} shippedAt={order.shipped_at} deliveredAt={order.delivered_at} />
+      <div className="flex flex-wrap gap-2 justify-end">
+        {prev && (
+          <Button variant="ghost" size="sm" disabled={saving} onClick={() => setStatus(prev)}>
+            <Undo2 className="w-4 h-4 mr-1" aria-hidden="true" /> Desfazer
+          </Button>
+        )}
+        {next && (
+          <Button size="sm" disabled={saving} onClick={() => setStatus(next.status)} className="rounded-xl">
+            {saving ? <Loader2 className="w-4 h-4 mr-1 animate-spin" /> : <next.icon className="w-4 h-4 mr-1" aria-hidden="true" />}
+            {next.label}
+          </Button>
+        )}
+      </div>
+    </div>
+  );
+}
 
 export default function AdminClientes() {
   const { isAdmin, isLoading: authLoading, user } = useAuth();
@@ -385,8 +442,13 @@ export default function AdminClientes() {
                                         {paymentConfig.label}
                                       </Badge>
                                     </div>
-                                    <span className="font-display font-bold text-primary">
-                                      Consulte-nos
+                                    <span className="font-display font-extrabold text-foreground tabular-nums">
+                                      {formatPrice(Number(order.total_amount))}
+                                      {Number(order.shipping_amount) > 0 && (
+                                        <span className="block text-xs font-normal text-muted-foreground text-right">
+                                          inclui frete {formatPrice(Number(order.shipping_amount))}
+                                        </span>
+                                      )}
                                     </span>
                                   </div>
                                   <div className="text-sm text-muted-foreground">
@@ -397,6 +459,7 @@ export default function AdminClientes() {
                                       </span>
                                     ))}
                                   </div>
+                                  <FulfillmentActions order={order} onChanged={fetchCompanies} />
                                 </div>
                               );
                             })}

@@ -1,7 +1,7 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
 import { Resend } from "https://esm.sh/resend@2.0.0";
-import { isValidUUID } from "../_shared/orders.ts";
+import { isValidUUID, PAID_STATUSES } from "../_shared/orders.ts";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -152,7 +152,7 @@ serve(async (req: Request): Promise<Response> => {
       return jsonResponse({ error: 'Order has no PIX charge' }, 400);
     }
 
-    if (currentOrder.status === 'paid') {
+    if (PAID_STATUSES.includes(currentOrder.status)) {
       return jsonResponse({ data: { status: 'PAID' }, orderUpdated: false }, 200);
     }
 

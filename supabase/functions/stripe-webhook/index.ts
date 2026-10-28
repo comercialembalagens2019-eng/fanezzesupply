@@ -2,6 +2,7 @@ import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import Stripe from "https://esm.sh/stripe@18.5.0";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
 import { Resend } from "https://esm.sh/resend@2.0.0";
+import { PAID_STATUSES } from "../_shared/orders.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -76,7 +77,7 @@ async function markOrderPaid(supabaseClient: any, orderId: string): Promise<"upd
     .maybeSingle();
   if (selectError) throw new Error("Order lookup failed");
   if (!order) throw new Error("Order not found");
-  if (order.status === "paid") return "already_paid";
+  if (PAID_STATUSES.includes(order.status)) return "already_paid";
 
   const { error } = await supabaseClient.rpc("update_order_status", {
     p_order_id: orderId,

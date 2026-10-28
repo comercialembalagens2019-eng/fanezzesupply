@@ -55,9 +55,9 @@ const RecuperarSenha = () => {
   };
 
   return (
-    <div className="min-h-screen bg-secondary flex">
+    <div className="min-h-screen bg-background flex gap-4 p-4">
       {/* Left Side - Branding */}
-      <div className="hidden lg:flex lg:w-1/2 bg-primary relative overflow-hidden">
+      <div className="hidden lg:flex lg:w-1/2 bg-primary relative overflow-hidden rounded-3xl">
         <div className="absolute inset-0 opacity-10">
           <div className="absolute top-20 left-10 w-72 h-72 rounded-full bg-beige blur-3xl" />
           <div className="absolute bottom-20 right-10 w-96 h-96 rounded-full bg-beige blur-3xl" />
@@ -65,7 +65,7 @@ const RecuperarSenha = () => {
 
         <div className="relative z-10 flex flex-col justify-center p-12 lg:p-16">
           <Link to="/" className="flex items-center gap-3 mb-12">
-            <div className="w-12 h-12 rounded-xl bg-beige flex items-center justify-center">
+            <div className="w-12 h-12 rounded-xl bg-beige grid place-items-center">
               <Package className="w-7 h-7 text-navy" />
             </div>
             <span className="font-display font-bold text-2xl text-beige">
@@ -83,8 +83,8 @@ const RecuperarSenha = () => {
       </div>
 
       {/* Right Side - Form */}
-      <div className="w-full lg:w-1/2 flex items-center justify-center p-6 md:p-12">
-        <div className="w-full max-w-md">
+      <div className="w-full lg:w-1/2 flex items-center justify-center md:p-8">
+        <div className="w-full max-w-md tile p-6 md:p-10">
           {/* Mobile Logo */}
           <Link to="/" className="flex lg:hidden items-center gap-2 mb-8 justify-center">
             <div className="w-10 h-10 rounded-lg bg-primary flex items-center justify-center">
@@ -117,7 +117,7 @@ const RecuperarSenha = () => {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="seu@email.com"
-                  className="w-full h-12 pl-10 pr-4 rounded-lg border border-border bg-card text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
+                  className="w-full h-12 pl-10 pr-4 rounded-xl border border-border bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
                   required
                 />
               </div>
