@@ -9,6 +9,7 @@ import { useCart } from "@/contexts/CartContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { getFunctionErrorMessage } from "@/lib/functionErrors";
+import { getUnitPrice } from "@/lib/pricing";
 import { toast } from "@/hooks/use-toast";
 import { Loader2, QrCode, Building2, MapPin, Phone, ChevronRight, ChevronLeft, CheckCircle, Copy, Home, ShoppingBag, PartyPopper, CreditCard, LogIn, FileText, ExternalLink } from "lucide-react";
 import { Link } from "react-router-dom";
@@ -1058,12 +1059,14 @@ export const CheckoutModal = ({ open, onOpenChange }: CheckoutModalProps) => {
                     <span className="text-muted-foreground">
                       {item.product.name} x {item.quantity}
                     </span>
-                    <span className="font-medium text-primary">Consulte-nos</span>
+                    <span className="font-medium text-foreground tabular-nums">
+                      {formatPrice(getUnitPrice(item.product.id, item.quantity, item.product.price) * item.quantity)}
+                    </span>
                   </div>
                 ))}
                 <div className="border-t pt-2 mt-2 flex justify-between font-bold">
                   <span>Total</span>
-                  <span className="text-primary">Consulte-nos</span>
+                  <span className="text-foreground tabular-nums">{formatPrice(getTotal())}</span>
                 </div>
               </div>
             </div>

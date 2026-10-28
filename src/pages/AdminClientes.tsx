@@ -216,7 +216,7 @@ export default function AdminClientes() {
   if (authLoading || (!isAdmin && user)) {
     return (
       <Layout>
-        <div className="min-h-screen bg-background pt-24 pb-16 flex items-center justify-center">
+        <div className="min-h-screen bg-background pt-8 pb-16 flex items-center justify-center">
           <Loader2 className="w-8 h-8 animate-spin text-primary" />
         </div>
       </Layout>
@@ -225,7 +225,7 @@ export default function AdminClientes() {
 
   return (
     <Layout>
-      <div className="min-h-screen bg-background pt-24 pb-16">
+      <div className="min-h-screen bg-background pt-8 pb-16">
         <div className="container-custom">
           {/* Header */}
           <div className="mb-8">

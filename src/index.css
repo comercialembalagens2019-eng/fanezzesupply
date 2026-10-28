@@ -1,40 +1,42 @@
+@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=DM+Sans:wght@400;500;600;700&display=swap');
 
 @layer base {
   :root {
-    --background: 45 70% 98%;
-    --foreground: 223 65% 13%;
+    /* Bento theme: cool gray canvas, white tiles, navy #1B2845, sand #F5E6D3 */
+    --background: 228 22% 96%;
+    --foreground: 222 44% 19%;
 
     --card: 0 0% 100%;
-    --card-foreground: 223 70% 15%;
+    --card-foreground: 222 44% 19%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 223 70% 15%;
+    --popover-foreground: 222 44% 19%;
 
-    --primary: 223 100% 15%;
-    --primary-foreground: 45 95% 96%;
+    --primary: 222 44% 19%;
+    --primary-foreground: 0 0% 100%;
 
-    --secondary: 45 100% 55%;
-    --secondary-foreground: 223 100% 15%;
+    --secondary: 34 62% 89%;
+    --secondary-foreground: 222 44% 19%;
 
-    --muted: 45 75% 93%;
-    --muted-foreground: 223 32% 32%;
+    --muted: 225 33% 95%;
+    --muted-foreground: 222 18% 40%;
 
-    --accent: 45 100% 60%;
-    --accent-foreground: 223 100% 15%;
+    --accent: 34 62% 89%;
+    --accent-foreground: 222 44% 19%;
 
     --destructive: 0 72% 42%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 45 60% 80%;
-    --input: 45 60% 78%;
-    --ring: 223 100% 15%;
+    --border: 225 16% 90%;
+    --input: 225 16% 86%;
+    --ring: 222 44% 19%;
 
-    --radius: 0.625rem;
+    --radius: 0.75rem;
 
     /* Status tokens (accessible contrast) */
     --success: 145 63% 28%;
@@ -53,25 +55,25 @@
     --info-soft-foreground: 223 80% 22%;
 
     /* Custom Design Tokens */
-    --navy: 223 100% 15%;
-    --navy-dark: 223 100% 9%;
-    --navy-light: 223 55% 28%;
-    --beige: 45 100% 55%;
-    --beige-dark: 42 100% 45%;
-    --beige-light: 45 100% 85%;
-    --cream: 45 90% 96%;
+    --navy: 222 44% 19%;
+    --navy-dark: 224 59% 10%;
+    --navy-light: 222 41% 34%;
+    --beige: 34 62% 89%;
+    --beige-dark: 34 45% 72%;
+    --beige-light: 34 70% 95%;
+    --cream: 34 70% 97%;
 
     /* Gradients */
-    --gradient-navy: linear-gradient(135deg, hsl(223 100% 9%) 0%, hsl(223 100% 15%) 50%, hsl(223 60% 24%) 100%);
-    --gradient-beige: linear-gradient(180deg, hsl(45 100% 60%) 0%, hsl(42 100% 50%) 100%);
-    --gradient-hero: linear-gradient(135deg, hsl(223 100% 11%) 0%, hsl(223 85% 19%) 100%);
+    --gradient-navy: linear-gradient(135deg, hsl(224 59% 10%) 0%, hsl(222 44% 19%) 50%, hsl(222 41% 30%) 100%);
+    --gradient-beige: linear-gradient(180deg, hsl(34 70% 92%) 0%, hsl(34 62% 86%) 100%);
+    --gradient-hero: linear-gradient(135deg, hsl(222 44% 17%) 0%, hsl(222 41% 26%) 100%);
 
     /* Shadows */
-    --shadow-sm: 0 2px 8px -2px hsl(223 100% 15% / 0.08);
-    --shadow-md: 0 4px 16px -4px hsl(223 100% 15% / 0.12);
-    --shadow-lg: 0 8px 32px -8px hsl(223 100% 15% / 0.16);
-    --shadow-card: 0 4px 24px -8px hsl(223 100% 15% / 0.1);
-    --shadow-hover: 0 8px 40px -12px hsl(223 100% 15% / 0.2);
+    --shadow-sm: 0 1px 2px hsl(222 44% 19% / 0.06);
+    --shadow-md: 0 4px 16px -4px hsl(222 44% 19% / 0.10);
+    --shadow-lg: 0 8px 32px -8px hsl(222 44% 19% / 0.14);
+    --shadow-card: 0 4px 24px -10px hsl(222 44% 19% / 0.12);
+    --shadow-hover: 0 12px 32px -12px hsl(222 44% 19% / 0.22);
 
     /* Transitions */
     --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
@@ -151,6 +153,11 @@
 @layer components {
   .container-custom {
     @apply mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl;
+  }
+
+  /* White rounded tile used across the bento layout */
+  .tile {
+    @apply rounded-3xl bg-card ring-1 ring-black/5;
   }
 
   .section-padding {
@@ -286,7 +293,7 @@
 }
 
 ::-webkit-scrollbar-track {
-  background: hsl(var(--beige));
+  background: hsl(var(--muted));
 }
 
 ::-webkit-scrollbar-thumb {
