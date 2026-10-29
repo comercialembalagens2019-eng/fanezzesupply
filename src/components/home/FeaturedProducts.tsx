@@ -1,3 +1,4 @@
+import type { CSSProperties } from "react";
 import { Link } from "react-router-dom";
 import { productImageClass } from "@/lib/productImage";
 import { products } from "@/data/products";
@@ -14,7 +15,8 @@ export function FeaturedProducts() {
           <Link
             key={p.id}
             to={`/produtos?q=${encodeURIComponent(p.name)}`}
-            className="tile p-4 flex flex-col hover:shadow-hover transition-shadow focus-visible:ring-2 focus-visible:ring-ring"
+            className="tile p-4 flex flex-col hover:shadow-hover transition-shadow focus-visible:ring-2 focus-visible:ring-ring animate-enter"
+            style={{ "--enter-delay": `${i * 40}ms` } as CSSProperties}
           >
             <div className="rounded-2xl bg-card ring-1 ring-black/5 aspect-[4/3] grid place-items-center relative overflow-hidden">
               <img src={p.image} alt="" loading="lazy" width={300} height={225} className={productImageClass(p)} />

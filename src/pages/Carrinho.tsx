@@ -84,6 +84,7 @@ const Carrinho = () => {
                       <div className="relative w-24 h-24 rounded-2xl bg-card ring-1 ring-black/5 overflow-hidden flex-shrink-0">
                         <img
                           src={item.product.image}
+                          loading="lazy"
                           alt=""
                           className={productImageClass(item.product)}
                         />

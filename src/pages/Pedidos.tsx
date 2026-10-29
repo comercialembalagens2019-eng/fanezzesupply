@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { Navigate } from "react-router-dom";
+import { ListSkeleton } from "@/components/skeletons";
 import { Layout } from "@/components/layout/Layout";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
@@ -285,8 +286,8 @@ export default function Pedidos() {
   if (authLoading) {
     return (
       <Layout>
-        <div className="min-h-screen bg-background pt-8 pb-16 flex items-center justify-center">
-          <Loader2 className="w-8 h-8 animate-spin text-primary" />
+        <div className="min-h-screen bg-background pt-8 pb-16 container-custom max-w-3xl">
+          <ListSkeleton />
         </div>
       </Layout>
     );
@@ -312,9 +313,7 @@ export default function Pedidos() {
 
           {/* Loading state */}
           {isLoading && (
-            <div className="flex items-center justify-center py-12">
-              <Loader2 className="w-8 h-8 animate-spin text-primary" />
-            </div>
+            <ListSkeleton />
           )}
 
           {/* Results */}

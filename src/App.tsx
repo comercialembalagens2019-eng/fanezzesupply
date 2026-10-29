@@ -1,4 +1,5 @@
 import { lazy, Suspense } from "react";
+import { PageSkeleton } from "@/components/skeletons";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -26,11 +27,7 @@ const NotFound = lazy(() => import("./pages/NotFound"));
 const Termos = lazy(() => import("./pages/Termos"));
 const Privacidade = lazy(() => import("./pages/Privacidade"));
 
-const PageFallback = () => (
-  <div className="min-h-screen grid place-items-center" role="status" aria-label="Carregando">
-    <div className="w-8 h-8 rounded-full border-2 border-primary border-t-transparent animate-spin" />
-  </div>
-);
+const PageFallback = PageSkeleton;
 
 const queryClient = new QueryClient();
 
