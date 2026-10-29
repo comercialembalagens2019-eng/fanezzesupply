@@ -21,7 +21,7 @@ Atualizado em: 2026-10-28
 
 ## Falta
 - [ ] **Testar pagamento real no AbacatePay**: comprar o produto teste (100 un = R$ 1,00) com Pix e conferir e-mails e status no painel
-- [ ] **Cartão**: pronto no código (abacatepay.js + `pay-abacate-card`); aparece no checkout quando o secret `ABACATEPAY_PUBLIC_KEY` (pk_ de produção) estiver no GitHub
+- [x] **Cartão** pelo AbacatePay (abacatepay.js + `pay-abacate-card`), chave pública no GitHub desde 2026-10-29 — falta testar com cartão real
 - [ ] **Asaas**: conta atual é pessoa física (CPF do dono); CNPJ preso em outra conta, aguardando suporte. Site não usa mais o Asaas
 - [ ] **Fotos dos outros produtos** (stretch e demais): o dono vai mandar
 - [ ] Fase 5: mais testes, refatorar `CheckoutModal`
