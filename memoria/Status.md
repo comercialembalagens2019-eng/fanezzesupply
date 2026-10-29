@@ -8,6 +8,8 @@ Atualizado em: 2026-10-28
 - [x] Token Supabase antigo revogado (o secret do GitHub tem um novo)
 - [x] Domínio fanezzesupply.com.br e www apontando para o site novo (workflow `domain.yml`, 2026-10-29)
 - [x] Asaas integrado (Pix com QR Code, boleto com linha digitável, cartão na página segura do Asaas); webhook cadastrado automaticamente no deploy
+- [x] Fluxo Issue → PR → deploy (`AGENTS.md`); testes no CI; skeletons e animações; e-mail e pagamento redesenhados (#25, #26, #27, #36)
+- [x] Pix testado em produção (R$ 1,00)
 - [x] Fase 3 — Infra: CI, deploy automático, keep-alive, backup semanal (ver [[Infraestrutura]])
 - [x] Fase 4 — Front novo "Bento / Pedido Rápido" (proposta 4 escolhida)
 - [x] Painel admin (`/admin`): pedidos com Recebido/Enviado/Entregue, cadastros, carrinhos
@@ -20,7 +22,8 @@ Atualizado em: 2026-10-28
 - [x] E-mails de pedido ligados: "pago" nos webhooks/checagem do Pix, "enviado/entregue" ao mudar no painel admin (função `notify-order-status`); cada e-mail sai uma vez só (tabela `order_emails`)
 
 ## Falta
-- [ ] **Testar pagamento real no AbacatePay**: comprar o produto teste (100 un = R$ 1,00) com Pix e conferir e-mails e status no painel
+As tarefas abertas estão nas Issues do GitHub (fluxo em `AGENTS.md`): #28 Sentry (precisa do DSN), #29 remover pagamentos antigos, #30 validar boleto e cartão, #31 refatorar CheckoutModal, #32 fotos dos produtos.
+
 - [x] **Cartão** pelo AbacatePay (abacatepay.js + `pay-abacate-card`), chave pública no GitHub desde 2026-10-29 — falta testar com cartão real
 - [ ] **Asaas**: conta atual é pessoa física (CPF do dono); CNPJ preso em outra conta, aguardando suporte. Site não usa mais o Asaas
 - [ ] **Fotos dos outros produtos** (stretch e demais): o dono vai mandar
