@@ -14,24 +14,6 @@ export type Database = {
   }
   public: {
     Tables: {
-      carts: {
-        Row: {
-          items: Json
-          updated_at: string
-          user_id: string
-        }
-        Insert: {
-          items?: Json
-          updated_at?: string
-          user_id: string
-        }
-        Update: {
-          items?: Json
-          updated_at?: string
-          user_id?: string
-        }
-        Relationships: []
-      }
       companies: {
         Row: {
           bairro: string
@@ -237,17 +219,6 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      admin_list_users: {
-        Args: never
-        Returns: {
-          created_at: string
-          email: string
-          email_confirmed_at: string | null
-          id: string
-          is_admin: boolean
-          last_sign_in_at: string | null
-        }[]
-      }
       admin_set_fulfillment_status: {
         Args: { p_order_id: string; p_status: string }
         Returns: undefined
