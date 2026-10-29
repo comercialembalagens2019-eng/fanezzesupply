@@ -19,12 +19,14 @@ Regras de trabalho para qualquer agente de IA (Claude, GPT, Gemini, Copilot…) 
 5. **O dono autoriza merges sem perguntar.** Abra o PR e faça o merge quando o CI e as checagens locais passarem.
 
 ## Antes de abrir o PR
-Rode o mesmo que o CI roda:
+Rode o mesmo que o CI roda (`.github/workflows/ci.yml`):
 ```bash
-npm run lint && npx tsc --noEmit -p tsconfig.app.json && npm run build
+npm run lint && npx tsc --noEmit -p tsconfig.app.json
+npm run knip && npm test
+npm run build && npm run test:e2e
 npx -y deno@2.5.6 test supabase/functions/_shared/
 ```
-Quando os scripts existirem: `npm test` (unitários) e `npm run test:e2e` (Playwright).
+O `npm run test:e2e` usa o Playwright no build de produção. Se o Chromium já estiver instalado na máquina, use `PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium`.
 
 ## Regras do projeto
 - **Preço só no servidor:** `supabase/functions/_shared/catalog.ts` é a única tabela de preços. O navegador nunca envia o valor a cobrar.
