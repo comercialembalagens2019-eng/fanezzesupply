@@ -22,6 +22,7 @@
 | `backup.yml` | semanal | exporta tabelas e usuários (artefato 90 dias) |
 | `test-email.yml` | manual | envia e-mails de exemplo |
 | `domain.yml` | manual | aponta o domínio para o Pages |
+| `resend-dns.yml` | manual | limpa registros antigos do SES no `send.` |
 
 ## Secrets do GitHub
 `SUPABASE_ACCESS_TOKEN`, `CLOUDFLARE_API_TOKEN`, `CLOUDFLARE_ACCOUNT_ID`, `RESEND_API_KEY`.
