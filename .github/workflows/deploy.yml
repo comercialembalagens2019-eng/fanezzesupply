@@ -49,6 +49,14 @@ jobs:
           if [ -n "$ASAAS_API_KEY" ] && [ -z "$ASAAS_WEBHOOK_TOKEN" ]; then
             ASAAS_WEBHOOK_TOKEN=$(printf 'fnz-asaas-webhook:%s' "$ASAAS_API_KEY" | sha256sum | cut -d' ' -f1)
           fi
+          # Same for the AbacatePay webhook secret (scripts/abacatepay-webhook.mjs).
+          if [ -n "$ABACATEPAY_API_KEY" ] && [ -z "$ABACATEPAY_WEBHOOK_SECRET" ]; then
+            ABACATEPAY_WEBHOOK_SECRET=$(printf 'fnz-abacate-webhook:%s' "$ABACATEPAY_API_KEY" | sha256sum | cut -d' ' -f1)
+          fi
+          if [ -n "$ABACATEPAY_WEBHOOK_SECRET" ]; then
+            echo "::add-mask::$ABACATEPAY_WEBHOOK_SECRET"
+            echo "ABACATEPAY_WEBHOOK_SECRET=$ABACATEPAY_WEBHOOK_SECRET" >> "$GITHUB_ENV"
+          fi
           if [ -n "$ASAAS_WEBHOOK_TOKEN" ]; then
             echo "::add-mask::$ASAAS_WEBHOOK_TOKEN"
             echo "ASAAS_WEBHOOK_TOKEN=$ASAAS_WEBHOOK_TOKEN" >> "$GITHUB_ENV"
@@ -76,6 +84,10 @@ jobs:
         env:
           ASAAS_API_KEY: ${{ secrets.ASAAS_API_KEY }}
         run: node scripts/asaas-webhook.mjs
+      - name: Register the AbacatePay payment webhook
+        env:
+          ABACATEPAY_API_KEY: ${{ secrets.ABACATEPAY_API_KEY }}
+        run: node scripts/abacatepay-webhook.mjs
 
   site:
     needs: supabase

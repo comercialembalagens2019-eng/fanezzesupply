@@ -12,7 +12,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { getFunctionErrorMessage } from "@/lib/functionErrors";
 import { getUnitPrice, shippingFor } from "@/lib/pricing";
 import { toast } from "@/hooks/use-toast";
-import { Loader2, QrCode, Building2, MapPin, Phone, ChevronRight, ChevronLeft, CheckCircle, Copy, Home, ShoppingBag, PartyPopper, CreditCard, LogIn, FileText, ExternalLink } from "lucide-react";
+import { Loader2, QrCode, Building2, MapPin, Phone, ChevronRight, ChevronLeft, CheckCircle, Copy, Home, ShoppingBag, PartyPopper, LogIn, FileText, ExternalLink } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
@@ -92,7 +92,7 @@ export const CheckoutModal = ({ open, onOpenChange }: CheckoutModalProps) => {
   const [existingCompanyId, setExistingCompanyId] = useState<string | null>(null);
   const [currentOrderId, setCurrentOrderId] = useState<string | null>(null);
   const [currentPixId, setCurrentPixId] = useState<string | null>(null);
-  const [paymentMethod, setPaymentMethod] = useState<'pix' | 'card' | 'boleto'>('pix');
+  const [paymentMethod, setPaymentMethod] = useState<'pix' | 'boleto'>('pix');
   const [boletoUrl, setBoletoUrl] = useState<string | null>(null);
   const [boletoLine, setBoletoLine] = useState<string | null>(null);
   const [chargedTotal, setChargedTotal] = useState<number | null>(null);
@@ -242,7 +242,7 @@ export const CheckoutModal = ({ open, onOpenChange }: CheckoutModalProps) => {
     }, 3000);
   };
 
-  // Listen for payment confirmation via Asaas status checks + Realtime + DB polling
+  // Listen for payment confirmation via AbacatePay status checks + Realtime + DB polling
   useEffect(() => {
     if (!paymentCreated || !currentOrderId || paymentConfirmed) return;
 
@@ -270,12 +270,12 @@ export const CheckoutModal = ({ open, onOpenChange }: CheckoutModalProps) => {
         console.log('Realtime subscription status:', status);
       });
 
-    // Ask Asaas for the charge status (the server confirms the order if it is paid)
+    // Ask AbacatePay for the Pix status (the server confirms the order if it is paid)
     const checkPixStatus = async () => {
       if (!currentPixId) return;
       
       try {
-        const { data, error } = await supabase.functions.invoke('check-asaas-payment', {
+        const { data, error } = await supabase.functions.invoke('check-abacate-payment', {
           body: { orderId: currentOrderId },
         });
 
@@ -504,14 +504,14 @@ export const CheckoutModal = ({ open, onOpenChange }: CheckoutModalProps) => {
     }
   };
 
-  // One server call creates the order and its Asaas charge; prices come from the server.
-  const handleAsaasPayment = async () => {
+  // One server call creates the order and its AbacatePay charge; prices come from the server.
+  const handlePayment = async () => {
     setIsLoading(true);
     try {
       const company = isTestOrder ? null : await saveCompanyData();
       if (company) setExistingCompanyId(company.id);
 
-      const { data, error } = await supabase.functions.invoke('create-asaas-payment', {
+      const { data, error } = await supabase.functions.invoke('create-abacate-payment', {
         body: {
           ...(company ? { companyId: company.id } : { testOrder: true }),
           method: paymentMethod,
@@ -525,13 +525,6 @@ export const CheckoutModal = ({ open, onOpenChange }: CheckoutModalProps) => {
 
       setCurrentOrderId(data.orderId);
       setChargedTotal(typeof data.totalCents === 'number' ? data.totalCents / 100 : null);
-      setPaymentUrl(data.invoiceUrl || null);
-
-      if (paymentMethod === 'card') {
-        // Card data is entered on Asaas' payment page, never on our site.
-        window.location.href = data.invoiceUrl;
-        return;
-      }
 
       if (paymentMethod === 'pix') {
         setQrCodeImage(data.pix?.image ?? null);
@@ -540,7 +533,7 @@ export const CheckoutModal = ({ open, onOpenChange }: CheckoutModalProps) => {
         setCurrentPixId(data.orderId);
         toast({ title: "Pedido registrado!", description: "Escaneie o QR Code ou copie o código Pix para pagar." });
       } else {
-        setBoletoUrl(data.boleto?.url ?? data.invoiceUrl ?? null);
+        setBoletoUrl(data.boleto?.url ?? null);
         setBoletoLine(data.boleto?.identificationField ?? null);
         toast({ title: "Boleto gerado!", description: "Abra o boleto ou copie a linha digitável para pagar." });
       }
@@ -878,7 +871,7 @@ export const CheckoutModal = ({ open, onOpenChange }: CheckoutModalProps) => {
 
             <div>
               <h4 className="font-semibold text-foreground mb-3">Forma de Pagamento</h4>
-              <div className="grid grid-cols-3 gap-3">
+              <div className="grid grid-cols-2 gap-3">
                 <button
                   type="button"
                   onClick={() => setPaymentMethod('pix')}
@@ -907,20 +900,6 @@ export const CheckoutModal = ({ open, onOpenChange }: CheckoutModalProps) => {
                   <span className={cn("font-medium text-sm", paymentMethod === 'boleto' ? "text-primary" : "text-foreground")}>Boleto</span>
                   <span className="text-xs text-muted-foreground text-center">Vence em 3 dias</span>
                 </button>
-                <button
-                  type="button"
-                  onClick={() => setPaymentMethod('card')}
-                  className={cn(
-                    "flex flex-col items-center gap-2 p-4 rounded-lg border-2 transition-all",
-                    paymentMethod === 'card'
-                      ? "border-primary bg-primary/5"
-                      : "border-muted hover:border-primary/50"
-                  )}
-                >
-                  <CreditCard className={cn("w-8 h-8", paymentMethod === 'card' ? "text-primary" : "text-muted-foreground")} />
-                  <span className={cn("font-medium text-sm", paymentMethod === 'card' ? "text-primary" : "text-foreground")}>Cartão</span>
-                  <span className="text-xs text-muted-foreground text-center">Crédito</span>
-                </button>
               </div>
             </div>
 
@@ -928,14 +907,9 @@ export const CheckoutModal = ({ open, onOpenChange }: CheckoutModalProps) => {
               <div className="mt-4 p-3 bg-warning-soft border border-warning/30 rounded-lg">
                 <p className="text-sm text-warning-soft-foreground flex items-center gap-2">
                   <FileText className="w-4 h-4 flex-shrink-0" />
-                  <span>O boleto sai no CNPJ da empresa e vence em <strong>3 dias</strong>.</span>
+                  <span>O boleto sai no CNPJ da empresa e vence em <strong>3 dias</strong>. Ele também traz um Pix para pagar na hora.</span>
                 </p>
               </div>
-            )}
-            {paymentMethod === 'card' && (
-              <p className="mt-4 text-xs text-muted-foreground">
-                Você será levado à página segura do Asaas para digitar os dados do cartão.
-              </p>
             )}
           </div>
         )}
@@ -1179,7 +1153,7 @@ export const CheckoutModal = ({ open, onOpenChange }: CheckoutModalProps) => {
               </Button>
             ) : (
               <Button 
-                onClick={handleAsaasPayment}
+                onClick={handlePayment}
                 disabled={isLoading}
                 className="gap-2"
               >
@@ -1193,15 +1167,10 @@ export const CheckoutModal = ({ open, onOpenChange }: CheckoutModalProps) => {
                     <QrCode className="w-4 h-4" />
                     Gerar QR Code PIX
                   </>
-                ) : paymentMethod === 'boleto' ? (
+                ) : (
                   <>
                     <FileText className="w-4 h-4" />
                     Gerar Boleto
-                  </>
-                ) : (
-                  <>
-                    <CreditCard className="w-4 h-4" />
-                    Pagar com Cartão
                   </>
                 )}
               </Button>

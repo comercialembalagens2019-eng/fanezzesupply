@@ -20,6 +20,8 @@ Atualizado em: 2026-10-28
 - [x] E-mails de pedido ligados: "pago" nos webhooks/checagem do Pix, "enviado/entregue" ao mudar no painel admin (função `notify-order-status`); cada e-mail sai uma vez só (tabela `order_emails`)
 
 ## Falta
-- [ ] **Testar pagamento real no Asaas**: comprar o produto teste (500 un = R$ 5,00) com Pix e conferir e-mails e status no painel
+- [ ] **Testar pagamento real no AbacatePay**: comprar o produto teste (100 un = R$ 1,00) com Pix e conferir e-mails e status no painel
+- [ ] **Cartão**: escondido do checkout. Pelo AbacatePay precisa da chave pública (`ABACATEPAY_PUBLIC_KEY`) e do formulário abacatepay.js
+- [ ] **Asaas**: conta atual é pessoa física (CPF do dono); CNPJ preso em outra conta, aguardando suporte. Site não usa mais o Asaas
 - [ ] **Fotos dos outros produtos** (stretch e demais): o dono vai mandar
 - [ ] Fase 5: mais testes, refatorar `CheckoutModal`
