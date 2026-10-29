@@ -17,3 +17,4 @@
 - **2026-10-29**: Resend Forge — removidos MX/TXT antigos (Amazon SES) em send.fanezzesupply.com.br que conflitavam com o CNAME (workflow `resend-dns.yml`)
 - **2026-10-29**: integração Asaas (Pix, boleto, cartão) no checkout; produto teste passa a ter mínimo de 500 un (R$ 5,00)
 - **2026-10-29**: stretch removido do site e do catálogo; pedido de teste do admin (só produto teste) pula o cadastro e vai direto ao pagamento, faturado no CNPJ da FNZ
+- **2026-10-29**: índices revisados (4 novos, 2 removidos) e RLS reescrito para avaliar auth.uid() uma vez por consulta; plano em `docs/plans/2026-10-29-db-indexes.md`. Skills superpowers brainstorming/executing-plans/subagent-driven-development instaladas
