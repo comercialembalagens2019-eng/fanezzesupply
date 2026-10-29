@@ -1,0 +1,20 @@
+name: Point domain to Pages
+
+# Manual: attaches fanezzesupply.com.br and www to the Cloudflare Pages project and
+# switches their DNS from the old Lovable host to Pages. Safe to re-run.
+on:
+  workflow_dispatch:
+
+jobs:
+  domain:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Attach domain and update DNS
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: node scripts/cloudflare-domain.mjs
