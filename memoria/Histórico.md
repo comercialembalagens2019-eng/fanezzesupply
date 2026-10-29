@@ -19,3 +19,4 @@
 - **2026-10-29**: stretch removido do site e do catálogo; pedido de teste do admin (só produto teste) pula o cadastro e vai direto ao pagamento, faturado no CNPJ da FNZ
 - **2026-10-29**: índices revisados (4 novos, 2 removidos) e RLS reescrito para avaliar auth.uid() uma vez por consulta; plano em `docs/plans/2026-10-29-db-indexes.md`. Skills superpowers brainstorming/executing-plans/subagent-driven-development instaladas
 - **2026-10-29**: checkout passa a cobrar Pix e boleto pelo AbacatePay (conta da FNZ); cartão escondido; produto teste volta a 100 un (R$ 1,00)
+- **2026-10-29**: corrigido erro do Pix no AbacatePay (travessão na descrição é recusado); cartão via abacatepay.js pronto, aguardando a chave pública
