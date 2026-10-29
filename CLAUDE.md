@@ -1,5 +1,7 @@
 # CLAUDE.md
 
+Siga o `AGENTS.md`: fluxo Issue → PR → deploy, regras do projeto e checagens antes do PR.
+
 A memória do projeto fica em `memoria/` (cofre do Obsidian, em português).
 
 - No início de cada sessão, leia `memoria/00 Início.md`, `memoria/Status.md` e `memoria/Preferências do dono.md`.
