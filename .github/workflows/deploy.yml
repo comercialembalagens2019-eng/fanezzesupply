@@ -44,6 +44,15 @@ jobs:
           ASAAS_API_KEY: ${{ secrets.ASAAS_API_KEY }}
           ASAAS_WEBHOOK_TOKEN: ${{ secrets.ASAAS_WEBHOOK_TOKEN }}
         run: |
+          # The Asaas webhook token is derived from the API key, so only ASAAS_API_KEY has
+          # to be added by hand; scripts/asaas-webhook.mjs registers the same token at Asaas.
+          if [ -n "$ASAAS_API_KEY" ] && [ -z "$ASAAS_WEBHOOK_TOKEN" ]; then
+            ASAAS_WEBHOOK_TOKEN=$(printf 'fnz-asaas-webhook:%s' "$ASAAS_API_KEY" | sha256sum | cut -d' ' -f1)
+          fi
+          if [ -n "$ASAAS_WEBHOOK_TOKEN" ]; then
+            echo "::add-mask::$ASAAS_WEBHOOK_TOKEN"
+            echo "ASAAS_WEBHOOK_TOKEN=$ASAAS_WEBHOOK_TOKEN" >> "$GITHUB_ENV"
+          fi
           args=()
           for name in RESEND_API_KEY ABACATEPAY_API_KEY ABACATEPAY_PUBLIC_KEY ABACATEPAY_WEBHOOK_SECRET \
                       STRIPE_SECRET_KEY STRIPE_WEBHOOK_SECRET ASAAS_API_KEY ASAAS_WEBHOOK_TOKEN; do
@@ -63,6 +72,10 @@ jobs:
         run: node scripts/supabase-auth-config.mjs
       - name: Deploy edge functions
         run: npx -y supabase@2.122.0 functions deploy --project-ref "$SUPABASE_PROJECT_REF" --use-api
+      - name: Register the Asaas payment webhook
+        env:
+          ASAAS_API_KEY: ${{ secrets.ASAAS_API_KEY }}
+        run: node scripts/asaas-webhook.mjs
 
   site:
     needs: supabase
