@@ -1,6 +1,7 @@
 import { useState } from "react";
+import { Logo } from "@/components/Logo";
 import { Link, useNavigate } from "react-router-dom";
-import { Package, Loader2, Eye, EyeOff } from "lucide-react";
+import { Loader2, Eye, EyeOff } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { toast } from "@/hooks/use-toast";
 import { SEO } from "@/components/SEO";
@@ -96,14 +97,9 @@ const Cadastro = () => {
       <header className="py-4">
         <div className="container-custom">
           <div className="flex items-center justify-between">
-            <Link to="/" className="flex items-center gap-2">
-              <div className="w-10 h-10 rounded-xl bg-primary flex items-center justify-center">
-                <Package className="w-6 h-6 text-primary-foreground" />
-              </div>
-              <span className="font-display font-bold text-xl text-foreground">
-                FNZ Supply
-              </span>
-            </Link>
+            <Link to="/" className="flex items-center" aria-label="FNZ Supply — início">
+            <Logo className="h-10" />
+          </Link>
             <Link to="/login" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
               Já tem conta? Entrar
             </Link>
