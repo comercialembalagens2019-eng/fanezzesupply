@@ -35,7 +35,7 @@ console.log(`Loja AbacatePay: ${store.name}`);
 
 const existing = ((await call("GET", "/webhooks/list")) ?? []).filter((w) => w.endpoint === endpoint);
 for (const w of existing) {
-  await call("POST", "/webhooks/delete", { id: w.id });
+  await call("POST", `/webhooks/delete?id=${encodeURIComponent(w.id)}`);
   console.log(`Removed old webhook ${w.id}`);
 }
 
