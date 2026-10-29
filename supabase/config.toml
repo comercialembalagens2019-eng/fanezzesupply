@@ -38,3 +38,12 @@ verify_jwt = true
 
 [functions.asaas-webhook]
 verify_jwt = false
+
+[functions.create-abacate-payment]
+verify_jwt = true
+
+[functions.check-abacate-payment]
+verify_jwt = true
+
+[functions.abacate-webhook]
+verify_jwt = false

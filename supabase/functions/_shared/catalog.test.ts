@@ -29,9 +29,9 @@ Deno.test("rejects below minimum, quote-only and unknown products", () => {
 });
 
 Deno.test("test product costs one centavo per unit and is admin-only", () => {
-  const priced = priceOrder([{ productId: "produto-teste", quantity: 500 }]);
-  assertEquals("totalCents" in priced && priced.totalCents, 500);
-  assertEquals(priceOrder([{ productId: "produto-teste", quantity: 499 }]), { error: "Quantidade abaixo do pedido mínimo" });
+  const priced = priceOrder([{ productId: "produto-teste", quantity: 100 }]);
+  assertEquals("totalCents" in priced && priced.totalCents, 100);
+  assertEquals(priceOrder([{ productId: "produto-teste", quantity: 99 }]), { error: "Quantidade abaixo do pedido mínimo" });
   assertEquals(hasAdminOnlyProduct([{ productId: "produto-teste" }]), true);
   assertEquals(hasAdminOnlyProduct([{ productId: "envelope-coex-19x25" }]), false);
 });

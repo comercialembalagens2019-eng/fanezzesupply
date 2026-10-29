@@ -86,10 +86,10 @@ export const products: Product[] = [
     id: "produto-teste",
     name: "Produto teste (admin)",
     description:
-      "Produto para testar pagamentos. Visível apenas para administradores. 500 unidades = R$ 5,00, o mínimo por cobrança no Asaas.",
+      "Produto para testar pagamentos. Visível apenas para administradores. 100 unidades = R$ 1,00, o mínimo por cobrança no AbacatePay.",
     price: unitPrice("produto-teste"),
     unit: "unidade",
-    minOrder: 500,
+    minOrder: 100,
     minOrderUnit: "unidades",
     image: "/placeholder.svg",
     category: "Teste",

@@ -38,7 +38,7 @@ export const PRODUCT_INFO: Record<string, { name: string; unit: string; minQty: 
   "envelope-coex": { name: "Envelope COEX", unit: "unidade", minQty: 500 },
   "envelope-cinza": { name: "Envelope Cinza", unit: "unidade", minQty: 500 },
   // 100 × R$ 0,01 = R$ 1,00, the minimum a PIX charge accepts.
-  "produto-teste": { name: "Produto teste (admin)", unit: "unidade", minQty: 500 },
+  "produto-teste": { name: "Produto teste (admin)", unit: "unidade", minQty: 100 },
 };
 
 // Products only admins may buy (createPendingOrder checks the role).
