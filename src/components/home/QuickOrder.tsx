@@ -9,7 +9,6 @@ import { buildCartProduct, formatBRL, getUnitPrice } from "@/lib/pricing";
 const QUICK_ITEMS = [
   { productId: "envelope-coex", size: "19x25", step: 500 },
   { productId: "envelope-cinza", size: "32x40", step: 500 },
-  { productId: "stretch-4kg", size: undefined, step: 50 },
 ];
 
 function QuickOrderRow({ productId, size, step }: (typeof QUICK_ITEMS)[number]) {

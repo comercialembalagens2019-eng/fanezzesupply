@@ -1,6 +1,5 @@
 import { Product, SizePricing } from "@/types";
 import envelopeImg from "@/assets/envelope.webp";
-import stretchImg from "@/assets/stretch.webp";
 // Single source of truth for prices: the same catalog the edge functions charge from.
 import {
   PRODUCT_UNIT_PRICE_CENTS,
@@ -84,20 +83,6 @@ export const products: Product[] = [
     quoteOnly: true,
   },
   {
-    id: "stretch-4kg",
-    name: "Stretch 4kg",
-    description:
-      "Filme stretch em bobina de 4kg, ideal para paletização e unitização de cargas.",
-    spec: "Tubete 500g",
-    price: unitPrice("stretch-4kg"),
-    unit: "kg",
-    minOrder: 500,
-    minOrderUnit: "kg",
-    image: stretchImg,
-    category: "Plásticos",
-    featured: true,
-  },
-  {
     id: "produto-teste",
     name: "Produto teste (admin)",
     description:
@@ -112,4 +97,4 @@ export const products: Product[] = [
   },
 ];
 
-export const categories = ["Todos", "Envelopes", "Plásticos"];
+export const categories = ["Todos", "Envelopes"];
