@@ -8,3 +8,4 @@
 - **Front Bento / Pedido Rápido** — proposta 4 de 5
 - **Sem migração do Lovable**: nunca houve clientes ou pedidos lá
 - **E-mail de pedido uma vez só**: tabela `order_emails` (chave pedido + tipo) evita duplicar quando webhook e checagem do Pix confirmam juntos
+- **Editar pelo Lovable quebra o projeto**: ele regenera `src/integrations/supabase/types.ts` a partir do banco antigo. Pedir mudanças ao Claude; se usar o Lovable, o Claude restaura os tipos
