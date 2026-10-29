@@ -1,6 +1,7 @@
 import { useState, FormEvent } from "react";
+import { Logo } from "@/components/Logo";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { Menu, X, ShoppingCart, User, Package, LogOut, Users, Search } from "lucide-react";
+import { Menu, X, ShoppingCart, User, LogOut, Users, Search } from "lucide-react";
 import { useCart } from "@/contexts/CartContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { cn } from "@/lib/utils";
@@ -47,11 +48,8 @@ export function Header() {
       <div className="container-custom">
         <div className="flex items-center gap-3 md:gap-5 h-16">
           {/* Logo */}
-          <Link to="/" className="flex items-center gap-2 shrink-0" aria-label="FNZ Supply — início">
-            <span className="w-9 h-9 rounded-xl bg-primary text-beige grid place-items-center">
-              <Package className="w-5 h-5" aria-hidden="true" />
-            </span>
-            <span className="hidden sm:inline font-display font-extrabold text-lg text-foreground">FNZ Supply</span>
+          <Link to="/" className="flex items-center shrink-0" aria-label="FNZ Supply — início">
+            <Logo className="h-11" />
           </Link>
 
           {/* Search */}

@@ -1,16 +1,14 @@
+import { Logo } from "@/components/Logo";
 import { Link } from "react-router-dom";
-import { Package, Phone, Mail, MapPin } from "lucide-react";
+import { Phone, Mail, MapPin } from "lucide-react";
 
 export function Footer() {
   return (
     <footer className="bg-card border-t border-border mt-16">
       <div className="container-custom py-10 grid gap-8 sm:grid-cols-2 lg:grid-cols-4 text-sm">
         <div className="space-y-3">
-          <Link to="/" className="flex items-center gap-2">
-            <span className="w-9 h-9 rounded-xl bg-primary text-beige grid place-items-center">
-              <Package className="w-5 h-5" aria-hidden="true" />
-            </span>
-            <span className="font-display font-extrabold text-lg text-foreground">FNZ Supply</span>
+          <Link to="/" className="flex items-center" aria-label="FNZ Supply — início">
+            <Logo className="h-9" />
           </Link>
           <p className="text-muted-foreground leading-relaxed">
             Distribuição de embalagens para empresas, com nota fiscal e preço de atacado.

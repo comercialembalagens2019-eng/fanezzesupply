@@ -11,3 +11,4 @@
   - E-mails de pedido (pago/enviado/entregue) aprovados e ligados ao fluxo real
   - Não há dados antigos no Lovable para migrar
 - **2026-10-28 (noite)**: foto dos envelopes refeita em 4:3 com margem, centralizada e sem corte; cards usam `imageFit: "cover"`
+- **2026-10-29**: logo nova (FNZ Supply, azul e amarelo) no topo, rodapé e páginas de login/cadastro (`src/components/Logo.tsx`)
