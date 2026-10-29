@@ -121,6 +121,8 @@ jobs:
           # Public values (they ship in the browser bundle anyway).
           VITE_SUPABASE_URL: https://krmrnoqkkimhlmbcinmd.supabase.co
           VITE_SUPABASE_PROJECT_ID: krmrnoqkkimhlmbcinmd
+          # AbacatePay public key (pk_...) for the card form; the card option stays hidden without it.
+          VITE_ABACATEPAY_PUBLIC_KEY: ${{ secrets.ABACATEPAY_PUBLIC_KEY }}
           VITE_SUPABASE_PUBLISHABLE_KEY: ${{ vars.SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtybXJub3Fra2ltaGxtYmNpbm1kIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTMyMDQ4MDYsImV4cCI6MjEwODc4MDgwNn0.vTOvHltI_T1xrexkHTjp-e98SwxLEknhIcOpN3Q4aCM' }}
       - if: steps.cf.outputs.enabled == 'true'
         name: SPA fallback for client-side routes

@@ -8,11 +8,12 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useCart } from "@/contexts/CartContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { products } from "@/data/products";
+import { ABACATEPAY_PUBLIC_KEY, CardPayment, type CardCustomer } from "@/components/checkout/CardPayment";
 import { supabase } from "@/integrations/supabase/client";
 import { getFunctionErrorMessage } from "@/lib/functionErrors";
 import { getUnitPrice, shippingFor } from "@/lib/pricing";
 import { toast } from "@/hooks/use-toast";
-import { Loader2, QrCode, Building2, MapPin, Phone, ChevronRight, ChevronLeft, CheckCircle, Copy, Home, ShoppingBag, PartyPopper, LogIn, FileText, ExternalLink } from "lucide-react";
+import { Loader2, QrCode, Building2, MapPin, Phone, ChevronRight, ChevronLeft, CheckCircle, Copy, Home, ShoppingBag, PartyPopper, CreditCard, LogIn, FileText, ExternalLink } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
@@ -92,10 +93,11 @@ export const CheckoutModal = ({ open, onOpenChange }: CheckoutModalProps) => {
   const [existingCompanyId, setExistingCompanyId] = useState<string | null>(null);
   const [currentOrderId, setCurrentOrderId] = useState<string | null>(null);
   const [currentPixId, setCurrentPixId] = useState<string | null>(null);
-  const [paymentMethod, setPaymentMethod] = useState<'pix' | 'boleto'>('pix');
+  const [paymentMethod, setPaymentMethod] = useState<'pix' | 'boleto' | 'card'>('pix');
   const [boletoUrl, setBoletoUrl] = useState<string | null>(null);
   const [boletoLine, setBoletoLine] = useState<string | null>(null);
   const [chargedTotal, setChargedTotal] = useState<number | null>(null);
+  const [cardCustomer, setCardCustomer] = useState<CardCustomer | null>(null);
   const navigate = useNavigate();
 
   const [companyData, setCompanyData] = useState<CompanyData>({
@@ -526,7 +528,10 @@ export const CheckoutModal = ({ open, onOpenChange }: CheckoutModalProps) => {
       setCurrentOrderId(data.orderId);
       setChargedTotal(typeof data.totalCents === 'number' ? data.totalCents / 100 : null);
 
-      if (paymentMethod === 'pix') {
+      if (paymentMethod === 'card') {
+        // The order exists now; the card form charges exactly its total.
+        setCardCustomer(data.customer ?? null);
+      } else if (paymentMethod === 'pix') {
         setQrCodeImage(data.pix?.image ?? null);
         setBrCode(data.pix?.payload ?? null);
         // Enables the status polling below.
@@ -599,6 +604,7 @@ export const CheckoutModal = ({ open, onOpenChange }: CheckoutModalProps) => {
     setBrCode(null);
     setBoletoUrl(null);
     setBoletoLine(null);
+    setCardCustomer(null);
     setChargedTotal(null);
     setCurrentPixId(null);
     setPaymentCreated(false);
@@ -871,7 +877,7 @@ export const CheckoutModal = ({ open, onOpenChange }: CheckoutModalProps) => {
 
             <div>
               <h4 className="font-semibold text-foreground mb-3">Forma de Pagamento</h4>
-              <div className="grid grid-cols-2 gap-3">
+              <div className={cn("grid gap-3", ABACATEPAY_PUBLIC_KEY ? "grid-cols-3" : "grid-cols-2")}>
                 <button
                   type="button"
                   onClick={() => setPaymentMethod('pix')}
@@ -900,6 +906,22 @@ export const CheckoutModal = ({ open, onOpenChange }: CheckoutModalProps) => {
                   <span className={cn("font-medium text-sm", paymentMethod === 'boleto' ? "text-primary" : "text-foreground")}>Boleto</span>
                   <span className="text-xs text-muted-foreground text-center">Vence em 3 dias</span>
                 </button>
+                {ABACATEPAY_PUBLIC_KEY && (
+                  <button
+                    type="button"
+                    onClick={() => setPaymentMethod('card')}
+                    className={cn(
+                      "flex flex-col items-center gap-2 p-4 rounded-lg border-2 transition-all",
+                      paymentMethod === 'card'
+                        ? "border-primary bg-primary/5"
+                        : "border-muted hover:border-primary/50"
+                    )}
+                  >
+                    <CreditCard className={cn("w-8 h-8", paymentMethod === 'card' ? "text-primary" : "text-muted-foreground")} />
+                    <span className={cn("font-medium text-sm", paymentMethod === 'card' ? "text-primary" : "text-foreground")}>Cartão</span>
+                    <span className="text-xs text-muted-foreground text-center">Crédito</span>
+                  </button>
+                )}
               </div>
             </div>
 
@@ -1133,6 +1155,35 @@ export const CheckoutModal = ({ open, onOpenChange }: CheckoutModalProps) => {
           </div>
         )}
 
+        {/* Step 5: Payment - Card */}
+        {step === 5 && paymentCreated && paymentMethod === 'card' && (
+          <div className="text-center space-y-6 py-4">
+            {paymentConfirmed ? (
+              <div className="animate-scale-in">
+                <div className="w-24 h-24 mx-auto bg-success/15 rounded-full flex items-center justify-center mb-4 animate-pulse">
+                  <PartyPopper className="w-12 h-12 text-success" />
+                </div>
+                <h3 className="font-display text-2xl font-bold text-success mb-2">Pagamento Confirmado!</h3>
+                <p className="text-muted-foreground">Obrigado pela compra! Redirecionando para seus pedidos...</p>
+              </div>
+            ) : currentOrderId && cardCustomer && chargedTotal !== null ? (
+              <>
+                <div>
+                  <h3 className="font-display text-lg font-semibold text-foreground mb-1">Pagamento com cartão</h3>
+                  <p className="text-muted-foreground text-sm">Valor: {formatPrice(chargedTotal)}</p>
+                </div>
+                <CardPayment
+                  orderId={currentOrderId}
+                  totalCents={Math.round(chargedTotal * 100)}
+                  customer={cardCustomer}
+                  formattedTotal={formatPrice(chargedTotal)}
+                  onPaid={handlePaymentConfirmed}
+                />
+              </>
+            ) : null}
+          </div>
+        )}
+
         {/* Navigation Buttons */}
         {step < 5 && !paymentCreated && (
           <div className="flex justify-between pt-4 border-t">
@@ -1167,10 +1218,15 @@ export const CheckoutModal = ({ open, onOpenChange }: CheckoutModalProps) => {
                     <QrCode className="w-4 h-4" />
                     Gerar QR Code PIX
                   </>
-                ) : (
+                ) : paymentMethod === 'boleto' ? (
                   <>
                     <FileText className="w-4 h-4" />
                     Gerar Boleto
+                  </>
+                ) : (
+                  <>
+                    <CreditCard className="w-4 h-4" />
+                    Pagar com Cartão
                   </>
                 )}
               </Button>

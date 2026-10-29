@@ -1,5 +1,7 @@
 // Creates the order server-side and its AbacatePay charge (transparent checkout):
 // Pix returns the QR code; boleto the PDF link, linha digitável and a Pix alternative.
+// Card only creates the order and returns the amount and payer for abacatepay.js;
+// pay-abacate-card then charges the card token the browser produced.
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
 import { createPendingOrder, discardOrder } from "../_shared/orders.ts";
@@ -20,7 +22,7 @@ function jsonResponse(body: unknown, status: number): Response {
   });
 }
 
-const METHODS = { pix: "PIX", boleto: "BOLETO" } as const;
+const METHODS = { pix: "PIX", boleto: "BOLETO", card: "CARD" } as const;
 type Method = keyof typeof METHODS;
 
 interface Charge {
@@ -77,7 +79,8 @@ serve(async (req) => {
 
     const data: Record<string, unknown> = {
       amount: created.totalCents,
-      description: `Pedido #${shortOrderId(created.orderId)} — FNZ Supply`,
+      // AbacatePay rejects some typographic characters (e.g. em dash) in descriptions.
+      description: `Pedido ${shortOrderId(created.orderId)} - FNZ Supply`,
       customer: {
         name: company.razao_social,
         email: company.email,
@@ -88,6 +91,10 @@ serve(async (req) => {
     };
     if (method === "pix") data.expiresIn = 86_400; // one day to pay
     else data.dueDate = dueDate(3);
+
+    if (method === "card") {
+      return jsonResponse({ orderId: created.orderId, method, totalCents: created.totalCents, customer: data.customer }, 200);
+    }
 
     const charge = await abacate<Charge>(apiKey, "POST", "/transparents/create", {
       method: METHODS[method as Method],

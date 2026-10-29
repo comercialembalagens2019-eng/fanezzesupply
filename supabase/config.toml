@@ -47,3 +47,6 @@ verify_jwt = true
 
 [functions.abacate-webhook]
 verify_jwt = false
+
+[functions.pay-abacate-card]
+verify_jwt = true
