@@ -6,6 +6,7 @@ Atualizado em: 2026-10-28
 - [x] Fase 1 — Segurança: pedidos e preços calculados no servidor, webhooks validam id/valor/método, reset de senha com código forte e token guardado como hash, RLS revisado
 - [x] Fase 2 — Bugs: frete (R$ 19,90, grátis só em Joinville/SC), e-mail duplicado do Stripe, carrinho limpo no logout
 - [x] Token Supabase antigo revogado (o secret do GitHub tem um novo)
+- [x] Domínio fanezzesupply.com.br e www apontando para o site novo (workflow `domain.yml`, 2026-10-29)
 - [x] Fase 3 — Infra: CI, deploy automático, keep-alive, backup semanal (ver [[Infraestrutura]])
 - [x] Fase 4 — Front novo "Bento / Pedido Rápido" (proposta 4 escolhida)
 - [x] Painel admin (`/admin`): pedidos com Recebido/Enviado/Entregue, cadastros, carrinhos
@@ -18,7 +19,7 @@ Atualizado em: 2026-10-28
 - [x] E-mails de pedido ligados: "pago" nos webhooks/checagem do Pix, "enviado/entregue" ao mudar no painel admin (função `notify-order-status`); cada e-mail sai uma vez só (tabela `order_emails`)
 
 ## Falta
-- [ ] **Virada do domínio**: apontar fanezzesupply.com.br e www para o Cloudflare Pages (corrige erro 1000 no www e tira o site antigo do Lovable do ar)
+- [ ] **Pagamentos no site novo**: nenhuma chave configurada (AbacatePay/Stripe ficaram no Lovable). Checkout não conclui pagamento até integrar o Asaas
 - [ ] **Asaas**: O dono cria contas sandbox e produção e coloca `ASAAS_API_KEY` e `ASAAS_WEBHOOK_TOKEN` nos secrets do GitHub → integrar Pix, boleto e cartão
 - [ ] **Fotos dos outros produtos** (stretch e demais): o dono vai mandar
 - [ ] Fase 5: mais testes, refatorar `CheckoutModal`

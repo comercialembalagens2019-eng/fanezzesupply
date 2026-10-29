@@ -13,3 +13,4 @@
 - **2026-10-28 (noite)**: foto dos envelopes refeita em 4:3 com margem, centralizada e sem corte; cards usam `imageFit: "cover"`
 - **2026-10-29**: logo nova (FNZ Supply, azul e amarelo) no topo, rodapé e páginas de login/cadastro (`src/components/Logo.tsx`)
 - **2026-10-29**: removida a seção "Tabelas de preço" da home (imagens ficavam no Lovable); favicon novo veio de uma edição no Lovable, que também apagou tipos do Supabase (restaurados)
+- **2026-10-29**: domínio virado para o site novo (o dono escolheu virar antes do Asaas, sabendo que o pagamento fica indisponível até lá)
