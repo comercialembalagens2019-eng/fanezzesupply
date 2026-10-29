@@ -90,46 +90,9 @@ export const CheckoutModal = ({ open, onOpenChange }: CheckoutModalProps) => {
   const [currentPixId, setCurrentPixId] = useState<string | null>(null);
   const [paymentMethod, setPaymentMethod] = useState<'pix' | 'card' | 'boleto'>('pix');
   const [boletoUrl, setBoletoUrl] = useState<string | null>(null);
-  const [boletoCpf, setBoletoCpf] = useState('');
+  const [boletoLine, setBoletoLine] = useState<string | null>(null);
+  const [chargedTotal, setChargedTotal] = useState<number | null>(null);
   const navigate = useNavigate();
-
-  const formatCPF = (value: string) => {
-    return value
-      .replace(/\D/g, '')
-      .replace(/(\d{3})(\d)/, '$1.$2')
-      .replace(/(\d{3})(\d)/, '$1.$2')
-      .replace(/(\d{3})(\d{1,2})/, '$1-$2')
-      .slice(0, 14);
-  };
-
-  const validateCPF = (cpfValue: string): boolean => {
-    const cpfClean = cpfValue.replace(/\D/g, '');
-    
-    if (cpfClean.length !== 11) return false;
-    
-    // Check for known invalid patterns (all same digits)
-    if (/^(\d)\1+$/.test(cpfClean)) return false;
-    
-    // Calculate first check digit
-    let sum = 0;
-    for (let i = 0; i < 9; i++) {
-      sum += parseInt(cpfClean[i]) * (10 - i);
-    }
-    let remainder = (sum * 10) % 11;
-    const firstDigit = remainder === 10 ? 0 : remainder;
-    
-    if (parseInt(cpfClean[9]) !== firstDigit) return false;
-    
-    // Calculate second check digit
-    sum = 0;
-    for (let i = 0; i < 10; i++) {
-      sum += parseInt(cpfClean[i]) * (11 - i);
-    }
-    remainder = (sum * 10) % 11;
-    const secondDigit = remainder === 10 ? 0 : remainder;
-    
-    return parseInt(cpfClean[10]) === secondDigit;
-  };
 
   const [companyData, setCompanyData] = useState<CompanyData>({
     razaoSocial: '',
@@ -271,7 +234,7 @@ export const CheckoutModal = ({ open, onOpenChange }: CheckoutModalProps) => {
     }, 3000);
   };
 
-  // Listen for payment confirmation via AbacatePay API + Realtime + DB Polling
+  // Listen for payment confirmation via Asaas status checks + Realtime + DB polling
   useEffect(() => {
     if (!paymentCreated || !currentOrderId || paymentConfirmed) return;
 
@@ -299,13 +262,12 @@ export const CheckoutModal = ({ open, onOpenChange }: CheckoutModalProps) => {
         console.log('Realtime subscription status:', status);
       });
 
-    // Check PIX status directly with AbacatePay API - now also updates DB on server side
+    // Ask Asaas for the charge status (the server confirms the order if it is paid)
     const checkPixStatus = async () => {
       if (!currentPixId) return;
       
       try {
-        console.log('Checking PIX status via AbacatePay API...');
-        const { data, error } = await supabase.functions.invoke('check-pix-status', {
+        const { data, error } = await supabase.functions.invoke('check-asaas-payment', {
           body: { orderId: currentOrderId },
         });
 
@@ -316,7 +278,7 @@ export const CheckoutModal = ({ open, onOpenChange }: CheckoutModalProps) => {
 
         console.log('PIX status response:', data);
         
-        if (data?.data?.status === 'PAID') {
+        if (data?.status === 'PAID') {
           // Server already updated the DB, but verify before confirming
           handlePaymentConfirmed();
         }
@@ -353,8 +315,8 @@ export const CheckoutModal = ({ open, onOpenChange }: CheckoutModalProps) => {
     checkPixStatus();
     checkDbStatus();
 
-    // Poll PIX status every 3 seconds, DB every 5 seconds (more frequent)
-    const pixIntervalId = setInterval(checkPixStatus, 3000);
+    // Poll the Asaas status and the DB every 5 seconds
+    const pixIntervalId = setInterval(checkPixStatus, 5000);
     const dbIntervalId = setInterval(checkDbStatus, 5000);
 
     return () => {
@@ -534,206 +496,52 @@ export const CheckoutModal = ({ open, onOpenChange }: CheckoutModalProps) => {
     }
   };
 
-  const handleCreatePayment = async () => {
+  // One server call creates the order and its Asaas charge; prices come from the server.
+  const handleAsaasPayment = async () => {
     setIsLoading(true);
     try {
-      // Save company data first
       const company = await saveCompanyData();
+      setExistingCompanyId(company.id);
 
-      // Build description from items
-      const description = items.map(item => 
-        `${item.product.name} x ${item.quantity} ${item.product.unit}`
-      ).join(', ');
-
-      // Calculate total in cents (minimum R$1.00 = 100 cents required by AbacatePay)
-      const totalInCents = Math.max(100, Math.round(getTotal() * 100));
-
-      // Format phone number for AbacatePay (expects format like "(11) 4002-8922")
-      const formatPhoneForApi = (phone: string) => {
-        const digits = phone.replace(/\D/g, '');
-        if (digits.length === 11) {
-          return `(${digits.slice(0, 2)}) ${digits.slice(2, 7)}-${digits.slice(7)}`;
-        } else if (digits.length === 10) {
-          return `(${digits.slice(0, 2)}) ${digits.slice(2, 6)}-${digits.slice(6)}`;
-        }
-        return phone;
-      };
-
-      // Use company name as customer name since we removed responsible person data
-      const customer = {
-        name: companyData.nomeFantasia || companyData.razaoSocial,
-        cellphone: formatPhoneForApi(contactData.whatsapp),
-        email: contactData.email,
-        taxId: companyData.cnpj, // Use CNPJ
-      };
-
-      const { data, error } = await supabase.functions.invoke('create-pix-payment', {
+      const { data, error } = await supabase.functions.invoke('create-asaas-payment', {
         body: {
-          amount: totalInCents,
-          items: items.map(item => ({
-            productId: item.product.id,
-            quantity: item.quantity,
-          })),
-          description: description.slice(0, 200), // Limit description length
-          customer,
-          externalId: company.id,
+          companyId: company.id,
+          method: paymentMethod,
+          items: items.map(item => ({ productId: item.product.id, quantity: item.quantity })),
         },
       });
-
       if (error) {
         throw new Error(await getFunctionErrorMessage(error, 'Erro ao criar pagamento'));
       }
+      if (!data?.orderId) throw new Error('Resposta de pagamento inválida');
 
-      // The response should contain the QR code data and the server-created order
-      if (data?.data && data.orderId) {
-        const paymentData = data.data;
-        
-        // Save company ID
-        setExistingCompanyId(company.id);
-        
-        // Store PIX ID for status checking
-        if (paymentData.id) {
-          setCurrentPixId(paymentData.id);
-        }
-        
-        // The order is created server-side together with the PIX charge
-        setCurrentOrderId(data.orderId);
-        
-        // Set QR Code image (base64) and brCode for copy
-        if (paymentData.brCodeBase64) {
-          setQrCodeImage(paymentData.brCodeBase64);
-        }
-        if (paymentData.brCode) {
-          setBrCode(paymentData.brCode);
-        }
-        
-        setPaymentUrl(paymentData.url || null);
-        setPaymentCreated(true);
-        setStep(5);
-        toast({
-          title: "Pedido registrado!",
-          description: "Escaneie o QR Code ou copie o código PIX para pagar.",
-        });
-      } else {
-        throw new Error('Resposta de pagamento inválida');
+      setCurrentOrderId(data.orderId);
+      setChargedTotal(typeof data.totalCents === 'number' ? data.totalCents / 100 : null);
+      setPaymentUrl(data.invoiceUrl || null);
+
+      if (paymentMethod === 'card') {
+        // Card data is entered on Asaas' payment page, never on our site.
+        window.location.href = data.invoiceUrl;
+        return;
       }
+
+      if (paymentMethod === 'pix') {
+        setQrCodeImage(data.pix?.image ?? null);
+        setBrCode(data.pix?.payload ?? null);
+        // Enables the status polling below.
+        setCurrentPixId(data.orderId);
+        toast({ title: "Pedido registrado!", description: "Escaneie o QR Code ou copie o código Pix para pagar." });
+      } else {
+        setBoletoUrl(data.boleto?.url ?? data.invoiceUrl ?? null);
+        setBoletoLine(data.boleto?.identificationField ?? null);
+        toast({ title: "Boleto gerado!", description: "Abra o boleto ou copie a linha digitável para pagar." });
+      }
+      setPaymentCreated(true);
+      setStep(5);
     } catch (error) {
       console.error('Payment error:', error);
       toast({
         title: "Erro ao processar pedido",
-        description: error instanceof Error ? error.message : "Tente novamente mais tarde.",
-        variant: "destructive",
-      });
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleStripeCheckout = async () => {
-    setIsLoading(true);
-    try {
-      // Save company data first
-      const company = await saveCompanyData();
-      setExistingCompanyId(company.id);
-
-      // Prices and product names are resolved server-side
-      const cartItems = items.map(item => ({
-        productId: item.product.id,
-        quantity: item.quantity,
-      }));
-
-      const { data, error } = await supabase.functions.invoke('create-stripe-checkout', {
-        body: {
-          items: cartItems,
-          companyId: company.id,
-          customerEmail: contactData.email,
-          customerName: companyData.nomeFantasia || companyData.razaoSocial,
-        },
-      });
-
-      if (error) {
-        throw new Error(await getFunctionErrorMessage(error, 'Erro ao criar checkout'));
-      }
-
-      if (data?.url) {
-        // Redirect to Stripe checkout in the same window
-        window.location.href = data.url;
-      } else {
-        throw new Error('URL de checkout não retornada');
-      }
-    } catch (error) {
-      console.error('Stripe checkout error:', error);
-      toast({
-        title: "Erro ao processar pagamento",
-        description: error instanceof Error ? error.message : "Tente novamente mais tarde.",
-        variant: "destructive",
-      });
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleBoletoPayment = async () => {
-    setIsLoading(true);
-    try {
-      // Save company data first
-      const company = await saveCompanyData();
-      setExistingCompanyId(company.id);
-
-      // The order is created and priced server-side together with the boleto
-      const { data, error } = await supabase.functions.invoke('create-boleto-payment', {
-        body: {
-          items: items.map(item => ({
-            productId: item.product.id,
-            quantity: item.quantity,
-          })),
-          company_id: company.id,
-          customer_email: contactData.email,
-          customer_name: companyData.nomeFantasia || companyData.razaoSocial,
-          customer_cpf: boletoCpf.replace(/\D/g, ''),
-          address: {
-            line1: addressData.endereco
-              ? `${addressData.endereco}, ${addressData.numero}`
-              : 'Avenida Antonio Ramos Alvim, 1084',
-            line2: addressData.complemento || undefined,
-            city: addressData.cidade || 'Joinville',
-            state: addressData.estado || 'SC',
-            postal_code: (addressData.cep.replace(/\D/g, '') || '89219000'),
-          },
-        },
-      });
-
-      if (error) {
-        throw new Error(await getFunctionErrorMessage(error, 'Erro ao criar boleto'));
-      }
-
-      if (data?.boleto_url) {
-        setCurrentOrderId(data.order_id);
-        setBoletoUrl(data.boleto_url);
-        setPaymentCreated(true);
-        setStep(5);
-
-        toast({
-          title: "Boleto gerado!",
-          description: "Clique para abrir e pagar o boleto.",
-        });
-      } else {
-        // Boleto might need confirmation step - open Stripe page
-        if (data?.client_secret) {
-          toast({
-            title: "Boleto em processamento",
-            description: "O boleto será disponibilizado em breve.",
-          });
-          setPaymentCreated(true);
-          setStep(5);
-        } else {
-          throw new Error('Resposta de boleto inválida');
-        }
-      }
-    } catch (error) {
-      console.error('Boleto payment error:', error);
-      toast({
-        title: "Erro ao gerar boleto",
         description: error instanceof Error ? error.message : "Tente novamente mais tarde.",
         variant: "destructive",
       });
@@ -752,12 +560,6 @@ export const CheckoutModal = ({ open, onOpenChange }: CheckoutModalProps) => {
       case 3:
         return !!(contactData.whatsapp && contactData.email);
       case 4:
-        // For boleto, require valid CPF
-        if (paymentMethod === 'boleto') {
-          if (!validateCPF(boletoCpf)) {
-            return false;
-          }
-        }
         return true;
       default:
         return true;
@@ -769,24 +571,6 @@ export const CheckoutModal = ({ open, onOpenChange }: CheckoutModalProps) => {
       // Step 2 (address) was removed: go straight from company to contacts
       setStep(prev => Math.min(prev === 1 ? 3 : prev + 1, 5));
     } else {
-      // Custom error message for CPF validation
-      if (step === 4 && paymentMethod === 'boleto') {
-        const cpfDigits = boletoCpf.replace(/\D/g, '');
-        if (cpfDigits.length !== 11) {
-          toast({
-            title: "CPF inválido",
-            description: "O CPF deve ter 11 dígitos.",
-            variant: "destructive",
-          });
-        } else if (!validateCPF(boletoCpf)) {
-          toast({
-            title: "CPF inválido",
-            description: "Os dígitos verificadores do CPF são inválidos.",
-            variant: "destructive",
-          });
-        }
-        return;
-      }
       toast({
         title: "Campos obrigatórios",
         description: "Preencha todos os campos obrigatórios antes de continuar.",
@@ -813,7 +597,9 @@ export const CheckoutModal = ({ open, onOpenChange }: CheckoutModalProps) => {
     setQrCodeImage(null);
     setBrCode(null);
     setBoletoUrl(null);
-    setBoletoCpf('');
+    setBoletoLine(null);
+    setChargedTotal(null);
+    setCurrentPixId(null);
     setPaymentCreated(false);
     setPaymentConfirmed(false);
     setCurrentOrderId(null);
@@ -1111,7 +897,7 @@ export const CheckoutModal = ({ open, onOpenChange }: CheckoutModalProps) => {
                 >
                   <FileText className={cn("w-8 h-8", paymentMethod === 'boleto' ? "text-primary" : "text-muted-foreground")} />
                   <span className={cn("font-medium text-sm", paymentMethod === 'boleto' ? "text-primary" : "text-foreground")}>Boleto</span>
-                  <span className="text-xs text-muted-foreground text-center">28 dias para pagar</span>
+                  <span className="text-xs text-muted-foreground text-center">Vence em 3 dias</span>
                 </button>
                 <button
                   type="button"
@@ -1125,32 +911,23 @@ export const CheckoutModal = ({ open, onOpenChange }: CheckoutModalProps) => {
                 >
                   <CreditCard className={cn("w-8 h-8", paymentMethod === 'card' ? "text-primary" : "text-muted-foreground")} />
                   <span className={cn("font-medium text-sm", paymentMethod === 'card' ? "text-primary" : "text-foreground")}>Cartão</span>
-                  <span className="text-xs text-muted-foreground text-center">Crédito/Débito</span>
+                  <span className="text-xs text-muted-foreground text-center">Crédito</span>
                 </button>
               </div>
             </div>
 
-            {/* CPF field for Boleto */}
             {paymentMethod === 'boleto' && (
-              <div className="mt-4">
-                <Label htmlFor="boletoCpf">CPF do Responsável *</Label>
-                <Input
-                  id="boletoCpf"
-                  value={boletoCpf}
-                  onChange={(e) => setBoletoCpf(formatCPF(e.target.value))}
-                  placeholder="000.000.000-00"
-                  className="mt-1"
-                />
-                <p className="text-xs text-muted-foreground mt-1">
-                  O CPF é obrigatório para emissão do boleto bancário.
+              <div className="mt-4 p-3 bg-warning-soft border border-warning/30 rounded-lg">
+                <p className="text-sm text-warning-soft-foreground flex items-center gap-2">
+                  <FileText className="w-4 h-4 flex-shrink-0" />
+                  <span>O boleto sai no CNPJ da empresa e vence em <strong>3 dias</strong>.</span>
                 </p>
-                <div className="mt-3 p-3 bg-warning-soft border border-warning/30 rounded-lg">
-                  <p className="text-sm text-warning-soft-foreground flex items-center gap-2">
-                    <FileText className="w-4 h-4 flex-shrink-0" />
-                    <span>O boleto vence em <strong>28 dias</strong> após a emissão.</span>
-                  </p>
-                </div>
               </div>
+            )}
+            {paymentMethod === 'card' && (
+              <p className="mt-4 text-xs text-muted-foreground">
+                Você será levado à página segura do Asaas para digitar os dados do cartão.
+              </p>
             )}
           </div>
         )}
@@ -1201,12 +978,12 @@ export const CheckoutModal = ({ open, onOpenChange }: CheckoutModalProps) => {
                   </div>
                 )}
                 
-                <div className="p-4 rounded-lg bg-secondary/50 border">
-                  <p className="text-sm font-medium text-foreground mb-2">Entre em contato para valores:</p>
-                  <p className="text-lg font-display font-bold text-primary">Consulte-nos</p>
-                  <p className="text-sm text-muted-foreground mt-1">(47) 99149-0027</p>
-                  <p className="text-sm text-muted-foreground">vendas@fnzsupply.com.br</p>
-                </div>
+                {chargedTotal !== null && (
+                  <div className="p-4 rounded-lg bg-secondary/50 border">
+                    <p className="text-sm text-muted-foreground">Valor a pagar</p>
+                    <p className="text-2xl font-display font-bold text-primary tabular-nums">{formatPrice(chargedTotal)}</p>
+                  </div>
+                )}
                 
                 {/* Copy PIX Code Button */}
                 {brCode && (
@@ -1301,17 +1078,37 @@ export const CheckoutModal = ({ open, onOpenChange }: CheckoutModalProps) => {
                   </p>
                 </div>
                 
-                <div className="p-4 rounded-lg bg-secondary/50 border">
-                  <p className="text-sm font-medium text-foreground mb-2">Entre em contato para valores:</p>
-                  <p className="text-lg font-display font-bold text-primary">Consulte-nos</p>
-                  <p className="text-sm text-muted-foreground mt-1">(47) 99149-0027</p>
-                  <p className="text-sm text-muted-foreground">vendas@fnzsupply.com.br</p>
-                </div>
+                {chargedTotal !== null && (
+                  <div className="p-4 rounded-lg bg-secondary/50 border">
+                    <p className="text-sm text-muted-foreground">Valor a pagar</p>
+                    <p className="text-2xl font-display font-bold text-primary tabular-nums">{formatPrice(chargedTotal)}</p>
+                  </div>
+                )}
 
                 <div className="p-3 rounded-lg bg-warning-soft border border-warning/30 text-warning-soft-foreground text-sm">
-                  <strong>Importante:</strong> O boleto vence em 28 dias. Após o pagamento, pode levar até 3 dias úteis para compensação.
+                  <strong>Importante:</strong> O boleto vence em 3 dias. Após o pagamento, a compensação leva até 3 dias úteis.
                 </div>
                 
+                {boletoLine && (
+                  <div className="space-y-2 text-left">
+                    <p className="text-xs text-muted-foreground">Linha digitável:</p>
+                    <div className="flex gap-2">
+                      <Input value={boletoLine} readOnly className="text-xs font-mono" />
+                      <Button
+                        variant="outline"
+                        size="icon"
+                        aria-label="Copiar linha digitável"
+                        onClick={() => {
+                          navigator.clipboard.writeText(boletoLine);
+                          toast({ title: "Linha digitável copiada!", description: "Cole no app do seu banco para pagar." });
+                        }}
+                      >
+                        <Copy className="w-4 h-4" />
+                      </Button>
+                    </div>
+                  </div>
+                )}
+
                 {boletoUrl && (
                   <Button
                     size="lg"
@@ -1374,14 +1171,8 @@ export const CheckoutModal = ({ open, onOpenChange }: CheckoutModalProps) => {
               </Button>
             ) : (
               <Button 
-                onClick={
-                  paymentMethod === 'pix' 
-                    ? handleCreatePayment 
-                    : paymentMethod === 'boleto' 
-                      ? handleBoletoPayment 
-                      : handleStripeCheckout
-                } 
-                disabled={isLoading || (paymentMethod === 'boleto' && boletoCpf.replace(/\D/g, '').length !== 11)}
+                onClick={handleAsaasPayment}
+                disabled={isLoading}
                 className="gap-2"
               >
                 {isLoading ? (
