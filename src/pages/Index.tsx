@@ -1,7 +1,6 @@
 import { Layout } from "@/components/layout/Layout";
 import { SEO } from "@/components/SEO";
 import { HeroSection } from "@/components/home/HeroSection";
-import { EnvelopeBanner } from "@/components/home/EnvelopeBanner";
 import { FeaturedProducts } from "@/components/home/FeaturedProducts";
 import { QuickOrder } from "@/components/home/QuickOrder";
 import { CTASection } from "@/components/home/CTASection";
@@ -18,7 +17,6 @@ const Index = () => {
       <FeaturedProducts />
       <QuickOrder />
       <CTASection />
-      <EnvelopeBanner />
     </Layout>
   );
 };
