@@ -23,3 +23,4 @@
 - **2026-10-29**: adotado fluxo Issue → PR → deploy (`AGENTS.md`, template de PR); Issues #25–#32 abertas para as tarefas pendentes
 - **2026-10-29**: CI com Knip, Vitest (36 testes, inclui conferência de todos os preços site × servidor) e Playwright (12 testes E2E, desktop e celular); removido código morto (drizzle, componentes sem uso); botão de senha do login ganhou aria-label
 - **2026-10-29**: skeletons no lugar de spinners (pedidos, admin, carregamento de página), entrada curta de páginas e cards, imagens lazy, `prefers-reduced-motion` respeitado; skill design-motion-principles instalada
+- **2026-10-29**: Pix testado em produção (pedido #DB18520E, R$ 1,00, e-mail chegou). E-mail pós-compra redesenhado (logo, selo de sucesso, próximo passo, WhatsApp, endereço sem link do Gmail) e etapa de pagamento com Pix recomendado, valor no botão e sinais de confiança
