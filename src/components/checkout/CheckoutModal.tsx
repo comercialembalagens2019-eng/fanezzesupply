@@ -7,6 +7,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useCart } from "@/contexts/CartContext";
 import { useAuth } from "@/contexts/AuthContext";
+import { products } from "@/data/products";
 import { supabase } from "@/integrations/supabase/client";
 import { getFunctionErrorMessage } from "@/lib/functionErrors";
 import { getUnitPrice, shippingFor } from "@/lib/pricing";
@@ -76,7 +77,10 @@ const formatCEP = (value: string) => {
 
 export const CheckoutModal = ({ open, onOpenChange }: CheckoutModalProps) => {
   const { items, getTotal, clearCart } = useCart();
-  const { user } = useAuth();
+  const { user, isAdmin } = useAuth();
+  // Admin buying only the test product: billed to FNZ itself, so the company form is skipped.
+  const isTestOrder =
+    isAdmin && items.length > 0 && items.every((item) => products.find((p) => p.id === item.product.id)?.adminOnly);
   const [step, setStep] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
   const [isLoadingCompany, setIsLoadingCompany] = useState(false);
@@ -127,6 +131,10 @@ export const CheckoutModal = ({ open, onOpenChange }: CheckoutModalProps) => {
     const loadUserCompany = async () => {
       // Don't load/change step if payment was already created
       if (!user || !open || paymentCreated) return;
+      if (isTestOrder) {
+        setStep(4);
+        return;
+      }
       
       setIsLoadingCompany(true);
       try {
@@ -184,7 +192,7 @@ export const CheckoutModal = ({ open, onOpenChange }: CheckoutModalProps) => {
     };
 
     loadUserCompany();
-  }, [user, open, paymentCreated]);
+  }, [user, open, paymentCreated, isTestOrder]);
 
   // Handle payment confirmation - verify DB status before confirming
   const handlePaymentConfirmed = async () => {
@@ -328,7 +336,7 @@ export const CheckoutModal = ({ open, onOpenChange }: CheckoutModalProps) => {
   }, [paymentCreated, currentOrderId, currentPixId, paymentConfirmed, clearCart, onOpenChange, navigate]);
 
   // Charged by the server from the company's saved address; shown here before paying.
-  const shipping = shippingFor(addressData.cidade, addressData.estado);
+  const shipping = isTestOrder ? 0 : shippingFor(addressData.cidade, addressData.estado);
 
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat("pt-BR", {
@@ -500,12 +508,12 @@ export const CheckoutModal = ({ open, onOpenChange }: CheckoutModalProps) => {
   const handleAsaasPayment = async () => {
     setIsLoading(true);
     try {
-      const company = await saveCompanyData();
-      setExistingCompanyId(company.id);
+      const company = isTestOrder ? null : await saveCompanyData();
+      if (company) setExistingCompanyId(company.id);
 
       const { data, error } = await supabase.functions.invoke('create-asaas-payment', {
         body: {
-          companyId: company.id,
+          ...(company ? { companyId: company.id } : { testOrder: true }),
           method: paymentMethod,
           items: items.map(item => ({ productId: item.product.id, quantity: item.quantity })),
         },
@@ -1157,7 +1165,7 @@ export const CheckoutModal = ({ open, onOpenChange }: CheckoutModalProps) => {
             <Button
               variant="outline"
               onClick={prevStep}
-              disabled={step === 1}
+              disabled={step === 1 || isTestOrder}
               className="gap-2"
             >
               <ChevronLeft className="w-4 h-4" />

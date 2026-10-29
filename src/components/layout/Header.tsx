@@ -61,7 +61,7 @@ export function Header() {
                 type="search"
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
-                placeholder="Buscar envelope, tamanho ou stretch…"
+                placeholder="Buscar envelope ou tamanho…"
                 className="w-full bg-transparent text-sm text-foreground placeholder:text-muted-foreground focus:outline-none"
               />
             </label>

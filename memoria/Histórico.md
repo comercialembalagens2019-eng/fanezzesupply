@@ -16,3 +16,4 @@
 - **2026-10-29**: domínio virado para o site novo (o dono escolheu virar antes do Asaas, sabendo que o pagamento fica indisponível até lá)
 - **2026-10-29**: Resend Forge — removidos MX/TXT antigos (Amazon SES) em send.fanezzesupply.com.br que conflitavam com o CNAME (workflow `resend-dns.yml`)
 - **2026-10-29**: integração Asaas (Pix, boleto, cartão) no checkout; produto teste passa a ter mínimo de 500 un (R$ 5,00)
+- **2026-10-29**: stretch removido do site e do catálogo; pedido de teste do admin (só produto teste) pula o cadastro e vai direto ao pagamento, faturado no CNPJ da FNZ

@@ -58,7 +58,7 @@ const Produtos = () => {
     <Layout>
       <SEO
         title="Nossos Produtos — FNZ Supply"
-        description="Envelopes de segurança COEX, cinza e personalizados e filme stretch para empresas. Tabela de preço por quantidade e pedido mínimo acessível."
+        description="Envelopes de segurança COEX, cinza e personalizados para empresas. Tabela de preço por quantidade e pedido mínimo acessível."
         path="/produtos"
       />
       <Helmet>
