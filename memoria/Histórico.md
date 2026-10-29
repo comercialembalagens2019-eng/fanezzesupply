@@ -14,3 +14,4 @@
 - **2026-10-29**: logo nova (FNZ Supply, azul e amarelo) no topo, rodapé e páginas de login/cadastro (`src/components/Logo.tsx`)
 - **2026-10-29**: removida a seção "Tabelas de preço" da home (imagens ficavam no Lovable); favicon novo veio de uma edição no Lovable, que também apagou tipos do Supabase (restaurados)
 - **2026-10-29**: domínio virado para o site novo (o dono escolheu virar antes do Asaas, sabendo que o pagamento fica indisponível até lá)
+- **2026-10-29**: Resend Forge — removidos MX/TXT antigos (Amazon SES) em send.fanezzesupply.com.br que conflitavam com o CNAME (workflow `resend-dns.yml`)
