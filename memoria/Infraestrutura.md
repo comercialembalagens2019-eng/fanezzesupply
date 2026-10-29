@@ -7,7 +7,7 @@
 
 ## Hospedagem
 - Cloudflare Pages, projeto `fnzsupply` → https://fnzsupply.pages.dev
-- DNS do domínio já está no Cloudflare; registro A ainda aponta para o Lovable (185.158.133.1)
+- fanezzesupply.com.br e www: CNAME com proxy para fnzsupply.pages.dev (o Lovable saiu do ar). Script: `scripts/cloudflare-domain.mjs`
 
 ## E-mail
 - Resend, domínio fanezzesupply.com.br verificado (sa-east-1)
@@ -21,6 +21,7 @@
 | `keepalive.yml` | a cada 3 dias | evita pausa do Supabase free |
 | `backup.yml` | semanal | exporta tabelas e usuários (artefato 90 dias) |
 | `test-email.yml` | manual | envia e-mails de exemplo |
+| `domain.yml` | manual | aponta o domínio para o Pages |
 
 ## Secrets do GitHub
 `SUPABASE_ACCESS_TOKEN`, `CLOUDFLARE_API_TOKEN`, `CLOUDFLARE_ACCOUNT_ID`, `RESEND_API_KEY`.
