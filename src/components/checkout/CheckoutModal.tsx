@@ -13,7 +13,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { getFunctionErrorMessage } from "@/lib/functionErrors";
 import { getUnitPrice, shippingFor } from "@/lib/pricing";
 import { toast } from "@/hooks/use-toast";
-import { Loader2, QrCode, Building2, MapPin, Phone, ChevronRight, ChevronLeft, CheckCircle, Copy, Home, ShoppingBag, PartyPopper, CreditCard, LogIn, FileText, ExternalLink } from "lucide-react";
+import { Loader2, QrCode, Building2, MapPin, Phone, ChevronRight, ChevronLeft, CheckCircle, Copy, Home, ShoppingBag, PartyPopper, CreditCard, LogIn, FileText, ExternalLink, Lock, ShieldCheck } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
@@ -75,6 +75,13 @@ const formatCEP = (value: string) => {
     .replace(/(\d{5})(\d)/, '$1-$2')
     .slice(0, 9);
 };
+
+// Pix first and suggested: it confirms in seconds and costs the customer nothing extra.
+const PAYMENT_OPTIONS = [
+  { id: 'pix', label: 'Pix', hint: 'Aprovação na hora, sem taxa extra', icon: QrCode, badge: 'Recomendado' },
+  { id: 'boleto', label: 'Boleto', hint: 'Vence em 3 dias · também traz um Pix', icon: FileText, badge: null },
+  { id: 'card', label: 'Cartão de crédito', hint: 'Visa e Mastercard, à vista', icon: CreditCard, badge: null },
+] as const;
 
 export const CheckoutModal = ({ open, onOpenChange }: CheckoutModalProps) => {
   const { items, getTotal, clearCart } = useCart();
@@ -836,103 +843,89 @@ export const CheckoutModal = ({ open, onOpenChange }: CheckoutModalProps) => {
 
         {/* Step 4: Payment Selection */}
         {step === 4 && !paymentCreated && (
-          <div className="space-y-4">
-            {/* Pickup Only Notice */}
-            <div className="p-3 rounded-lg bg-warning-soft border border-warning/30 flex items-center gap-3">
-              <MapPin className="w-5 h-5 text-warning flex-shrink-0" />
-              <div>
-                <p className="font-medium text-warning-soft-foreground text-sm">Frete grátis para Joinville</p>
-                <p className="text-warning-soft-foreground text-xs">Demais localidades: R$ 19,90.</p>
-              </div>
-            </div>
-
-            {/* Order Summary */}
-            <div className="p-4 rounded-lg bg-secondary/50 border">
-              <h4 className="font-semibold text-foreground mb-3">Resumo do Pedido</h4>
+          <div className="space-y-5">
+            {/* Order summary: transparent pricing, total stated once and clearly */}
+            <div className="rounded-2xl bg-secondary/50 p-4">
+              <h4 className="font-semibold text-foreground mb-3">Resumo do pedido</h4>
               <div className="space-y-2 text-sm">
                 {items.map(item => (
-                  <div key={item.product.id} className="flex justify-between">
+                  <div key={item.product.id} className="flex justify-between gap-4">
                     <span className="text-muted-foreground">
-                      {item.product.name} x {item.quantity}
+                      {item.product.name} × {item.quantity.toLocaleString("pt-BR")}
                     </span>
                     <span className="font-medium text-foreground tabular-nums">
                       {formatPrice(getUnitPrice(item.product.id, item.quantity, item.product.price) * item.quantity)}
                     </span>
                   </div>
                 ))}
-                <div className="flex justify-between">
+                <div className="flex justify-between gap-4">
                   <span className="text-muted-foreground">
                     Frete{addressData.cidade ? ` (${addressData.cidade}/${addressData.estado})` : ""}
                   </span>
-                  <span className="font-medium text-foreground tabular-nums">
-                    {shipping === 0 ? "Grátis" : formatPrice(shipping)}
-                  </span>
-                </div>
-                <div className="border-t pt-2 mt-2 flex justify-between font-bold">
-                  <span>Total</span>
-                  <span className="text-foreground tabular-nums">{formatPrice(getTotal() + shipping)}</span>
-                </div>
-              </div>
-            </div>
-
-            <div>
-              <h4 className="font-semibold text-foreground mb-3">Forma de Pagamento</h4>
-              <div className={cn("grid gap-3", ABACATEPAY_PUBLIC_KEY ? "grid-cols-3" : "grid-cols-2")}>
-                <button
-                  type="button"
-                  onClick={() => setPaymentMethod('pix')}
-                  className={cn(
-                    "flex flex-col items-center gap-2 p-4 rounded-lg border-2 transition-all",
-                    paymentMethod === 'pix'
-                      ? "border-primary bg-primary/5"
-                      : "border-muted hover:border-primary/50"
+                  {shipping === 0 ? (
+                    <span className="font-semibold text-success">Grátis</span>
+                  ) : (
+                    <span className="font-medium text-foreground tabular-nums">{formatPrice(shipping)}</span>
                   )}
-                >
-                  <QrCode className={cn("w-8 h-8", paymentMethod === 'pix' ? "text-primary" : "text-muted-foreground")} />
-                  <span className={cn("font-medium text-sm", paymentMethod === 'pix' ? "text-primary" : "text-foreground")}>PIX</span>
-                  <span className="text-xs text-muted-foreground text-center">Instantâneo</span>
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setPaymentMethod('boleto')}
-                  className={cn(
-                    "flex flex-col items-center gap-2 p-4 rounded-lg border-2 transition-all",
-                    paymentMethod === 'boleto'
-                      ? "border-primary bg-primary/5"
-                      : "border-muted hover:border-primary/50"
-                  )}
-                >
-                  <FileText className={cn("w-8 h-8", paymentMethod === 'boleto' ? "text-primary" : "text-muted-foreground")} />
-                  <span className={cn("font-medium text-sm", paymentMethod === 'boleto' ? "text-primary" : "text-foreground")}>Boleto</span>
-                  <span className="text-xs text-muted-foreground text-center">Vence em 3 dias</span>
-                </button>
-                {ABACATEPAY_PUBLIC_KEY && (
-                  <button
-                    type="button"
-                    onClick={() => setPaymentMethod('card')}
-                    className={cn(
-                      "flex flex-col items-center gap-2 p-4 rounded-lg border-2 transition-all",
-                      paymentMethod === 'card'
-                        ? "border-primary bg-primary/5"
-                        : "border-muted hover:border-primary/50"
-                    )}
-                  >
-                    <CreditCard className={cn("w-8 h-8", paymentMethod === 'card' ? "text-primary" : "text-muted-foreground")} />
-                    <span className={cn("font-medium text-sm", paymentMethod === 'card' ? "text-primary" : "text-foreground")}>Cartão</span>
-                    <span className="text-xs text-muted-foreground text-center">Crédito</span>
-                  </button>
+                </div>
+                <div className="border-t border-border pt-3 mt-1 flex items-baseline justify-between">
+                  <span className="font-semibold text-foreground">Total</span>
+                  <span className="text-xl font-extrabold text-foreground tabular-nums">{formatPrice(getTotal() + shipping)}</span>
+                </div>
+                {shipping > 0 && (
+                  <p className="text-xs text-muted-foreground">Frete grátis para Joinville/SC.</p>
                 )}
               </div>
             </div>
 
-            {paymentMethod === 'boleto' && (
-              <div className="mt-4 p-3 bg-warning-soft border border-warning/30 rounded-lg">
-                <p className="text-sm text-warning-soft-foreground flex items-center gap-2">
-                  <FileText className="w-4 h-4 flex-shrink-0" />
-                  <span>O boleto sai no CNPJ da empresa e vence em <strong>3 dias</strong>. Ele também traz um Pix para pagar na hora.</span>
-                </p>
+            {/* Payment method: radio group, Pix suggested first */}
+            <div>
+              <h4 id="payment-method-label" className="font-semibold text-foreground mb-3">Como você prefere pagar?</h4>
+              <div role="radiogroup" aria-labelledby="payment-method-label" className="space-y-2">
+                {PAYMENT_OPTIONS.filter((option) => option.id !== 'card' || ABACATEPAY_PUBLIC_KEY).map((option) => {
+                  const selected = paymentMethod === option.id;
+                  return (
+                    <button
+                      key={option.id}
+                      type="button"
+                      role="radio"
+                      aria-checked={selected}
+                      onClick={() => setPaymentMethod(option.id)}
+                      className={cn(
+                        "w-full flex items-center gap-3 p-3.5 rounded-xl border-2 text-left transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+                        selected ? "border-primary bg-primary/5" : "border-border hover:border-primary/40"
+                      )}
+                    >
+                      <span className={cn("w-10 h-10 rounded-lg grid place-items-center shrink-0", selected ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground")}>
+                        <option.icon className="w-5 h-5" aria-hidden="true" />
+                      </span>
+                      <span className="flex-1 min-w-0">
+                        <span className="flex items-center gap-2">
+                          <span className="font-semibold text-foreground">{option.label}</span>
+                          {option.badge && (
+                            <span className="text-[11px] font-bold rounded-full px-2 py-0.5 bg-success/15 text-success">{option.badge}</span>
+                          )}
+                        </span>
+                        <span className="block text-xs text-muted-foreground">{option.hint}</span>
+                      </span>
+                      <span
+                        aria-hidden="true"
+                        className={cn("w-5 h-5 rounded-full border-2 grid place-items-center shrink-0", selected ? "border-primary" : "border-muted-foreground/40")}
+                      >
+                        {selected && <span className="w-2.5 h-2.5 rounded-full bg-primary" />}
+                      </span>
+                    </button>
+                  );
+                })}
               </div>
-            )}
+            </div>
+
+            {/* Quiet trust signals */}
+            <ul className="flex flex-wrap justify-center gap-x-4 gap-y-1 text-xs text-muted-foreground">
+              <li className="flex items-center gap-1.5"><Lock className="w-3.5 h-3.5" aria-hidden="true" /> Pagamento seguro</li>
+              <li className="flex items-center gap-1.5"><FileText className="w-3.5 h-3.5" aria-hidden="true" /> NF-e em todo pedido</li>
+              <li className="flex items-center gap-1.5"><ShieldCheck className="w-3.5 h-3.5" aria-hidden="true" /> Dados protegidos</li>
+            </ul>
           </div>
         )}
 
@@ -1216,17 +1209,17 @@ export const CheckoutModal = ({ open, onOpenChange }: CheckoutModalProps) => {
                 ) : paymentMethod === 'pix' ? (
                   <>
                     <QrCode className="w-4 h-4" />
-                    Gerar QR Code PIX
+                    Pagar {formatPrice(getTotal() + shipping)} com Pix
                   </>
                 ) : paymentMethod === 'boleto' ? (
                   <>
                     <FileText className="w-4 h-4" />
-                    Gerar Boleto
+                    Gerar boleto de {formatPrice(getTotal() + shipping)}
                   </>
                 ) : (
                   <>
                     <CreditCard className="w-4 h-4" />
-                    Pagar com Cartão
+                    Pagar {formatPrice(getTotal() + shipping)} no cartão
                   </>
                 )}
               </Button>
