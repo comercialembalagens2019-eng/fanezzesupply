@@ -95,6 +95,7 @@ const Checkout = () => {
                         <div className="w-16 h-16 rounded-lg bg-secondary overflow-hidden flex-shrink-0">
                           <img
                             src={item.product.image}
+                            loading="lazy"
                             alt={item.product.name}
                             className="w-full h-full object-cover"
                           />

@@ -4,6 +4,7 @@ import {
   Building2, CheckCircle2, ChevronDown, ChevronUp, Clock, CreditCard, FileText, Loader2, Mail, MapPin,
   Package, PackageCheck, Phone, QrCode, Search, ShoppingCart, Truck, Users, XCircle,
 } from "lucide-react";
+import { ListSkeleton } from "@/components/skeletons";
 import { Layout } from "@/components/layout/Layout";
 import { SEO } from "@/components/SEO";
 import { supabase } from "@/integrations/supabase/client";
@@ -216,7 +217,7 @@ export default function Admin() {
   if (authLoading || !isAdmin) {
     return (
       <Layout>
-        <div className="min-h-[60vh] grid place-items-center"><Loader2 className="w-8 h-8 animate-spin" /></div>
+        <div className="container-custom py-8"><ListSkeleton rows={4} /></div>
       </Layout>
     );
   }
@@ -271,7 +272,7 @@ export default function Admin() {
         </div>
 
         {loading ? (
-          <div className="py-20 grid place-items-center"><Loader2 className="w-8 h-8 animate-spin" /></div>
+          <ListSkeleton rows={4} />
         ) : tab === "orders" ? (
           <div className="space-y-3">
             <div className="flex flex-wrap gap-2">

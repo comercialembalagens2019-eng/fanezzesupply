@@ -12,3 +12,4 @@
 - **Não instalar caveman nem rtk**: caveman deixa as respostas telegráficas (o dono precisa de explicações claras em PT); rtk é um binário que intercepta o shell e precisaria ser reinstalado a cada sessão na nuvem, com ganho pequeno aqui
 - **AbacatePay no lugar do Asaas**: a conta Asaas disponível é no CPF do dono e o CNPJ ficou preso; AbacatePay tem Pix mais barato (R$ 0,80)
 - **Toda tarefa vira Issue e todo deploy passa por PR** citando a Issue (`Closes #N`); regras em `AGENTS.md`, válidas para qualquer agente
+- **Movimento com contenção**: entradas de 220 ms com ease-out forte e nada em interações frequentes (skill design-motion-principles, lente e-commerce). Não animar "todos os elementos"

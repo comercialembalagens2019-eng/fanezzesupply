@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo, useEffect, type CSSProperties } from "react";
 import { useSearchParams } from "react-router-dom";
 import { Search, Grid3X3, LayoutList } from "lucide-react";
 import { Layout } from "@/components/layout/Layout";
@@ -177,8 +177,8 @@ const Produtos = () => {
                 {filteredProducts.map((product, index) => (
                   <div
                     key={product.id}
-                    className="animate-scale-in"
-                    style={{ animationDelay: `${index * 0.05}s` }}
+                    className="animate-enter"
+                    style={{ "--enter-delay": `${Math.min(index, 8) * 40}ms` } as CSSProperties}
                   >
                     <ProductCard product={product} />
                   </div>
