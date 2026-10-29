@@ -1,0 +1,18 @@
+name: Check Asaas account
+
+# Manual: shows which Asaas account (CPF or CNPJ) the ASAAS_API_KEY secret receives into.
+on:
+  workflow_dispatch:
+
+jobs:
+  account:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Show account owner
+        env:
+          ASAAS_API_KEY: ${{ secrets.ASAAS_API_KEY }}
+        run: node scripts/asaas-account.mjs
