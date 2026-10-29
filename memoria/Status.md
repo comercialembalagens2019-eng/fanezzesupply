@@ -24,4 +24,5 @@ Atualizado em: 2026-10-28
 - [x] **Cartão** pelo AbacatePay (abacatepay.js + `pay-abacate-card`), chave pública no GitHub desde 2026-10-29 — falta testar com cartão real
 - [ ] **Asaas**: conta atual é pessoa física (CPF do dono); CNPJ preso em outra conta, aguardando suporte. Site não usa mais o Asaas
 - [ ] **Fotos dos outros produtos** (stretch e demais): o dono vai mandar
-- [ ] Fase 5: mais testes, refatorar `CheckoutModal`
+- [x] Testes no CI (Vitest + Playwright + Knip)
+- [ ] Refatorar `CheckoutModal` (Issue #31)

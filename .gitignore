@@ -33,3 +33,8 @@ supabase/.temp/
 # Obsidian per-device state
 memoria/.obsidian/workspace*.json
 memoria/.trash/
+
+# Test output
+coverage/
+playwright-report/
+test-results/

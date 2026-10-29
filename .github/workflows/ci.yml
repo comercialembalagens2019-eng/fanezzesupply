@@ -1,4 +1,5 @@
-# Checks every pull request and push: lint, types, unit tests and production build.
+# Checks every pull request and push: lint, types, dead code, unit tests, build and
+# end-to-end smoke tests against the production build.
 name: CI
 
 on:
@@ -18,9 +19,26 @@ jobs:
       - run: npm ci --no-audit --no-fund
       - run: npx eslint .
       - run: npx tsc -p tsconfig.app.json --noEmit
+      - name: Dead code (Knip)
+        run: npm run knip
+      - name: Unit tests with coverage
+        run: npm run test:coverage
       - run: npm run build
       - uses: denoland/setup-deno@v2
         with:
           deno-version: v2.x
       - name: Edge function tests
         run: deno test supabase/functions/_shared/
+      - name: Install Playwright Chromium
+        run: npx playwright install --with-deps chromium
+      - name: End-to-end smoke tests
+        run: npm run test:e2e
+      - name: Upload reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-reports
+          path: |
+            coverage/
+            playwright-report/
+          retention-days: 14

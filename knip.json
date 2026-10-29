@@ -1,0 +1,32 @@
+{
+  "$schema": "https://unpkg.com/knip@6/schema.json",
+  "entry": [
+    "e2e/**/*.spec.ts",
+    "scripts/*.mjs"
+  ],
+  "project": [
+    "src/**/*.{ts,tsx}",
+    "e2e/**/*.ts",
+    "scripts/*.mjs"
+  ],
+  "ignore": [
+    "src/components/ui/**",
+    "src/integrations/supabase/types.ts",
+    "src/hooks/use-mobile.tsx"
+  ],
+  "ignoreExportsUsedInFile": true,
+  "ignoreDependencies": [
+    "@radix-ui/.*",
+    "@hookform/resolvers",
+    "cmdk",
+    "date-fns",
+    "embla-carousel-react",
+    "input-otp",
+    "react-day-picker",
+    "react-hook-form",
+    "react-resizable-panels",
+    "recharts",
+    "vaul",
+    "zod"
+  ]
+}
