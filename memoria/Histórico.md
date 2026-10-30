@@ -29,3 +29,4 @@
 - **2026-10-30**: Meus pedidos refeito (indicadores reais, filtros, busca, status de pagamento separado do de entrega, linha do tempo, detalhes, "Comprar novamente"); Sobre só com "40+ anos" (demais números não confirmados saíram); Contato e rodapé sem o telefone fixo, atendimento 24h, link do mapa e orçamento pelo WhatsApp (#43)
 - **2026-10-30**: foto própria do Envelope Cinza; banner mostra o produto real; busca do cabeçalho com sugestões e que acha tamanhos (ex.: 32x40) (#45)
 - **2026-10-30**: home ampliada: banner 8/4 com calculadora, faixa de diferenciais, "Escolha o material", guia de tamanhos com filtro, "Como funciona" e FAQ; tamanho 40x00 do Envelope Cinza corrigido para 40x60 (#47)
+- **2026-10-30**: CLAUDE.md reescrito com o contexto completo do projeto para o Claude Code no terminal (#49)
