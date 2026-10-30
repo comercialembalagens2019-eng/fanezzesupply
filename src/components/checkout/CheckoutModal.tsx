@@ -14,7 +14,7 @@ import { getFunctionErrorMessage } from "@/lib/functionErrors";
 import { getUnitPrice, SHIPPING_FEE, shippingFor } from "@/lib/pricing";
 import { toast } from "@/hooks/use-toast";
 import { Logo } from "@/components/Logo";
-import { Loader2, QrCode, Building2, User, ArrowRight, ArrowLeft, Check, CheckCircle, Copy, Home, ShoppingBag, PartyPopper, CreditCard, LogIn, FileText, ExternalLink, Lock, ShieldCheck, Truck, Barcode, Package } from "lucide-react";
+import { Loader2, QrCode, Building2, User, ArrowRight, ArrowLeft, Check, CheckCircle, ChevronRight, Info, Copy, Home, ShoppingBag, PartyPopper, CreditCard, LogIn, FileText, ExternalLink, Lock, ShieldCheck, Truck, Barcode, Package } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
@@ -78,21 +78,21 @@ const formatCEP = (value: string) => {
     .slice(0, 9);
 };
 
-// Pix mark: four rounded petals around the center, in the Pix teal.
+// Pix mark: four rounded diamonds forming a larger diamond, in the Pix teal.
 const PixIcon = (props: SVGProps<SVGSVGElement>) => (
-  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.2} strokeLinejoin="round" {...props}>
-    <path d="M12 2.8 15.6 6.4 12 10 8.4 6.4Z" />
-    <path d="M21.2 12 17.6 15.6 14 12 17.6 8.4Z" />
-    <path d="M12 21.2 8.4 17.6 12 14 15.6 17.6Z" />
-    <path d="M2.8 12 6.4 8.4 10 12 6.4 15.6Z" />
+  <svg viewBox="0 0 24 24" fill="currentColor" {...props}>
+    <rect x="8.6" y="1.6" width="6.8" height="6.8" rx="1.6" transform="rotate(45 12 5)" />
+    <rect x="15.6" y="8.6" width="6.8" height="6.8" rx="1.6" transform="rotate(45 19 12)" />
+    <rect x="8.6" y="15.6" width="6.8" height="6.8" rx="1.6" transform="rotate(45 12 19)" />
+    <rect x="1.6" y="8.6" width="6.8" height="6.8" rx="1.6" transform="rotate(45 5 12)" />
   </svg>
 );
 
 // Pix first: it confirms in seconds and costs the customer nothing extra.
 const PAYMENT_OPTIONS = [
-  { id: 'pix', label: 'Pix', hint: 'Aprovação imediata', chip: 'Mais rápido', icon: PixIcon, tone: 'text-[#32BCAD] bg-[#32BCAD]/10' },
-  { id: 'boleto', label: 'Boleto', hint: 'Vence em 3 dias', chip: 'Sem taxas', icon: Barcode, tone: 'text-navy bg-navy/10' },
-  { id: 'card', label: 'Cartão', hint: 'Crédito à vista', chip: 'Visa e Mastercard', icon: CreditCard, tone: 'text-navy bg-navy/10' },
+  { id: 'pix', label: 'PIX', hint: 'Aprovação imediata', chip: 'Mais rápido', icon: PixIcon, tone: 'text-[#32BCAD]' },
+  { id: 'boleto', label: 'Boleto', hint: 'Vence em 3 dias', chip: 'Sem taxas', icon: Barcode, tone: 'text-navy dark:text-foreground' },
+  { id: 'card', label: 'Cartão', hint: 'Crédito à vista', chip: 'Visa e Master', icon: CreditCard, tone: 'text-navy dark:text-foreground' },
 ] as const;
 
 export const CheckoutModal = ({ open, onOpenChange }: CheckoutModalProps) => {
@@ -638,24 +638,33 @@ export const CheckoutModal = ({ open, onOpenChange }: CheckoutModalProps) => {
 
   return (
     <Dialog open={open} onOpenChange={handleClose}>
-      <DialogContent className="w-[calc(100%-1.5rem)] max-w-2xl max-h-[92vh] overflow-y-auto overflow-x-hidden rounded-2xl sm:rounded-2xl p-0 gap-0 [&>button]:text-white [&>button]:opacity-80 [&>button:hover]:opacity-100">
+      <DialogContent className="w-[calc(100%-1.5rem)] max-w-2xl max-h-[92vh] overflow-y-auto overflow-x-hidden rounded-2xl sm:rounded-2xl p-0 gap-0 bg-card [&>button]:text-white [&>button]:opacity-80 [&>button:hover]:opacity-100">
         {/* Navy brand band: logo, reassurance and the title */}
-        <div className="relative overflow-hidden bg-navy-dark px-5 sm:px-7 pt-5 pb-6 text-white">
-          <div aria-hidden="true" className="absolute -bottom-10 right-10 h-40 w-5 rotate-[35deg] bg-[#F7B500]" />
-          <div aria-hidden="true" className="absolute -bottom-10 right-[4.5rem] h-40 w-1.5 rotate-[35deg] bg-[#F7B500]/60" />
-          <div className="relative flex items-center justify-between gap-4 pr-8">
-            <Logo white className="h-8" />
-            <span className="hidden sm:flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-3 py-1.5 text-xs leading-tight">
-              <Lock className="w-4 h-4 text-[#F7B500]" aria-hidden="true" />
+        <div className="relative overflow-hidden bg-[linear-gradient(135deg,#0A1330_0%,#132042_55%,#1C2C55_100%)] px-6 sm:px-8 pt-6 pb-7 text-white">
+          <svg aria-hidden="true" className="pointer-events-none absolute right-0 top-0 h-full w-40 sm:w-56" viewBox="0 0 200 180" preserveAspectRatio="none" fill="none">
+            <defs>
+              <linearGradient id="fnz-gold" x1="0" y1="1" x2="1" y2="0">
+                <stop offset="0" stopColor="#F7B500" stopOpacity="0" />
+                <stop offset="0.55" stopColor="#F7B500" />
+                <stop offset="1" stopColor="#FFE7A3" />
+              </linearGradient>
+            </defs>
+            <path d="M206 18 C 168 70, 146 108, 112 150" stroke="#F7B500" strokeOpacity="0.18" strokeWidth="14" strokeLinecap="round" />
+            <path d="M206 18 C 168 70, 146 108, 112 150" stroke="url(#fnz-gold)" strokeWidth="3" strokeLinecap="round" />
+          </svg>
+          <div className="relative flex items-start justify-between gap-4 pr-8">
+            <Logo white className="h-9" />
+            <span className="flex items-center gap-2.5 text-[11px] sm:text-xs leading-tight">
+              <Lock className="w-5 h-5 shrink-0" strokeWidth={1.75} aria-hidden="true" />
               <span>
                 <strong className="block font-semibold">Compra segura</strong>
-                <span className="text-white/70">Seus dados protegidos</span>
+                <span className="text-white/65">Seus dados protegidos</span>
               </span>
             </span>
           </div>
-          <DialogHeader className="relative mt-5 text-left space-y-1">
-            <DialogTitle className="font-display text-2xl text-white">Finalizar Pedido</DialogTitle>
-            <DialogDescription className="text-white/75">
+          <DialogHeader className="relative mt-7 text-left space-y-1.5">
+            <DialogTitle className="font-display text-2xl sm:text-3xl font-bold text-white">Finalizar Pedido</DialogTitle>
+            <DialogDescription className="text-white/85 text-sm sm:text-base">
               {user ? "Confirme os dados e escolha a forma de pagamento" : "Faça login para continuar com o pedido"}
             </DialogDescription>
           </DialogHeader>
@@ -701,39 +710,36 @@ export const CheckoutModal = ({ open, onOpenChange }: CheckoutModalProps) => {
             const StepIcon = s.icon;
             const isActive = step === s.step || (step === 5 && index === stepTitles.length - 1);
             const isCompleted = step > s.step && !isActive;
-            const nextReached = index < stepTitles.length - 1 && step >= stepTitles[index + 1].step;
             return (
               <li key={s.label} className="flex flex-1 items-start last:flex-none" aria-current={isActive ? "step" : undefined}>
-                <div className="flex flex-col items-center w-20 shrink-0">
-                  <div className="relative">
-                    <div
+                <div className="flex flex-col items-start gap-1.5 shrink-0">
+                  <div className="flex items-center gap-1.5">
+                    <span
                       className={cn(
-                        "w-11 h-11 rounded-full flex items-center justify-center transition-colors",
-                        isActive && "bg-navy text-white shadow-md shadow-navy/25",
-                        isCompleted && "bg-navy/10 text-navy",
-                        !isActive && !isCompleted && "bg-muted text-muted-foreground"
+                        "w-11 h-11 sm:w-12 sm:h-12 rounded-full grid place-items-center transition-colors",
+                        isActive || isCompleted ? "bg-slate-100 dark:bg-white/10 text-navy dark:text-foreground" : "bg-slate-100/70 dark:bg-white/5 text-muted-foreground",
+                        isActive && "ring-2 ring-navy/15"
                       )}
                     >
-                      <StepIcon className="w-5 h-5" aria-hidden="true" />
-                    </div>
-                    {isCompleted && (
-                      <span className="absolute -right-0.5 -bottom-0.5 w-5 h-5 rounded-full bg-success text-white grid place-items-center ring-2 ring-background">
+                      <StepIcon className="w-5 h-5 sm:w-6 sm:h-6" strokeWidth={1.75} aria-hidden="true" />
+                    </span>
+                    {isCompleted ? (
+                      <span className="w-5 h-5 rounded-full bg-success text-white grid place-items-center">
                         <Check className="w-3 h-3" strokeWidth={3} aria-hidden="true" />
+                        <span className="sr-only">concluída</span>
+                      </span>
+                    ) : (
+                      <span className="w-6 h-6 rounded-full bg-slate-100 dark:bg-white/10 text-muted-foreground text-[11px] font-semibold grid place-items-center" aria-hidden="true">
+                        {index + 1}
                       </span>
                     )}
                   </div>
-                  <span className={cn(
-                    "text-xs mt-1.5 text-center",
-                    isActive ? "text-foreground font-semibold" : "text-muted-foreground"
-                  )}>
+                  <span className={cn("text-xs sm:text-sm font-semibold", isActive || isCompleted ? "text-foreground" : "text-muted-foreground")}>
                     {s.label}
                   </span>
                 </div>
                 {index < stepTitles.length - 1 && (
-                  <div className={cn(
-                    "flex-1 h-0.5 mt-[22px] rounded-full",
-                    nextReached ? "bg-navy/60" : "bg-border"
-                  )} />
+                  <div aria-hidden="true" className="flex-1 h-px mt-[22px] sm:mt-6 mx-2 sm:mx-4 bg-navy/70 dark:bg-border" />
                 )}
               </li>
             );
@@ -885,83 +891,76 @@ export const CheckoutModal = ({ open, onOpenChange }: CheckoutModalProps) => {
         {step === 4 && !paymentCreated && (
           <div className="space-y-5">
             {/* Shipping first: free delivery is the strongest reason to close now */}
-            {shipping === 0 ? (
-              <div className="flex items-center gap-3 rounded-2xl border border-success/20 bg-success-soft px-4 py-3 text-success-soft-foreground">
-                <span className="w-10 h-10 rounded-full bg-success text-white grid place-items-center shrink-0">
-                  <Truck className="w-5 h-5" aria-hidden="true" />
-                </span>
-                <span className="text-sm leading-snug">
-                  <strong className="block font-bold">Frete grátis para {addressData.cidade || "Joinville"}!</strong>
-                  <span className="opacity-80">Demais localidades: {formatPrice(SHIPPING_FEE)}</span>
-                </span>
-              </div>
-            ) : (
-              <div className="flex items-center gap-3 rounded-2xl border border-border bg-secondary/60 px-4 py-3">
-                <span className="w-10 h-10 rounded-full bg-navy/10 text-navy grid place-items-center shrink-0">
-                  <Truck className="w-5 h-5" aria-hidden="true" />
-                </span>
-                <span className="text-sm leading-snug">
-                  <strong className="block font-semibold text-foreground">
-                    Entrega{addressData.cidade ? ` para ${addressData.cidade}/${addressData.estado}` : ""}: {formatPrice(shipping)}
-                  </strong>
-                  <span className="text-muted-foreground">Frete grátis para Joinville/SC.</span>
-                </span>
-              </div>
-            )}
+            <div className={cn(
+              "flex items-center gap-3.5 rounded-xl border px-4 py-3.5",
+              shipping === 0 ? "border-success/25 bg-success-soft" : "border-border bg-slate-50 dark:bg-white/5"
+            )}>
+              <Truck className="w-7 h-7 shrink-0 text-navy dark:text-foreground" strokeWidth={1.75} aria-hidden="true" />
+              <span className="flex-1 min-w-0 text-sm leading-snug">
+                {shipping === 0 ? (
+                  <>
+                    <strong className="block font-bold text-foreground">Frete grátis para {addressData.cidade || "Joinville"}</strong>
+                    <span className="text-foreground/80">Demais localidades: {formatPrice(SHIPPING_FEE)}</span>
+                  </>
+                ) : (
+                  <>
+                    <strong className="block font-bold text-foreground">
+                      Frete{addressData.cidade ? ` para ${addressData.cidade}/${addressData.estado}` : ""}: {formatPrice(shipping)}
+                    </strong>
+                    <span className="text-foreground/80">Frete grátis para Joinville/SC</span>
+                  </>
+                )}
+              </span>
+              <ChevronRight className="w-5 h-5 shrink-0 text-foreground/70" aria-hidden="true" />
+            </div>
 
             {/* Order summary: transparent pricing, total stated once and clearly */}
-            <div className="rounded-2xl border border-border bg-card p-4 sm:p-5">
-              <div className="flex items-center gap-3 mb-4">
-                <span className="w-14 h-14 rounded-xl bg-secondary overflow-hidden grid place-items-center shrink-0">
+            <div className="rounded-xl border border-border bg-card p-4 sm:p-5">
+              <div className="flex items-center justify-between gap-3 mb-4">
+                <h4 className="font-bold text-foreground">Resumo do Pedido</h4>
+                <span className="text-xs font-medium rounded-full bg-slate-100 dark:bg-white/10 px-3 py-1 text-foreground/80 tabular-nums">
+                  {totalUnits.toLocaleString("pt-BR")} {totalUnits === 1 ? "unidade" : "unidades"}
+                </span>
+              </div>
+              <div className="flex gap-4">
+                <span className="grid w-20 sm:w-32 h-16 sm:h-24 rounded-lg bg-slate-100 dark:bg-white/10 overflow-hidden place-items-center shrink-0">
                   {firstImage && firstImage !== "/placeholder.svg" ? (
                     <img src={firstImage} alt="" className="w-full h-full object-cover" />
                   ) : (
-                    <Package className="w-6 h-6 text-navy" aria-hidden="true" />
+                    <Package className="w-8 h-8 text-navy" aria-hidden="true" />
                   )}
                 </span>
-                <div className="min-w-0 flex-1">
-                  <h4 className="font-semibold text-foreground">Resumo do pedido</h4>
-                  <p className="text-xs text-muted-foreground">
-                    {items.length} {items.length === 1 ? "produto" : "produtos"}
-                  </p>
-                </div>
-                <span className="text-xs font-semibold rounded-full bg-secondary px-2.5 py-1 text-foreground tabular-nums shrink-0">
-                  {totalUnits.toLocaleString("pt-BR")} un.
-                </span>
-              </div>
-              <div className="space-y-2 text-sm">
-                {items.map(item => (
-                  <div key={item.product.id} className="flex justify-between gap-4">
-                    <span className="text-muted-foreground">
-                      {item.product.name} × {item.quantity.toLocaleString("pt-BR")}
+                <div className="flex-1 min-w-0 space-y-2 text-sm self-center">
+                  {items.map(item => (
+                    <div key={item.product.id} className="flex justify-between gap-3">
+                      <span className="text-muted-foreground">
+                        {item.product.name} × {item.quantity.toLocaleString("pt-BR")}
+                      </span>
+                      <span className="font-bold text-foreground tabular-nums whitespace-nowrap">
+                        {formatPrice(getUnitPrice(item.product.id, item.quantity, item.product.price) * item.quantity)}
+                      </span>
+                    </div>
+                  ))}
+                  <div className="flex justify-between gap-3">
+                    <span className="flex items-center gap-1 text-muted-foreground">
+                      Frete
+                      <Info className="w-3.5 h-3.5" aria-label={addressData.cidade ? `Entrega em ${addressData.cidade}/${addressData.estado}` : "Calculado pelo endereço da empresa"} />
                     </span>
-                    <span className="font-medium text-foreground tabular-nums">
-                      {formatPrice(getUnitPrice(item.product.id, item.quantity, item.product.price) * item.quantity)}
-                    </span>
+                    <span className="text-muted-foreground tabular-nums">{shipping === 0 ? "Grátis" : formatPrice(shipping)}</span>
                   </div>
-                ))}
-                <div className="flex justify-between gap-4">
-                  <span className="text-muted-foreground">
-                    Frete{addressData.cidade ? ` (${addressData.cidade}/${addressData.estado})` : ""}
-                  </span>
-                  {shipping === 0 ? (
-                    <span className="font-semibold text-success">Grátis</span>
-                  ) : (
-                    <span className="font-medium text-foreground tabular-nums">{formatPrice(shipping)}</span>
-                  )}
                 </div>
-                <div className="border-t border-dashed border-border pt-3 mt-1 flex items-baseline justify-between">
-                  <span className="font-semibold text-foreground">Total</span>
-                  <span className="text-2xl font-extrabold text-navy dark:text-foreground tabular-nums">{formatPrice(orderTotal)}</span>
-                </div>
+              </div>
+              <div className="border-t border-border mt-4 pt-4 flex items-baseline justify-between">
+                <span className="font-bold text-foreground">Total</span>
+                <span className="text-xl font-extrabold text-foreground tabular-nums">{formatPrice(orderTotal)}</span>
               </div>
             </div>
 
             {/* Payment method: radio cards, Pix first */}
             <div>
-              <h4 id="payment-method-label" className="font-semibold text-foreground">Forma de Pagamento</h4>
+              <h4 id="payment-method-label" className="font-bold text-foreground">Forma de Pagamento</h4>
               <p className="text-xs text-muted-foreground mb-3">Escolha a melhor opção para você</p>
-              <div role="radiogroup" aria-labelledby="payment-method-label" className={cn("grid gap-2.5", paymentOptions.length === 3 ? "sm:grid-cols-3" : "sm:grid-cols-2")}>
+              <div role="radiogroup" aria-labelledby="payment-method-label" className={cn("grid gap-2 sm:gap-3", paymentOptions.length === 3 ? "grid-cols-3" : "grid-cols-2")}>
                 {paymentOptions.map((option) => {
                   const selected = paymentMethod === option.id;
                   return (
@@ -972,24 +971,20 @@ export const CheckoutModal = ({ open, onOpenChange }: CheckoutModalProps) => {
                       aria-checked={selected}
                       onClick={() => setPaymentMethod(option.id)}
                       className={cn(
-                        "relative flex items-center gap-3 sm:flex-col sm:items-start sm:gap-2 p-3.5 rounded-xl border-2 text-left transition-[border-color,background-color,box-shadow] duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
-                        selected ? "border-navy bg-navy/[0.04] shadow-sm dark:border-primary" : "border-border hover:border-navy/40"
+                        "relative flex flex-col items-start gap-1 p-3 sm:p-4 rounded-xl border-2 bg-card text-left transition-[border-color,box-shadow] duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+                        selected ? "border-navy shadow-md shadow-navy/10 dark:border-primary" : "border-border hover:border-navy/40"
                       )}
                     >
-                      <span className={cn("w-10 h-10 rounded-lg grid place-items-center shrink-0", option.tone)}>
-                        <option.icon className="w-5 h-5" aria-hidden="true" />
-                      </span>
-                      <span className="flex-1 min-w-0">
-                        <span className="block font-bold text-foreground">{option.label}</span>
-                        <span className="block text-xs text-muted-foreground">{option.hint}</span>
-                      </span>
-                      <span className="text-[11px] font-semibold rounded-full px-2 py-0.5 bg-success-soft text-success-soft-foreground shrink-0">
+                      <option.icon className={cn("w-7 h-7 sm:w-8 sm:h-8 mb-2", option.tone)} aria-hidden="true" />
+                      <span className="font-bold text-foreground">{option.label}</span>
+                      <span className="text-[11px] sm:text-xs text-muted-foreground leading-snug">{option.hint}</span>
+                      <span className="mt-1.5 whitespace-nowrap text-[10px] sm:text-[11px] font-medium rounded-full px-2 sm:px-2.5 py-0.5 bg-slate-100 dark:bg-white/10 text-foreground/80">
                         {option.chip}
                       </span>
                       <span
                         aria-hidden="true"
                         className={cn(
-                          "w-5 h-5 rounded-full border-2 grid place-items-center shrink-0 transition-colors sm:absolute sm:top-3 sm:right-3",
+                          "absolute top-2.5 right-2.5 sm:top-3 sm:right-3 w-5 h-5 rounded-full border-2 grid place-items-center transition-colors",
                           selected ? "border-navy bg-navy text-white dark:border-primary dark:bg-primary" : "border-muted-foreground/30"
                         )}
                       >
@@ -1002,25 +997,25 @@ export const CheckoutModal = ({ open, onOpenChange }: CheckoutModalProps) => {
             </div>
 
             {/* Quiet trust row */}
-            <div className="flex flex-col sm:flex-row sm:items-center gap-3 rounded-2xl bg-secondary/60 px-4 py-3">
-              <div className="flex items-center gap-3 flex-1">
-                <ShieldCheck className="w-7 h-7 text-success shrink-0" aria-hidden="true" />
-                <p className="text-sm leading-snug">
-                  <strong className="block font-semibold text-foreground">Pagamento 100% seguro</strong>
-                  <span className="text-xs text-muted-foreground">Seus dados são criptografados e protegidos.</span>
-                </p>
-              </div>
-              <ul className="flex items-center gap-1.5" aria-label="Formas aceitas">
-                <li className="flex items-center gap-1 rounded-md border border-border bg-card px-2 py-1 text-[11px] font-bold text-[#32BCAD]">
-                  <PixIcon className="w-3.5 h-3.5" aria-hidden="true" /> pix
+            <div className="flex items-center gap-3 rounded-xl border border-border bg-card px-4 py-3">
+              <span className="w-10 h-10 rounded-full bg-success-soft text-success grid place-items-center shrink-0">
+                <ShieldCheck className="w-5 h-5" aria-hidden="true" />
+              </span>
+              <p className="flex-1 min-w-0 text-xs leading-snug">
+                <strong className="block font-semibold text-foreground text-[13px]">Pagamento 100% seguro</strong>
+                <span className="text-muted-foreground">Seus dados são criptografados e protegidos.</span>
+              </p>
+              <ul className="hidden min-[420px]:flex items-center gap-2.5 shrink-0" aria-label="Formas aceitas">
+                <li className="flex items-center gap-1 text-[#32BCAD]">
+                  <PixIcon className="w-4 h-4" aria-hidden="true" />
+                  <span className="text-xs font-semibold text-muted-foreground">pix</span>
                 </li>
-                <li className="rounded-md border border-border bg-card px-2 py-1 text-[11px] font-bold text-foreground">Boleto</li>
                 {ABACATEPAY_PUBLIC_KEY && (
                   <>
-                    <li className="rounded-md border border-border bg-card px-2 py-1 text-[11px] font-extrabold italic text-[#1A1F71] dark:text-foreground">VISA</li>
-                    <li className="flex items-center rounded-md border border-border bg-card px-2 py-1.5" aria-label="Mastercard">
-                      <span className="w-3 h-3 rounded-full bg-[#EB001B]" />
-                      <span className="w-3 h-3 -ml-1.5 rounded-full bg-[#F79E1B]/90" />
+                    <li className="text-sm font-extrabold italic tracking-tight text-[#1A1F71] dark:text-foreground">VISA</li>
+                    <li className="flex items-center" aria-label="Mastercard">
+                      <span className="w-4 h-4 rounded-full bg-[#EB001B]" />
+                      <span className="w-4 h-4 -ml-2 rounded-full bg-[#F79E1B]/90" />
                     </li>
                   </>
                 )}
@@ -1279,12 +1274,13 @@ export const CheckoutModal = ({ open, onOpenChange }: CheckoutModalProps) => {
 
         {/* Navigation Buttons */}
         {step < 5 && !paymentCreated && (
-          <div className="flex items-center justify-between gap-3 pt-5 mt-5 border-t">
+          <div className="flex items-center justify-between gap-3 mt-6">
             <Button
-              variant="ghost"
+              variant="secondary"
+              size="lg"
               onClick={prevStep}
               disabled={step === 1 || isTestOrder}
-              className="gap-2 text-muted-foreground"
+              className="gap-2 rounded-xl px-4 sm:px-6 shrink-0 bg-slate-100 text-foreground hover:bg-slate-200 shadow-sm dark:bg-white/10 dark:hover:bg-white/15"
             >
               <ArrowLeft className="w-4 h-4" aria-hidden="true" />
               Voltar
@@ -1300,7 +1296,7 @@ export const CheckoutModal = ({ open, onOpenChange }: CheckoutModalProps) => {
                 onClick={handlePayment}
                 disabled={isLoading}
                 size="lg"
-                className="gap-2 rounded-xl bg-navy text-white hover:bg-navy-light shadow-md shadow-navy/20 dark:bg-primary dark:text-primary-foreground"
+                className="flex-1 sm:flex-none min-w-0 gap-2 rounded-xl px-4 sm:px-6 bg-navy text-white hover:bg-navy-light shadow-md shadow-navy/25 dark:bg-primary dark:text-primary-foreground"
               >
                 {isLoading ? (
                   <>
@@ -1310,7 +1306,7 @@ export const CheckoutModal = ({ open, onOpenChange }: CheckoutModalProps) => {
                 ) : (
                   <>
                     {paymentMethod === 'pix' ? <QrCode className="w-4 h-4" aria-hidden="true" /> : paymentMethod === 'boleto' ? <Barcode className="w-4 h-4" aria-hidden="true" /> : <CreditCard className="w-4 h-4" aria-hidden="true" />}
-                    {paymentMethod === 'pix' ? 'Gerar QR Code Pix' : paymentMethod === 'boleto' ? 'Gerar boleto' : 'Pagar com cartão'}
+                    {paymentMethod === 'pix' ? 'Gerar QR Code PIX' : paymentMethod === 'boleto' ? 'Gerar boleto' : 'Pagar com cartão'}
                     <ArrowRight className="w-4 h-4" aria-hidden="true" />
                   </>
                 )}

@@ -17,7 +17,6 @@ mkdirSync(OUT, { recursive: true });
 
 const dataUri = (file, type) => `data:${type};base64,${readFileSync(file).toString("base64")}`;
 const logo = dataUri("src/assets/fnz-logo.png", "image/png");
-const envelope = dataUri("src/assets/envelope.webp", "image/webp");
 const svg = (name, color, size, strokeWidth = 2) =>
   renderToStaticMarkup(createElement(icons[name], { color, size, strokeWidth }));
 
@@ -40,10 +39,35 @@ const assets = [
     <script>const i=new Image();i.onload=()=>{const c=document.getElementById('c').getContext('2d');c.drawImage(i,0,0,208,88);
     const d=c.getImageData(0,0,208,88);for(let p=0;p<d.data.length;p+=4){const[r,g,b]=[d.data[p],d.data[p+1],d.data[p+2]];
     if(!(r>150&&g>110&&b<110)){d.data[p]=255;d.data[p+1]=255;d.data[p+2]=255;}}c.putImageData(d,0,0);document.body.dataset.ready=1};i.src='${logo}'</script>`],
-  ["hero.png", 220, 260, `<div style="position:relative;width:220px;height:260px;font-family:Caveat,cursive">
-    <img src="${envelope}" style="position:absolute;top:0;left:0;width:220px;height:176px;object-fit:cover;border-radius:18px">
-    <div style="position:absolute;right:6px;bottom:6px;transform:rotate(-7deg);color:${NAVY};font-size:24px;line-height:1.05;text-align:right;font-weight:700">
-      Obrigado por confiar<br>na FNZ Supply!<div style="margin-top:2px;font-size:22px">⟶</div></div></div>`],
+  // Product scene: a branded box with the envelope leaning on it, fading into the white card on the left.
+  // Spans the whole header card, so the tagline is part of the picture.
+  ["hero.png", 260, 400, `<div style="position:relative;width:260px;height:400px;overflow:hidden;
+      -webkit-mask-image:linear-gradient(90deg,transparent 0,#000 14%);mask-image:linear-gradient(90deg,transparent 0,#000 14%);
+      background:radial-gradient(130% 70% at 85% 10%,#FFFFFF 0%,#F6F2EC 55%,#EDE5D8 100%)">
+    <div style="position:absolute;right:28px;top:26px;font:600 13px/1.4 Manrope,sans-serif;color:#5B6478;text-align:right">Qualidade em<br>cada embalagem.</div>
+    <div style="position:absolute;left:0;top:100px;width:260px;height:300px;font-family:Caveat,cursive">
+    <div style="position:absolute;left:0;right:0;bottom:0;height:96px;background:linear-gradient(180deg,#E8DCC9,#DDCDB5)"></div>
+    <div style="position:absolute;right:22px;top:40px;width:30px;height:28px;background:#E7E2DA;border-radius:4px 4px 8px 8px;box-shadow:inset 0 -6px 0 #D6CFC4"></div>
+    ${[[-38, 30, "#5E8C4F"], [-12, 18, "#6E9D5C"], [14, 26, "#4F7D44"], [40, 20, "#6E9D5C"], [-60, 14, "#7DAA69"]]
+      .map(([deg, h, c]) => `<div style="position:absolute;right:${32 - deg / 6}px;top:${8 + (40 - h) / 2}px;width:12px;height:${h + 14}px;background:${c};border-radius:50% 50% 50% 50%/60% 60% 40% 40%;transform-origin:bottom center;transform:rotate(${deg}deg)"></div>`)
+      .join("")}
+    <div style="position:absolute;right:-6px;top:62px;width:150px;height:26px;background:#D7A56C;transform:skewX(-35deg);transform-origin:bottom left"></div>
+    <div style="position:absolute;right:46px;top:62px;width:16px;height:26px;background:rgba(255,255,255,.35);transform:skewX(-35deg);transform-origin:bottom left"></div>
+    <div style="position:absolute;right:-24px;top:88px;width:150px;height:116px;background:linear-gradient(180deg,#C8935A,#B57F48);box-shadow:0 14px 18px -10px rgba(60,40,20,.45)">
+      <img src="${logo}" style="position:absolute;left:22px;top:30px;width:80px">
+    </div>
+    ${[[30, 70, -5], [46, 82, -13]]
+      .map(([left, top, deg]) => `<div style="position:absolute;left:${left}px;top:${top}px;width:98px;height:124px;transform:rotate(${deg}deg);border-radius:5px;
+        background:linear-gradient(155deg,#FFFFFF 0%,#F1F3F6 45%,#E3E6EB 75%,#F6F7F9 100%);box-shadow:0 12px 16px -8px rgba(30,30,40,.35),inset 0 0 0 1px rgba(0,0,0,.05)">
+        <div style="height:13px;border-radius:5px 5px 0 0;background:linear-gradient(180deg,#2A2A2E,#141416)"></div>
+        <div style="height:3px;background:linear-gradient(90deg,#9AA0A8,#E6E8EB,#9AA0A8)"></div>
+        <img src="${logo}" style="position:absolute;right:10px;top:26px;width:30px;opacity:.85">
+        <div style="position:absolute;left:10px;right:10px;bottom:14px;height:28px;border-radius:4px;background:linear-gradient(90deg,rgba(255,255,255,0),rgba(255,255,255,.7),rgba(255,255,255,0))"></div>
+      </div>`)
+      .join("")}
+    <div style="position:absolute;right:14px;bottom:10px;transform:rotate(-8deg);color:${NAVY};font-size:23px;line-height:1.02;text-align:right;font-weight:700">
+      Obrigado<br>por confiar<br>na FNZ Supply!<div style="font-size:20px;line-height:.8">⟶</div></div></div>
+</div>`],
   ["note-signoff.png", 170, 64, `<div style="width:170px;height:64px;font-family:Caveat,cursive;color:${NAVY};font-size:24px;font-weight:700;line-height:1.05;text-align:right;transform:rotate(-6deg);padding-top:6px">
     Conte sempre com<br>a FNZ Supply! ♡</div>`],
 ];
@@ -54,6 +78,7 @@ const browser = await chromium.launch(
 const page = await browser.newPage({ deviceScaleFactor: 2 });
 for (const [file, width, height, html] of assets) {
   await page.setViewportSize({ width, height });
+  page.removeAllListeners("pageerror"); page.on("pageerror", (e) => console.error(file, e.message));
   await page.setContent(`<!doctype html><html><head>${FONTS}<style>html,body{margin:0;background:transparent}</style></head><body>${html}</body></html>`);
   await page.evaluate(() => document.fonts.ready);
   if (html.includes("<canvas")) await page.waitForSelector("body[data-ready]");

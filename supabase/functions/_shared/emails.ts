@@ -31,7 +31,10 @@ const SUPPORT_EMAIL = "vendas@fnzsupply.com.br";
 export const EMAIL_REPLY_TO = SUPPORT_EMAIL;
 const WHATSAPP = "(47) 99149-0027";
 
+import { SHIPPING_FEE_CENTS } from "./catalog.ts";
+
 const NAVY = "#1B2845";
+const BLUE = "#3B5B9A";
 const CANVAS = "#F4F5F8";
 const MUTED = "#5B6478";
 const LINE = "#E8EAF0";
@@ -92,8 +95,6 @@ const brl = (value: number) =>
 const escapeHtml = (value: string) =>
   value.replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]!);
 
-const unitLabel = (unit: string, quantity: number) => (unit === "unidade" && quantity !== 1 ? "unidades" : unit);
-
 const img = (file: string, width: number, height: number, alt = "", style = "") =>
   `<img src="${ASSETS}/${file}" width="${width}" height="${height}" alt="${alt}" style="display:block;border:0;width:${width}px;height:${height}px;${style}">`;
 
@@ -112,27 +113,24 @@ export function renderOrderEmail(kind: OrderEmailKind, data: OrderEmailData) {
   const greeting = escapeHtml(data.customerName);
   const city = data.city ? ` (${escapeHtml(data.city)})` : "";
 
-  const timeline = [
-    { icon: "icon-confirmed.png", label: "Pedido confirmado", detail: orderDate },
-    { icon: "icon-package.png", label: kind === "paid" ? "Em separação" : "Separado", detail: kind === "paid" ? today : "Conferido" },
-    { icon: "icon-truck.png", label: kind === "shipped" ? "Saiu para entrega" : kind === "delivered" ? "Enviado" : "Envio", detail: kind === "paid" ? "Em breve" : today },
-    { icon: "icon-headset.png", label: kind === "delivered" ? "Entregue" : "Entrega em breve", detail: kind === "delivered" ? today : city.trim() || "Endereço cadastrado" },
-  ]
-    .map((step, i) => {
-      const active = i <= copy.current;
-      return `<td class="tl" width="25%" valign="top" style="padding:0 6px;${i > 0 ? `border-left:1px solid ${LINE};` : ""}">
-        ${img(step.icon, 28, 28, "", active ? "" : "opacity:0.35;")}
-        <div style="margin-top:8px;font-size:12px;font-weight:800;color:${active ? NAVY : MUTED};">${step.label}</div>
-        <div style="font-size:12px;color:${MUTED};">${step.detail}</div>
-      </td>`;
-    })
+  const steps = {
+    paid: [["icon-confirmed.png", "Pedido confirmado", orderDate], ["icon-truck.png", "Em separação", today], ["icon-headset.png", "Entrega em breve", city.trim() || "Endereço cadastrado"]],
+    shipped: [["icon-confirmed.png", "Pedido confirmado", orderDate], ["icon-truck.png", "Saiu para entrega", today], ["icon-headset.png", "Entrega em breve", city.trim() || "Endereço cadastrado"]],
+    delivered: [["icon-confirmed.png", "Pedido confirmado", orderDate], ["icon-truck.png", "Enviado", "Concluído"], ["icon-headset.png", "Entregue", today]],
+  }[kind];
+  const timeline = steps
+    .map(([icon, label, detail], i) => `<td class="tl" width="33%" valign="middle" style="padding:0 10px;${i > 0 ? `border-left:1px solid ${LINE};` : ""}">
+        <table role="presentation" cellpadding="0" cellspacing="0"><tr>
+          <td valign="middle" style="padding-right:10px;">${img(icon, 26, 26)}</td>
+          <td valign="middle" style="font-size:12px;line-height:1.45;color:${BLUE};">${label}<br><span style="color:${MUTED};">${detail}</span></td>
+        </tr></table>
+      </td>`)
     .join("");
 
   const rows = data.items
     .map(
       (item) => `<tr>
-      <td style="padding:6px 0;font-size:14px;color:${NAVY};">${escapeHtml(item.productName)} <span style="color:${MUTED};">× ${item.quantity.toLocaleString("pt-BR")}</span><br>
-        <span style="color:${MUTED};font-size:12px;">${escapeHtml(unitLabel(item.unit, item.quantity))} a ${brl(item.unitPrice)}</span></td>
+      <td style="padding:6px 0;font-size:14px;color:${NAVY};">${escapeHtml(item.productName)} × ${item.quantity.toLocaleString("pt-BR")}</td>
       <td align="right" valign="top" style="padding:6px 0;font-size:14px;font-weight:700;color:${NAVY};white-space:nowrap;">${brl(item.totalPrice)}</td>
     </tr>`,
     )
@@ -145,12 +143,12 @@ export function renderOrderEmail(kind: OrderEmailKind, data: OrderEmailData) {
   const freeShipping =
     data.shippingAmount > 0
       ? ""
-      : `<tr><td style="background:${AMBER_SOFT};border-radius:16px;padding:14px 18px;">
+      : `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin-top:16px;"><tr><td style="background:${AMBER_SOFT};border-radius:14px;padding:12px 16px;">
           <table role="presentation" cellpadding="0" cellspacing="0"><tr>
             <td valign="middle" style="padding-right:12px;">${img("icon-truck-amber.png", 36, 36)}</td>
-            <td valign="middle" style="font-size:14px;color:${AMBER_TEXT};"><b>Frete grátis${city ? ` para ${escapeHtml(data.city!)}` : ""}</b><br><span style="font-size:12px;">Entrega sem custo adicional neste pedido.</span></td>
+            <td valign="middle" style="font-size:14px;color:${AMBER_TEXT};"><b>Frete grátis${city ? ` para ${escapeHtml(data.city!)}` : ""}</b><br><span style="font-size:12px;">Demais localidades: ${brl(SHIPPING_FEE_CENTS / 100)}.</span></td>
           </tr></table>
-        </td></tr>${gap()}`;
+        </td></tr></table>`;
 
   const feature = (icon: string, label: string) =>
     `<td class="feat" width="33%" valign="middle" style="padding:0 6px;"><table role="presentation" cellpadding="0" cellspacing="0"><tr>
@@ -168,7 +166,8 @@ export function renderOrderEmail(kind: OrderEmailKind, data: OrderEmailData) {
     .hide-sm { display:none !important; }
     .stack { display:block !important; width:100% !important; }
     .feat { display:block !important; width:100% !important; padding:6px 0 !important; }
-    .tl { padding:0 3px !important; font-size:11px !important; }
+    .tl { display:block !important; width:100% !important; border-left:0 !important; padding:6px 0 !important; }
+    .hero-text { padding:24px !important; }
     .pad { padding:20px !important; }
   }
 </style>
@@ -179,20 +178,18 @@ export function renderOrderEmail(kind: OrderEmailKind, data: OrderEmailData) {
     <tr><td align="center">
       <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:600px;">
 
-        <tr><td class="pad" style="background:#FFFFFF;border-radius:22px;padding:28px;">
+        <tr><td style="background:#FFFFFF;border-radius:22px;padding:0;">
           <table role="presentation" width="100%" cellpadding="0" cellspacing="0"><tr>
-            <td valign="top"><a href="${SITE_URL}" style="text-decoration:none;">${img("fnz-logo.png", 104, 44, "FNZ Supply", "height:44px;width:auto;")}</a></td>
-            <td align="right" valign="top" class="hide-sm" style="font-size:13px;line-height:1.4;color:${MUTED};">Qualidade em<br>cada embalagem.</td>
-          </tr></table>
-          <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin-top:18px;"><tr>
-            <td class="stack" valign="top" style="padding-right:12px;">
+            <td class="hero-text" valign="top" style="padding:28px 12px 28px 28px;">
+              <a href="${SITE_URL}" style="text-decoration:none;">${img("fnz-logo.png", 104, 44, "FNZ Supply", "height:44px;width:auto;")}</a>
+              <div style="height:22px;line-height:22px;font-size:0;">&nbsp;</div>
               ${img("icon-check-badge.png", 40, 40, "Confirmado")}
-              <h1 style="margin:14px 0 14px;font-size:30px;line-height:1.15;font-weight:800;color:${NAVY};">${copy.lead} <span style="color:${GREEN};">${copy.highlight}</span></h1>
+              <h1 style="margin:14px 0 14px;font-size:32px;line-height:1.15;font-weight:800;color:${NAVY};">${copy.lead} <span style="color:${GREEN};">${copy.highlight}</span></h1>
               <p style="margin:0 0 10px;font-size:15px;font-weight:800;color:${NAVY};">Olá, ${greeting}!</p>
               <p style="margin:0 0 10px;font-size:14px;line-height:1.6;color:${MUTED};">${copy.intro}</p>
               <p style="margin:0;font-size:14px;line-height:1.6;color:${MUTED};">${copy.after}</p>
             </td>
-            <td class="hide-sm" width="200" valign="top" align="right">${img("hero.png", 200, 236, "Obrigado por confiar na FNZ Supply!")}</td>
+            <td class="hide-sm" width="260" valign="bottom" align="right" style="padding:0;">${img("hero.png", 260, 400, "Obrigado por confiar na FNZ Supply!", "border-radius:0 22px 22px 0;")}</td>
           </tr></table>
         </td></tr>
         ${gap()}
@@ -219,14 +216,11 @@ export function renderOrderEmail(kind: OrderEmailKind, data: OrderEmailData) {
           <p style="margin:10px 0 0;font-size:12px;line-height:1.5;color:${MUTED};">Entrega em: ${escapeHtml(data.address).replace(/(\d+)/g, "$1&#8205;")}<br>A nota fiscal (NF-e) acompanha o seu pedido.</p>
         `)}
 
-        ${card(`<table role="presentation" width="100%" cellpadding="0" cellspacing="0"><tr>${timeline}</tr></table>`, "20px 18px")}
-
-        ${freeShipping}
-
-        <tr><td align="center" style="padding:6px 0 4px;">
-          <a href="${SITE_URL}/pedidos" style="display:inline-block;background:${NAVY};color:#FFFFFF;text-decoration:none;font-weight:800;font-size:15px;padding:15px 36px;border-radius:999px;">Acompanhar meu pedido &nbsp;&rarr;</a>
-        </td></tr>
-        ${gap(20)}
+        ${card(`<table role="presentation" width="100%" cellpadding="0" cellspacing="0"><tr>${timeline}</tr></table>
+          ${freeShipping}
+          <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin-top:20px;"><tr><td align="center">
+            <a href="${SITE_URL}/pedidos" style="display:inline-block;background:${NAVY};color:#FFFFFF;text-decoration:none;font-weight:800;font-size:15px;padding:15px 40px;border-radius:999px;">Acompanhar meu pedido &nbsp;&rarr;</a>
+          </td></tr></table>`, "20px 18px")}
 
         <tr><td class="pad" style="background:#FFFFFF;border-radius:22px 22px 0 0;padding:26px;">
           <table role="presentation" width="100%" cellpadding="0" cellspacing="0"><tr>
