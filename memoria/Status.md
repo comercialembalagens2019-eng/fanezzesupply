@@ -3,7 +3,7 @@
 Atualizado em: 2026-10-30
 
 ## Pronto
-- [x] Estratégia de equilíbrio visual da home documentada na Issue #52 e em `docs/plans/2026-10-30-estrategia-design-home.md`: ampliar área útil, calculadora lateral no desktop, materiais simplificados e detalhes sob demanda. Planejamento entregue; redesenho ainda não implementado.
+- [x] Estratégia da home corrigida na #54 / PR #55; Claude aprovou a revisão 2 com condições em `COMMUNICATION.md`. Condições incorporadas ao plano: três PRs separados (filtro → cadastro → layout), revisão entre etapas, foco de campos e links nos dois sentidos e capturas nas larguras críticas. Nenhuma implementação nesta entrega; CI documental não valida o desenho.
 - [x] Fase 1 — Segurança: pedidos e preços calculados no servidor, webhooks validam id/valor/método, reset de senha com código forte e token guardado como hash, RLS revisado
 - [x] Fase 2 — Bugs: frete (R$ 19,90, grátis só em Joinville/SC), e-mail duplicado do Stripe, carrinho limpo no logout
 - [x] Token Supabase antigo revogado (o secret do GitHub tem um novo)
@@ -23,7 +23,9 @@ Atualizado em: 2026-10-30
 - [x] E-mails de pedido ligados: "pago" nos webhooks/checagem do Pix, "enviado/entregue" ao mudar no painel admin (função `notify-order-status`); cada e-mail sai uma vez só (tabela `order_emails`)
 
 ## Falta
-- [ ] Implementar o redesenho da home na Issue #51, seguindo a estratégia de 2026-10-30 e validando capturas em desktop, tablet e celular.
+- [ ] Implementar a #51 em três PRs separados, após a aprovação do plano já registrada; marcar cada conclusão no canal e aguardar revisão do Claude antes do próximo PR.
+- [ ] Decisão do dono, separada para cada seção: Guia de tamanhos fica/sai; Pedido rápido fica/sai. Preservar ambos enquanto estiverem pendentes.
+- [ ] Validar o layout nas larguras de 1.024, 1.279, 1.280 e 1.920 px e demais referências; trazer ao canal qualquer problema com desalinhamento do cabeçalho antes de alargá-lo. Retiradas de seções exigem decisão explícita do dono.
 As tarefas abertas estão nas Issues do GitHub (fluxo em `AGENTS.md`): #28 Sentry (precisa do DSN), #29 remover pagamentos antigos, #30 validar boleto e cartão, #31 refatorar CheckoutModal, #32 fotos dos produtos.
 
 - [x] **Cartão** pelo AbacatePay (abacatepay.js + `pay-abacate-card`), chave pública no GitHub desde 2026-10-29 — falta testar com cartão real

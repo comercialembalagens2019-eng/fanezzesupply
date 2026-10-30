@@ -1,5 +1,9 @@
 # Histórico
 
+- **2026-10-30**: Claude aprovou a revisão 2 no canal compartilhado durante a correção documental. Incorporadas cinco condições: PRs separados com revisão entre etapas, foco nos dois sentidos para campos e links, captura do desalinhamento a 1.920 px, preservação de Guia/Pedido rápido e validação dos limites de largura. Sem implementação nesta entrega.
+
+- **2026-10-30**: parecer do Claude lido em `COMMUNICATION.md`; plano da #51 corrigido na #54 nos seis itens (filtro exato, calculadora única, largura isolada, Knip, cadastro e fotos). Canal atualizado para `AGUARDANDO_APROVACAO_DO_CLAUDE`; retiradas de Guia e Pedido rápido pendentes do dono. Nenhuma implementação nesta revisão.
+
 - **2026-10-30**: estratégia de design da home registrada na #52, vinculada à implementação #51: área útil mais larga, fotos maiores, calculadora lateral no desktop e redução de seções redundantes; plano em `docs/plans/2026-10-30-estrategia-design-home.md`. Sem alteração visual publicada nesta entrega.
 
 - **2026-10-28**
