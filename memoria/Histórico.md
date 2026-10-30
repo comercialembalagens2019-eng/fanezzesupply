@@ -1,5 +1,7 @@
 # Histórico
 
+- **2026-10-30**: estratégia de design da home registrada na #52, vinculada à implementação #51: área útil mais larga, fotos maiores, calculadora lateral no desktop e redução de seções redundantes; plano em `docs/plans/2026-10-30-estrategia-design-home.md`. Sem alteração visual publicada nesta entrega.
+
 - **2026-10-28**
   - Fases 1–4 entregues (segurança, bugs, infra, front novo)
   - Painel admin, produto de R$ 0,01, usuário admin
