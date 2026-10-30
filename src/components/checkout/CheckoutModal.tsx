@@ -11,12 +11,14 @@ import { products } from "@/data/products";
 import { ABACATEPAY_PUBLIC_KEY, CardPayment, type CardCustomer } from "@/components/checkout/CardPayment";
 import { supabase } from "@/integrations/supabase/client";
 import { getFunctionErrorMessage } from "@/lib/functionErrors";
-import { getUnitPrice, shippingFor } from "@/lib/pricing";
+import { getUnitPrice, SHIPPING_FEE, shippingFor } from "@/lib/pricing";
 import { toast } from "@/hooks/use-toast";
-import { Loader2, QrCode, Building2, MapPin, Phone, ChevronRight, ChevronLeft, CheckCircle, Copy, Home, ShoppingBag, PartyPopper, CreditCard, LogIn, FileText, ExternalLink, Lock, ShieldCheck } from "lucide-react";
+import { Logo } from "@/components/Logo";
+import { Loader2, QrCode, Building2, User, ArrowRight, ArrowLeft, Check, CheckCircle, Copy, Home, ShoppingBag, PartyPopper, CreditCard, LogIn, FileText, ExternalLink, Lock, ShieldCheck, Truck, Barcode, Package } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
+import type { SVGProps } from "react";
 
 interface CheckoutModalProps {
   open: boolean;
@@ -76,11 +78,21 @@ const formatCEP = (value: string) => {
     .slice(0, 9);
 };
 
-// Pix first and suggested: it confirms in seconds and costs the customer nothing extra.
+// Pix mark: four rounded petals around the center, in the Pix teal.
+const PixIcon = (props: SVGProps<SVGSVGElement>) => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.2} strokeLinejoin="round" {...props}>
+    <path d="M12 2.8 15.6 6.4 12 10 8.4 6.4Z" />
+    <path d="M21.2 12 17.6 15.6 14 12 17.6 8.4Z" />
+    <path d="M12 21.2 8.4 17.6 12 14 15.6 17.6Z" />
+    <path d="M2.8 12 6.4 8.4 10 12 6.4 15.6Z" />
+  </svg>
+);
+
+// Pix first: it confirms in seconds and costs the customer nothing extra.
 const PAYMENT_OPTIONS = [
-  { id: 'pix', label: 'Pix', hint: 'Aprovação na hora, sem taxa extra', icon: QrCode, badge: 'Recomendado' },
-  { id: 'boleto', label: 'Boleto', hint: 'Vence em 3 dias · também traz um Pix', icon: FileText, badge: null },
-  { id: 'card', label: 'Cartão de crédito', hint: 'Visa e Mastercard, à vista', icon: CreditCard, badge: null },
+  { id: 'pix', label: 'Pix', hint: 'Aprovação imediata', chip: 'Mais rápido', icon: PixIcon, tone: 'text-[#32BCAD] bg-[#32BCAD]/10' },
+  { id: 'boleto', label: 'Boleto', hint: 'Vence em 3 dias', chip: 'Sem taxas', icon: Barcode, tone: 'text-navy bg-navy/10' },
+  { id: 'card', label: 'Cartão', hint: 'Crédito à vista', chip: 'Visa e Mastercard', icon: CreditCard, tone: 'text-navy bg-navy/10' },
 ] as const;
 
 export const CheckoutModal = ({ open, onOpenChange }: CheckoutModalProps) => {
@@ -596,9 +608,14 @@ export const CheckoutModal = ({ open, onOpenChange }: CheckoutModalProps) => {
 
   const stepTitles = [
     { icon: Building2, label: "Empresa", step: 1 },
-    { icon: Phone, label: "Contatos", step: 3 },
-    { icon: QrCode, label: "Pagamento", step: 4 },
+    { icon: User, label: "Contatos", step: 3 },
+    { icon: CreditCard, label: "Pagamento", step: 4 },
   ];
+  const orderTotal = getTotal() + shipping;
+  const totalUnits = items.reduce((sum, item) => sum + item.quantity, 0);
+  const firstImage = items[0]?.product.image;
+  // The card option needs the AbacatePay public key to mount its form.
+  const paymentOptions = PAYMENT_OPTIONS.filter((option) => option.id !== 'card' || ABACATEPAY_PUBLIC_KEY);
 
   const handleClose = () => {
     if (paymentCreated || paymentConfirmed) {
@@ -621,15 +638,30 @@ export const CheckoutModal = ({ open, onOpenChange }: CheckoutModalProps) => {
 
   return (
     <Dialog open={open} onOpenChange={handleClose}>
-      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
-        <DialogHeader>
-          <DialogTitle className="font-display text-xl text-foreground">
-            Finalizar Pedido
-          </DialogTitle>
-          <DialogDescription>
-            {user ? "Confirme os dados e escolha a forma de pagamento" : "Faça login para continuar com o pedido"}
-          </DialogDescription>
-        </DialogHeader>
+      <DialogContent className="w-[calc(100%-1.5rem)] max-w-2xl max-h-[92vh] overflow-y-auto overflow-x-hidden rounded-2xl sm:rounded-2xl p-0 gap-0 [&>button]:text-white [&>button]:opacity-80 [&>button:hover]:opacity-100">
+        {/* Navy brand band: logo, reassurance and the title */}
+        <div className="relative overflow-hidden bg-navy-dark px-5 sm:px-7 pt-5 pb-6 text-white">
+          <div aria-hidden="true" className="absolute -bottom-10 right-10 h-40 w-5 rotate-[35deg] bg-[#F7B500]" />
+          <div aria-hidden="true" className="absolute -bottom-10 right-[4.5rem] h-40 w-1.5 rotate-[35deg] bg-[#F7B500]/60" />
+          <div className="relative flex items-center justify-between gap-4 pr-8">
+            <Logo white className="h-8" />
+            <span className="hidden sm:flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-3 py-1.5 text-xs leading-tight">
+              <Lock className="w-4 h-4 text-[#F7B500]" aria-hidden="true" />
+              <span>
+                <strong className="block font-semibold">Compra segura</strong>
+                <span className="text-white/70">Seus dados protegidos</span>
+              </span>
+            </span>
+          </div>
+          <DialogHeader className="relative mt-5 text-left space-y-1">
+            <DialogTitle className="font-display text-2xl text-white">Finalizar Pedido</DialogTitle>
+            <DialogDescription className="text-white/75">
+              {user ? "Confirme os dados e escolha a forma de pagamento" : "Faça login para continuar com o pedido"}
+            </DialogDescription>
+          </DialogHeader>
+        </div>
+
+        <div className="min-w-0 p-5 sm:p-7">
 
         {/* Login Required Screen */}
         {!user && (
@@ -664,41 +696,49 @@ export const CheckoutModal = ({ open, onOpenChange }: CheckoutModalProps) => {
         {user && (
           <>
         {/* Stepper */}
-        <div className="flex items-center justify-between mb-6 px-2">
+        <ol className="flex items-start mb-6" aria-label="Etapas do pedido">
           {stepTitles.map((s, index) => {
             const StepIcon = s.icon;
             const isActive = step === s.step || (step === 5 && index === stepTitles.length - 1);
-            const isCompleted = step > s.step;
+            const isCompleted = step > s.step && !isActive;
+            const nextReached = index < stepTitles.length - 1 && step >= stepTitles[index + 1].step;
             return (
-              <div key={index} className="flex items-center">
-                <div className="flex flex-col items-center">
-                  <div
-                    className={cn(
-                      "w-10 h-10 rounded-full flex items-center justify-center transition-all",
-                      isActive && "bg-primary text-primary-foreground",
-                      isCompleted && "bg-primary/20 text-primary",
-                      !isActive && !isCompleted && "bg-muted text-muted-foreground"
+              <li key={s.label} className="flex flex-1 items-start last:flex-none" aria-current={isActive ? "step" : undefined}>
+                <div className="flex flex-col items-center w-20 shrink-0">
+                  <div className="relative">
+                    <div
+                      className={cn(
+                        "w-11 h-11 rounded-full flex items-center justify-center transition-colors",
+                        isActive && "bg-navy text-white shadow-md shadow-navy/25",
+                        isCompleted && "bg-navy/10 text-navy",
+                        !isActive && !isCompleted && "bg-muted text-muted-foreground"
+                      )}
+                    >
+                      <StepIcon className="w-5 h-5" aria-hidden="true" />
+                    </div>
+                    {isCompleted && (
+                      <span className="absolute -right-0.5 -bottom-0.5 w-5 h-5 rounded-full bg-success text-white grid place-items-center ring-2 ring-background">
+                        <Check className="w-3 h-3" strokeWidth={3} aria-hidden="true" />
+                      </span>
                     )}
-                  >
-                    {isCompleted ? <CheckCircle className="w-5 h-5" /> : <StepIcon className="w-5 h-5" />}
                   </div>
                   <span className={cn(
-                    "text-xs mt-1 text-center hidden sm:block",
-                    isActive ? "text-foreground font-medium" : "text-muted-foreground"
+                    "text-xs mt-1.5 text-center",
+                    isActive ? "text-foreground font-semibold" : "text-muted-foreground"
                   )}>
                     {s.label}
                   </span>
                 </div>
                 {index < stepTitles.length - 1 && (
                   <div className={cn(
-                    "w-8 h-0.5 mx-1",
-                    step > index + 1 ? "bg-primary" : "bg-muted"
+                    "flex-1 h-0.5 mt-[22px] rounded-full",
+                    nextReached ? "bg-navy/60" : "bg-border"
                   )} />
                 )}
-              </div>
+              </li>
             );
           })}
-        </div>
+        </ol>
 
         {/* Step 1: Company Data */}
         {step === 1 && (
@@ -844,9 +884,51 @@ export const CheckoutModal = ({ open, onOpenChange }: CheckoutModalProps) => {
         {/* Step 4: Payment Selection */}
         {step === 4 && !paymentCreated && (
           <div className="space-y-5">
+            {/* Shipping first: free delivery is the strongest reason to close now */}
+            {shipping === 0 ? (
+              <div className="flex items-center gap-3 rounded-2xl border border-success/20 bg-success-soft px-4 py-3 text-success-soft-foreground">
+                <span className="w-10 h-10 rounded-full bg-success text-white grid place-items-center shrink-0">
+                  <Truck className="w-5 h-5" aria-hidden="true" />
+                </span>
+                <span className="text-sm leading-snug">
+                  <strong className="block font-bold">Frete grátis para {addressData.cidade || "Joinville"}!</strong>
+                  <span className="opacity-80">Demais localidades: {formatPrice(SHIPPING_FEE)}</span>
+                </span>
+              </div>
+            ) : (
+              <div className="flex items-center gap-3 rounded-2xl border border-border bg-secondary/60 px-4 py-3">
+                <span className="w-10 h-10 rounded-full bg-navy/10 text-navy grid place-items-center shrink-0">
+                  <Truck className="w-5 h-5" aria-hidden="true" />
+                </span>
+                <span className="text-sm leading-snug">
+                  <strong className="block font-semibold text-foreground">
+                    Entrega{addressData.cidade ? ` para ${addressData.cidade}/${addressData.estado}` : ""}: {formatPrice(shipping)}
+                  </strong>
+                  <span className="text-muted-foreground">Frete grátis para Joinville/SC.</span>
+                </span>
+              </div>
+            )}
+
             {/* Order summary: transparent pricing, total stated once and clearly */}
-            <div className="rounded-2xl bg-secondary/50 p-4">
-              <h4 className="font-semibold text-foreground mb-3">Resumo do pedido</h4>
+            <div className="rounded-2xl border border-border bg-card p-4 sm:p-5">
+              <div className="flex items-center gap-3 mb-4">
+                <span className="w-14 h-14 rounded-xl bg-secondary overflow-hidden grid place-items-center shrink-0">
+                  {firstImage && firstImage !== "/placeholder.svg" ? (
+                    <img src={firstImage} alt="" className="w-full h-full object-cover" />
+                  ) : (
+                    <Package className="w-6 h-6 text-navy" aria-hidden="true" />
+                  )}
+                </span>
+                <div className="min-w-0 flex-1">
+                  <h4 className="font-semibold text-foreground">Resumo do pedido</h4>
+                  <p className="text-xs text-muted-foreground">
+                    {items.length} {items.length === 1 ? "produto" : "produtos"}
+                  </p>
+                </div>
+                <span className="text-xs font-semibold rounded-full bg-secondary px-2.5 py-1 text-foreground tabular-nums shrink-0">
+                  {totalUnits.toLocaleString("pt-BR")} un.
+                </span>
+              </div>
               <div className="space-y-2 text-sm">
                 {items.map(item => (
                   <div key={item.product.id} className="flex justify-between gap-4">
@@ -868,21 +950,19 @@ export const CheckoutModal = ({ open, onOpenChange }: CheckoutModalProps) => {
                     <span className="font-medium text-foreground tabular-nums">{formatPrice(shipping)}</span>
                   )}
                 </div>
-                <div className="border-t border-border pt-3 mt-1 flex items-baseline justify-between">
+                <div className="border-t border-dashed border-border pt-3 mt-1 flex items-baseline justify-between">
                   <span className="font-semibold text-foreground">Total</span>
-                  <span className="text-xl font-extrabold text-foreground tabular-nums">{formatPrice(getTotal() + shipping)}</span>
+                  <span className="text-2xl font-extrabold text-navy dark:text-foreground tabular-nums">{formatPrice(orderTotal)}</span>
                 </div>
-                {shipping > 0 && (
-                  <p className="text-xs text-muted-foreground">Frete grátis para Joinville/SC.</p>
-                )}
               </div>
             </div>
 
-            {/* Payment method: radio group, Pix suggested first */}
+            {/* Payment method: radio cards, Pix first */}
             <div>
-              <h4 id="payment-method-label" className="font-semibold text-foreground mb-3">Como você prefere pagar?</h4>
-              <div role="radiogroup" aria-labelledby="payment-method-label" className="space-y-2">
-                {PAYMENT_OPTIONS.filter((option) => option.id !== 'card' || ABACATEPAY_PUBLIC_KEY).map((option) => {
+              <h4 id="payment-method-label" className="font-semibold text-foreground">Forma de Pagamento</h4>
+              <p className="text-xs text-muted-foreground mb-3">Escolha a melhor opção para você</p>
+              <div role="radiogroup" aria-labelledby="payment-method-label" className={cn("grid gap-2.5", paymentOptions.length === 3 ? "sm:grid-cols-3" : "sm:grid-cols-2")}>
+                {paymentOptions.map((option) => {
                   const selected = paymentMethod === option.id;
                   return (
                     <button
@@ -892,27 +972,28 @@ export const CheckoutModal = ({ open, onOpenChange }: CheckoutModalProps) => {
                       aria-checked={selected}
                       onClick={() => setPaymentMethod(option.id)}
                       className={cn(
-                        "w-full flex items-center gap-3 p-3.5 rounded-xl border-2 text-left transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
-                        selected ? "border-primary bg-primary/5" : "border-border hover:border-primary/40"
+                        "relative flex items-center gap-3 sm:flex-col sm:items-start sm:gap-2 p-3.5 rounded-xl border-2 text-left transition-[border-color,background-color,box-shadow] duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+                        selected ? "border-navy bg-navy/[0.04] shadow-sm dark:border-primary" : "border-border hover:border-navy/40"
                       )}
                     >
-                      <span className={cn("w-10 h-10 rounded-lg grid place-items-center shrink-0", selected ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground")}>
+                      <span className={cn("w-10 h-10 rounded-lg grid place-items-center shrink-0", option.tone)}>
                         <option.icon className="w-5 h-5" aria-hidden="true" />
                       </span>
                       <span className="flex-1 min-w-0">
-                        <span className="flex items-center gap-2">
-                          <span className="font-semibold text-foreground">{option.label}</span>
-                          {option.badge && (
-                            <span className="text-[11px] font-bold rounded-full px-2 py-0.5 bg-success/15 text-success">{option.badge}</span>
-                          )}
-                        </span>
+                        <span className="block font-bold text-foreground">{option.label}</span>
                         <span className="block text-xs text-muted-foreground">{option.hint}</span>
+                      </span>
+                      <span className="text-[11px] font-semibold rounded-full px-2 py-0.5 bg-success-soft text-success-soft-foreground shrink-0">
+                        {option.chip}
                       </span>
                       <span
                         aria-hidden="true"
-                        className={cn("w-5 h-5 rounded-full border-2 grid place-items-center shrink-0", selected ? "border-primary" : "border-muted-foreground/40")}
+                        className={cn(
+                          "w-5 h-5 rounded-full border-2 grid place-items-center shrink-0 transition-colors sm:absolute sm:top-3 sm:right-3",
+                          selected ? "border-navy bg-navy text-white dark:border-primary dark:bg-primary" : "border-muted-foreground/30"
+                        )}
                       >
-                        {selected && <span className="w-2.5 h-2.5 rounded-full bg-primary" />}
+                        {selected && <Check className="w-3 h-3" strokeWidth={3} />}
                       </span>
                     </button>
                   );
@@ -920,12 +1001,31 @@ export const CheckoutModal = ({ open, onOpenChange }: CheckoutModalProps) => {
               </div>
             </div>
 
-            {/* Quiet trust signals */}
-            <ul className="flex flex-wrap justify-center gap-x-4 gap-y-1 text-xs text-muted-foreground">
-              <li className="flex items-center gap-1.5"><Lock className="w-3.5 h-3.5" aria-hidden="true" /> Pagamento seguro</li>
-              <li className="flex items-center gap-1.5"><FileText className="w-3.5 h-3.5" aria-hidden="true" /> NF-e em todo pedido</li>
-              <li className="flex items-center gap-1.5"><ShieldCheck className="w-3.5 h-3.5" aria-hidden="true" /> Dados protegidos</li>
-            </ul>
+            {/* Quiet trust row */}
+            <div className="flex flex-col sm:flex-row sm:items-center gap-3 rounded-2xl bg-secondary/60 px-4 py-3">
+              <div className="flex items-center gap-3 flex-1">
+                <ShieldCheck className="w-7 h-7 text-success shrink-0" aria-hidden="true" />
+                <p className="text-sm leading-snug">
+                  <strong className="block font-semibold text-foreground">Pagamento 100% seguro</strong>
+                  <span className="text-xs text-muted-foreground">Seus dados são criptografados e protegidos.</span>
+                </p>
+              </div>
+              <ul className="flex items-center gap-1.5" aria-label="Formas aceitas">
+                <li className="flex items-center gap-1 rounded-md border border-border bg-card px-2 py-1 text-[11px] font-bold text-[#32BCAD]">
+                  <PixIcon className="w-3.5 h-3.5" aria-hidden="true" /> pix
+                </li>
+                <li className="rounded-md border border-border bg-card px-2 py-1 text-[11px] font-bold text-foreground">Boleto</li>
+                {ABACATEPAY_PUBLIC_KEY && (
+                  <>
+                    <li className="rounded-md border border-border bg-card px-2 py-1 text-[11px] font-extrabold italic text-[#1A1F71] dark:text-foreground">VISA</li>
+                    <li className="flex items-center rounded-md border border-border bg-card px-2 py-1.5" aria-label="Mastercard">
+                      <span className="w-3 h-3 rounded-full bg-[#EB001B]" />
+                      <span className="w-3 h-3 -ml-1.5 rounded-full bg-[#F79E1B]/90" />
+                    </li>
+                  </>
+                )}
+              </ul>
+            </div>
           </div>
         )}
 
@@ -1179,47 +1279,39 @@ export const CheckoutModal = ({ open, onOpenChange }: CheckoutModalProps) => {
 
         {/* Navigation Buttons */}
         {step < 5 && !paymentCreated && (
-          <div className="flex justify-between pt-4 border-t">
+          <div className="flex items-center justify-between gap-3 pt-5 mt-5 border-t">
             <Button
-              variant="outline"
+              variant="ghost"
               onClick={prevStep}
               disabled={step === 1 || isTestOrder}
-              className="gap-2"
+              className="gap-2 text-muted-foreground"
             >
-              <ChevronLeft className="w-4 h-4" />
+              <ArrowLeft className="w-4 h-4" aria-hidden="true" />
               Voltar
             </Button>
-            
+
             {step < 4 ? (
-              <Button onClick={nextStep} className="gap-2">
+              <Button onClick={nextStep} size="lg" className="gap-2 rounded-xl">
                 Próximo
-                <ChevronRight className="w-4 h-4" />
+                <ArrowRight className="w-4 h-4" aria-hidden="true" />
               </Button>
             ) : (
-              <Button 
+              <Button
                 onClick={handlePayment}
                 disabled={isLoading}
-                className="gap-2"
+                size="lg"
+                className="gap-2 rounded-xl bg-navy text-white hover:bg-navy-light shadow-md shadow-navy/20 dark:bg-primary dark:text-primary-foreground"
               >
                 {isLoading ? (
                   <>
-                    <Loader2 className="w-4 h-4 animate-spin" />
+                    <Loader2 className="w-4 h-4 animate-spin" aria-hidden="true" />
                     Processando...
-                  </>
-                ) : paymentMethod === 'pix' ? (
-                  <>
-                    <QrCode className="w-4 h-4" />
-                    Pagar {formatPrice(getTotal() + shipping)} com Pix
-                  </>
-                ) : paymentMethod === 'boleto' ? (
-                  <>
-                    <FileText className="w-4 h-4" />
-                    Gerar boleto de {formatPrice(getTotal() + shipping)}
                   </>
                 ) : (
                   <>
-                    <CreditCard className="w-4 h-4" />
-                    Pagar {formatPrice(getTotal() + shipping)} no cartão
+                    {paymentMethod === 'pix' ? <QrCode className="w-4 h-4" aria-hidden="true" /> : paymentMethod === 'boleto' ? <Barcode className="w-4 h-4" aria-hidden="true" /> : <CreditCard className="w-4 h-4" aria-hidden="true" />}
+                    {paymentMethod === 'pix' ? 'Gerar QR Code Pix' : paymentMethod === 'boleto' ? 'Gerar boleto' : 'Pagar com cartão'}
+                    <ArrowRight className="w-4 h-4" aria-hidden="true" />
                   </>
                 )}
               </Button>
@@ -1228,7 +1320,7 @@ export const CheckoutModal = ({ open, onOpenChange }: CheckoutModalProps) => {
         )}
           </>
         )}
-
+        </div>
       </DialogContent>
     </Dialog>
   );
