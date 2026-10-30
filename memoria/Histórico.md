@@ -1,6 +1,6 @@
 # Histórico
 
-- **2026-10-30**: PR #59 aprovado pelo Claude e mergeado com CI/deploy aprovados. Iniciada #60 em branch própria para corrigir cadastro/login com retorno ao carrinho e confirmação por e-mail; layout aguarda revisão separada.
+- **2026-10-30**: PR #59 aprovado pelo Claude e mergeado com CI/deploy aprovados. #60 implementada no PR #61: retorno restrito entre cadastro/login/carrinho e confirmação por e-mail, com 65 unitários, 44 E2E e 5 Deno aprovados. Conclusão registrada no canal para nova revisão do Claude; layout aguarda esse parecer.
 
 - **2026-10-30**: PR #57 aprovado pelo Claude e mergeado. Correção adicional #58 implementa sugestões exatas no cabeçalho, com testes por clique, teclado e tamanho; Enter sem seleção preserva busca livre. Mantida espera pelo parecer do Claude antes do cadastro.
 
