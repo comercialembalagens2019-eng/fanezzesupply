@@ -22,7 +22,7 @@ export const SIZE_TIER_PRICES: Record<string, Record<string, { minQty: number; p
     "40x50": [{ minQty: 500, priceCents: 55 }, { minQty: 1000, priceCents: 46 }],
     "50x70": [{ minQty: 500, priceCents: 105 }, { minQty: 1000, priceCents: 77 }],
     "70x60": [{ minQty: 500, priceCents: 120 }, { minQty: 1000, priceCents: 87 }],
-    "40x00": [{ minQty: 500, priceCents: 64 }, { minQty: 1000, priceCents: 55 }],
+    "40x60": [{ minQty: 500, priceCents: 64 }, { minQty: 1000, priceCents: 55 }],
     "50x90": [{ minQty: 500, priceCents: 140 }, { minQty: 1000, priceCents: 102 }],
   },
 };

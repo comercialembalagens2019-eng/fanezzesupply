@@ -15,3 +15,4 @@
 - **Movimento com contenção**: entradas de 220 ms com ease-out forte e nada em interações frequentes (skill design-motion-principles, lente e-commerce). Não animar "todos os elementos"
 
 - **2026-10-30**: dados públicos da empresa ficam em `src/lib/company.ts`. Só o WhatsApp (47) 99149-0027 é canal de telefone (o fixo não atende). Horário: atendimento 24h. Na página Sobre só entra número confirmado pelo dono (hoje: 40+ anos). Sem formulário de contato: orçamento vai pelo WhatsApp com mensagem pronta.
+- **2026-10-30**: o site não informa prazo de entrega da pronta-entrega (combinado pelo WhatsApp); só o personalizado tem prazo publicado (30 dias).

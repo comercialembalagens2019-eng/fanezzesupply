@@ -64,7 +64,7 @@ export const products: Product[] = [
     imageFit: "cover",
     category: "Envelopes",
     featured: true,
-    sizes: ["20x30", "26x36", "32x40", "40x50", "50x70", "70x60", "40x00", "50x90"],
+    sizes: ["20x30", "26x36", "32x40", "40x50", "50x70", "70x60", "40x60", "50x90"],
     sizePricing: sizePricing("envelope-cinza"),
   },
   {
