@@ -3,6 +3,7 @@
 Atualizado em: 2026-10-30
 
 ## Pronto
+- [x] PR #59 aprovado pelo Claude no commit `32094b6` e mergeado; CI e deploy passaram. Correção das sugestões concluída. Cadastro/retorno ao carrinho agora na #60, branch `fix/cadastro-retorno-carrinho`, separado do layout.
 - [x] Etapa 1 da #51 / #56 mergeada no PR #57 e aprovada pelo Claude: filtro exato `produto`, busca `q`, limpeza preservando parâmetros/histórico e links da home/guia corrigidos. O Claude pediu a correção adicional das sugestões do cabeçalho antes do cadastro (#58).
 - [x] Correção adicional #58 implementada: sugestões carregam id e tamanho separado, clique/teclado abrem material exato; Enter sem seleção mantém busca livre. Verificações locais: 48 unitários, 28 E2E e 5 Deno, lint, tipos, Knip e build. Cadastro aguarda revisão do Claude desta correção.
 - [x] Estratégia da home corrigida na #54 / PR #55; Claude aprovou a revisão 2 com condições em `COMMUNICATION.md`. Condições incorporadas ao plano: três PRs separados (filtro → cadastro → layout), revisão entre etapas, foco de campos e links nos dois sentidos e capturas nas larguras críticas. Nenhuma implementação nesta entrega; CI documental não valida o desenho.
@@ -25,6 +26,7 @@ Atualizado em: 2026-10-30
 - [x] E-mails de pedido ligados: "pago" nos webhooks/checagem do Pix, "enviado/entregue" ao mudar no painel admin (função `notify-order-status`); cada e-mail sai uma vez só (tabela `order_emails`)
 
 ## Falta
+- [ ] Concluir e revisar o PR da #60: retorno validado entre checkout/cadastro/login/confirmação, carrinho preservado e auth simulada. Aguardar parecer específico do Claude antes de iniciar layout.
 - [ ] Implementar a #51 em três PRs separados, após a aprovação do plano já registrada; marcar cada conclusão no canal e aguardar revisão do Claude antes do próximo PR.
 - [ ] Decisão do dono, separada para cada seção: Guia de tamanhos fica/sai; Pedido rápido fica/sai. Preservar ambos enquanto estiverem pendentes.
 - [ ] Validar o layout nas larguras de 1.024, 1.279, 1.280 e 1.920 px e demais referências; trazer ao canal qualquer problema com desalinhamento do cabeçalho antes de alargá-lo. Retiradas de seções exigem decisão explícita do dono.
