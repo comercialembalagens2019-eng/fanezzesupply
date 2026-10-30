@@ -1,5 +1,7 @@
 # Decisões
 
+- **Direção proposta para o redesenho da home (2026-10-30, #52; execução #51)**: aproveitar as laterais com área útil de até 1.440 px e calculadora à direita em telas grandes; reduzir duplicações entre materiais, tamanhos e pedido rápido; personalizado em destaque único e detalhes sob demanda. Preservar identidade e dados reais. Validar a composição em protótipo e capturas antes de considerar o desenho definitivo.
+
 - **Ficar no Supabase** (em vez de Appwrite/Neon/PocketBase): Auth + banco + functions + realtime juntos, já integrado
 - **Sair do Lovable**: projeto Supabase próprio, deploy pelo GitHub Actions, site no Cloudflare Pages
 - **Preço só no servidor**: o cliente nunca manda valor; `catalog.ts` é a única tabela
