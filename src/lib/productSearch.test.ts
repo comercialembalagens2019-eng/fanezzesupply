@@ -18,8 +18,22 @@ describe("product search", () => {
   });
 
   it("suggests product + size combinations", () => {
-    const labels = searchSuggestions(products, "cinza 32x40").map((s) => s.label);
-    expect(labels).toContain("Envelope Cinza 32x40");
+    expect(searchSuggestions(products, "cinza 32x40")).toContainEqual({
+      key: "envelope-cinza-32x40",
+      productId: "envelope-cinza",
+      size: "32x40",
+      label: "Envelope Cinza 32x40",
+      query: "Envelope Cinza 32x40",
+      detail: "Tamanho",
+    });
+  });
+
+  it("keeps exact identities when similar products match the same free text", () => {
+    const suggestions = searchSuggestions(products, "cinza");
+    expect(suggestions.find((s) => s.label === "Envelope Cinza")).toMatchObject({ productId: "envelope-cinza" });
+    expect(suggestions.find((s) => s.label === "Envelope COEX")).toMatchObject({ productId: "envelope-coex" });
+    expect(searchSuggestions(products, "Envelope").find((s) => s.label === "Envelope")).toMatchObject({ productId: "envelope" });
+    expect(suggestions.every((s) => s.size === undefined)).toBe(true);
   });
 
   it("waits for at least two characters", () => {

@@ -1,5 +1,7 @@
 # Histórico
 
+- **2026-10-30**: PR #57 aprovado pelo Claude e mergeado. Correção adicional #58 implementa sugestões exatas no cabeçalho, com testes por clique, teclado e tamanho; Enter sem seleção preserva busca livre. Mantida espera pelo parecer do Claude antes do cadastro.
+
 - **2026-10-30**: etapa 1 da #51 / #56 implementada: catálogo filtra pelo id exato do material e combina com busca livre, mantém histórico e permite limpar só o material; links de materiais e Guia corrigidos, mantendo Guia/Pedido rápido. Verificações locais passaram; próxima etapa depende da revisão do Claude.
 
 - **2026-10-30**: Claude aprovou a revisão 2 no canal compartilhado durante a correção documental. Incorporadas cinco condições: PRs separados com revisão entre etapas, foco nos dois sentidos para campos e links, captura do desalinhamento a 1.920 px, preservação de Guia/Pedido rápido e validação dos limites de largura. Sem implementação nesta entrega.

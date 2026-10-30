@@ -65,3 +65,34 @@ test("catalog search keeps the material while a new header search clears it", as
   await expect(page).toHaveURL(/q=COEX/);
   await expect(results.getByRole("heading", { level: 3 })).toHaveText(["Envelope COEX"]);
 });
+
+for (const inputMethod of ["click", "keyboard"] as const) {
+  test(`choosing a gray envelope suggestion uses its exact id by ${inputMethod}`, async ({ page }) => {
+    await page.goto("/");
+    const search = page.getByRole("combobox", { name: "Buscar produtos" });
+    await search.fill("cinza");
+    const gray = page.getByRole("listbox", { name: "Sugestões" }).getByRole("option").filter({ has: page.getByText("Envelope Cinza", { exact: true }) });
+    await expect(gray).toBeVisible();
+    if (inputMethod === "click") {
+      await gray.click();
+    } else {
+      await search.press("ArrowDown");
+      await search.press("ArrowDown");
+      await expect(gray).toHaveAttribute("aria-selected", "true");
+      await search.press("Enter");
+    }
+    await expect(page).toHaveURL(/produto=envelope-cinza/);
+    await expect(page).not.toHaveURL(/[?&]q=/);
+    await expect(page.getByRole("region", { name: "Resultados do catálogo" }).getByRole("heading", { level: 3 })).toHaveText(["Envelope Cinza"]);
+  });
+}
+
+test("choosing a size suggestion keeps its exact product and searches only that size", async ({ page }) => {
+  await page.goto("/");
+  await page.getByRole("combobox", { name: "Buscar produtos" }).fill("cinza 32x40");
+  await page.getByRole("listbox", { name: "Sugestões" }).getByRole("option").filter({ has: page.getByText("Envelope Cinza 32x40", { exact: true }) }).click();
+  await expect(page).toHaveURL(/produto=envelope-cinza/);
+  await expect(page).toHaveURL(/q=32x40/);
+  await expect(page.getByRole("searchbox", { name: "Buscar produtos", exact: true })).toHaveValue("32x40");
+  await expect(page.getByRole("region", { name: "Resultados do catálogo" }).getByRole("heading", { level: 3 })).toHaveText(["Envelope Cinza"]);
+});
