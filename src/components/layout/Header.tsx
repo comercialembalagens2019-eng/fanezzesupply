@@ -37,10 +37,13 @@ export function Header() {
     setIsMobileMenuOpen(false);
   };
 
+  const isActive = (href: string) => location.pathname === href || location.pathname.startsWith(`${href}/`);
   const linkClass = (href: string) =>
     cn(
-      "text-sm font-semibold transition-colors",
-      location.pathname === href ? "text-foreground" : "text-muted-foreground hover:text-foreground"
+      "relative text-sm font-semibold transition-colors rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-4",
+      // A short underline marks the page the visitor is on.
+      "after:absolute after:left-0 after:right-0 after:-bottom-1.5 after:h-0.5 after:rounded-full after:bg-foreground after:transition-opacity",
+      isActive(href) ? "text-foreground after:opacity-100" : "text-muted-foreground hover:text-foreground after:opacity-0"
     );
 
   return (
@@ -70,7 +73,7 @@ export function Header() {
           {/* Desktop Navigation */}
           <nav className="hidden lg:flex items-center gap-6" aria-label="Principal">
             {navLinks.map((link) => (
-              <Link key={link.href} to={link.href} className={linkClass(link.href)}>
+              <Link key={link.href} to={link.href} className={linkClass(link.href)} aria-current={isActive(link.href) ? "page" : undefined}>
                 {link.label}
               </Link>
             ))}
@@ -81,7 +84,7 @@ export function Header() {
               </Link>
             )}
             {user ? (
-              <button onClick={handleSignOut} className={cn(linkClass("/sair"), "flex items-center gap-1.5")}>
+              <button onClick={handleSignOut} className={cn(linkClass("/sair"), "flex items-center gap-1.5 after:hidden")}>
                 <LogOut className="w-4 h-4" aria-hidden="true" />
                 Sair
               </button>

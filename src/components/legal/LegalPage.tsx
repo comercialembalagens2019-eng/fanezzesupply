@@ -2,16 +2,7 @@ import { ReactNode } from "react";
 import { Link } from "react-router-dom";
 import { Layout } from "@/components/layout/Layout";
 import { SEO } from "@/components/SEO";
-
-// Identification shown on legal pages (from the SEF/SC contributor record).
-export const COMPANY = {
-  name: "FNZ Supply",
-  legalName: "FNZ Supply Embalagens para Indústria e Comércio Ltda" as string | null,
-  cnpj: "56.008.033/0001-32" as string | null,
-  address: "Av. Antonio Ramos Alvim, 1084, 2º andar, sala 3 · Floresta · Joinville/SC · CEP 89211-460",
-  email: "vendas@fnzsupply.com.br",
-  phone: "(47) 99149-0027",
-};
+import { COMPANY } from "@/lib/company";
 
 export const LEGAL_UPDATED_AT = "29/10/2026";
 
