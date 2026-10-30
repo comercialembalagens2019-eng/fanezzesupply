@@ -3,7 +3,8 @@
 Atualizado em: 2026-10-30
 
 ## Pronto
-- [x] Etapa 1 da #51 implementada na #56: filtro exato `produto` separado da busca `q`, limpeza preservando parâmetros e histórico, estados inválidos/admin sem exposição e links da home/guia corrigidos. Verificação local: 47 testes unitários, 22 E2E, 5 Deno, lint, tipos, Knip e build. Aguardando conclusão do PR e revisão do Claude antes de cadastro.
+- [x] Etapa 1 da #51 / #56 mergeada no PR #57 e aprovada pelo Claude: filtro exato `produto`, busca `q`, limpeza preservando parâmetros/histórico e links da home/guia corrigidos. O Claude pediu a correção adicional das sugestões do cabeçalho antes do cadastro (#58).
+- [x] Correção adicional #58 implementada: sugestões carregam id e tamanho separado, clique/teclado abrem material exato; Enter sem seleção mantém busca livre. Verificações locais: 48 unitários, 28 E2E e 5 Deno, lint, tipos, Knip e build. Cadastro aguarda revisão do Claude desta correção.
 - [x] Estratégia da home corrigida na #54 / PR #55; Claude aprovou a revisão 2 com condições em `COMMUNICATION.md`. Condições incorporadas ao plano: três PRs separados (filtro → cadastro → layout), revisão entre etapas, foco de campos e links nos dois sentidos e capturas nas larguras críticas. Nenhuma implementação nesta entrega; CI documental não valida o desenho.
 - [x] Fase 1 — Segurança: pedidos e preços calculados no servidor, webhooks validam id/valor/método, reset de senha com código forte e token guardado como hash, RLS revisado
 - [x] Fase 2 — Bugs: frete (R$ 19,90, grátis só em Joinville/SC), e-mail duplicado do Stripe, carrinho limpo no logout

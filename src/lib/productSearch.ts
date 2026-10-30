@@ -33,9 +33,11 @@ export function filterCatalog(
 
 export interface SearchSuggestion {
   key: string;
+  productId: string;
+  size?: string;
   label: string;
   detail: string;
-  /** Value for /produtos?q= */
+  /** Display text after choosing a suggestion; navigation uses the exact id and optional size. */
   query: string;
 }
 
@@ -48,10 +50,10 @@ export function searchSuggestions(products: Product[], term: string, limit = 6):
     if (!matchesProduct(product, term)) continue;
     const sizes = (product.sizes ?? []).filter((size) => q.split(/\s+/).some((word) => normalize(size).includes(word)));
     if (sizes.length === 0) {
-      result.push({ key: product.id, label: product.name, detail: product.category, query: product.name });
+      result.push({ key: product.id, productId: product.id, label: product.name, detail: product.category, query: product.name });
     }
     for (const size of sizes) {
-      result.push({ key: `${product.id}-${size}`, label: `${product.name} ${size}`, detail: "Tamanho", query: `${product.name} ${size}` });
+      result.push({ key: `${product.id}-${size}`, productId: product.id, size, label: `${product.name} ${size}`, detail: "Tamanho", query: `${product.name} ${size}` });
     }
   }
   return result.slice(0, limit);

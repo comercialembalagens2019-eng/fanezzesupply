@@ -40,9 +40,17 @@ export function Header() {
   );
   const suggestionsOpen = showSuggestions && suggestions.length > 0;
 
-  const goSearch = (q: string) => {
+  const goSearch = (q: string, picked?: SearchSuggestion) => {
     const term = q.trim();
-    navigate(term ? `/produtos?q=${encodeURIComponent(term)}` : "/produtos");
+    const params = new URLSearchParams();
+    if (picked) {
+      params.set("produto", picked.productId);
+      if (picked.size) params.set("q", picked.size);
+    } else if (term) {
+      params.set("q", term);
+    }
+    const search = params.toString();
+    navigate(search ? `/produtos?${search}` : "/produtos");
     setShowSuggestions(false);
     setActiveIndex(-1);
     setIsMobileMenuOpen(false);
@@ -52,7 +60,7 @@ export function Header() {
     e.preventDefault();
     const picked: SearchSuggestion | undefined = suggestionsOpen ? suggestions[activeIndex] : undefined;
     if (picked) setQuery(picked.query);
-    goSearch(picked ? picked.query : query);
+    goSearch(picked ? picked.query : query, picked);
   };
 
   // Arrow keys move through the suggestions; Enter picks one, Escape closes the list.
@@ -130,7 +138,7 @@ export function Header() {
                     onMouseDown={(e) => {
                       e.preventDefault();
                       setQuery(s.query);
-                      goSearch(s.query);
+                      goSearch(s.query, s);
                     }}
                     onMouseEnter={() => setActiveIndex(i)}
                     className={cn(
