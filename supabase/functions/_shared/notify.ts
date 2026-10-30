@@ -75,6 +75,7 @@ export async function sendOrderEmail(supabase: Client, orderId: string, kind: Or
       totalAmount: Number(order.total_amount),
       paymentMethod: order.payment_method,
       address: company ? formatAddress(company) : "",
+      city: company?.cidade,
       createdAt: order.created_at,
     });
 

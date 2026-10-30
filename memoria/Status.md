@@ -8,7 +8,7 @@ Atualizado em: 2026-10-28
 - [x] Token Supabase antigo revogado (o secret do GitHub tem um novo)
 - [x] Domínio fanezzesupply.com.br e www apontando para o site novo (workflow `domain.yml`, 2026-10-29)
 - [x] Asaas integrado (Pix com QR Code, boleto com linha digitável, cartão na página segura do Asaas); webhook cadastrado automaticamente no deploy
-- [x] Fluxo Issue → PR → deploy (`AGENTS.md`); testes no CI; skeletons e animações; e-mail e pagamento redesenhados (#25, #26, #27, #36)
+- [x] Fluxo Issue → PR → deploy (`AGENTS.md`); testes no CI; skeletons e animações; e-mail e pagamento redesenhados (#25, #26, #27, #36) e depois refeitos conforme os mockups do dono (#39)
 - [x] Pix testado em produção (R$ 1,00)
 - [x] Fase 3 — Infra: CI, deploy automático, keep-alive, backup semanal (ver [[Infraestrutura]])
 - [x] Fase 4 — Front novo "Bento / Pedido Rápido" (proposta 4 escolhida)
