@@ -4,6 +4,10 @@ import { HeroSection } from "@/components/home/HeroSection";
 import { FeaturedProducts } from "@/components/home/FeaturedProducts";
 import { QuickOrder } from "@/components/home/QuickOrder";
 import { CTASection } from "@/components/home/CTASection";
+import { Differentials } from "@/components/home/Differentials";
+import { SizeGuide } from "@/components/home/SizeGuide";
+import { HowItWorks } from "@/components/home/HowItWorks";
+import { FAQ } from "@/components/home/FAQ";
 
 const Index = () => {
   return (
@@ -14,9 +18,13 @@ const Index = () => {
         path="/"
       />
       <HeroSection />
+      <Differentials />
       <FeaturedProducts />
+      <SizeGuide />
+      <HowItWorks />
       <QuickOrder />
       <CTASection />
+      <FAQ />
     </Layout>
   );
 };

@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { ArrowRight, FileText, MessageCircle, Truck } from "lucide-react";
+import { ArrowRight, MessageCircle } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { PriceCalculator } from "./PriceCalculator";
 import { WHATSAPP_URL } from "@/lib/company";
@@ -15,7 +15,7 @@ export function HeroSection() {
   return (
     <section className="container-custom pt-4 grid grid-cols-1 md:grid-cols-6 lg:grid-cols-12 gap-4">
       {/* Main tile */}
-      <div className="md:col-span-6 lg:col-span-7 lg:row-span-2 rounded-3xl bg-primary text-primary-foreground p-8 md:p-10 flex flex-col justify-between min-h-[360px] relative overflow-hidden">
+      <div className="md:col-span-6 lg:col-span-8 rounded-3xl bg-primary text-primary-foreground p-8 md:p-10 flex flex-col justify-between min-h-[360px] relative overflow-hidden">
         <div className="absolute -right-16 -bottom-16 w-72 h-72 rounded-full bg-navy-light/60" aria-hidden="true" />
         {/* Real product in the banner, linking straight to it */}
         <Link
@@ -57,24 +57,10 @@ export function HeroSection() {
         </div>
       </div>
 
-      <div className="md:col-span-3 lg:col-span-5">
+      <div className="md:col-span-6 lg:col-span-4">
         <PriceCalculator />
       </div>
 
-      <div className="md:col-span-3 lg:col-span-3 rounded-3xl bg-beige p-6 flex flex-col justify-between min-h-[150px]">
-        <Truck className="w-7 h-7" aria-hidden="true" />
-        <div>
-          <b className="text-lg font-extrabold block">Frete grátis</b>
-          <span className="text-sm text-navy/75">em Joinville · demais R$ 19,90</span>
-        </div>
-      </div>
-      <div className="md:col-span-6 lg:col-span-2 tile p-6 flex flex-col justify-between min-h-[150px]">
-        <FileText className="w-7 h-7" aria-hidden="true" />
-        <div>
-          <b className="text-lg font-extrabold block">NF-e</b>
-          <span className="text-sm text-muted-foreground">em todo pedido</span>
-        </div>
-      </div>
     </section>
   );
 }
