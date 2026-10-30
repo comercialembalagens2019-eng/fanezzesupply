@@ -1,4 +1,5 @@
-import { COMPANY, CompanyIdentification, LegalPage } from "@/components/legal/LegalPage";
+import { CompanyIdentification, LegalPage } from "@/components/legal/LegalPage";
+import { COMPANY } from "@/lib/company";
 
 const sections = [
   {

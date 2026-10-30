@@ -1,6 +1,7 @@
 import { Logo } from "@/components/Logo";
 import { Link } from "react-router-dom";
-import { Phone, Mail, MapPin } from "lucide-react";
+import { Clock, Mail, MapPin, MessageCircle } from "lucide-react";
+import { COMPANY, MAPS_URL, WHATSAPP_URL } from "@/lib/company";
 
 export function Footer() {
   return (
@@ -22,6 +23,7 @@ export function Footer() {
             <li><Link to="/pedidos" className="hover:text-foreground transition-colors">Meus pedidos</Link></li>
             <li><Link to="/cadastro" className="hover:text-foreground transition-colors">Cadastre sua empresa</Link></li>
             <li><Link to="/sobre" className="hover:text-foreground transition-colors">Sobre nós</Link></li>
+            <li><Link to="/contato" className="hover:text-foreground transition-colors">Contato</Link></li>
           </ul>
         </div>
 
@@ -29,18 +31,20 @@ export function Footer() {
           <h2 className="font-display font-bold text-base text-foreground">Contato</h2>
           <ul className="space-y-2 text-muted-foreground">
             <li>
-              <a href="tel:+5547991490027" className="flex items-center gap-2 hover:text-foreground transition-colors">
-                <Phone className="w-4 h-4" aria-hidden="true" /> (47) 99149-0027
+              <a href={WHATSAPP_URL} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 hover:text-foreground transition-colors">
+                <MessageCircle className="w-4 h-4" aria-hidden="true" /> WhatsApp {COMPANY.phone}
               </a>
             </li>
             <li>
-              <a href="mailto:vendas@fnzsupply.com.br" className="flex items-center gap-2 hover:text-foreground transition-colors">
-                <Mail className="w-4 h-4" aria-hidden="true" /> vendas@fnzsupply.com.br
+              <a href={`mailto:${COMPANY.email}`} className="flex items-center gap-2 hover:text-foreground transition-colors">
+                <Mail className="w-4 h-4" aria-hidden="true" /> {COMPANY.email}
               </a>
             </li>
-            <li className="flex items-start gap-2">
-              <MapPin className="w-4 h-4 mt-0.5 shrink-0" aria-hidden="true" />
-              Av. Antonio Ramos Alvim, 1084 · Joinville/SC
+            <li>
+              <a href={MAPS_URL} target="_blank" rel="noopener noreferrer" className="flex items-start gap-2 hover:text-foreground transition-colors">
+                <MapPin className="w-4 h-4 mt-0.5 shrink-0" aria-hidden="true" />
+                {COMPANY.shortAddress}
+              </a>
             </li>
           </ul>
         </div>
@@ -50,13 +54,15 @@ export function Footer() {
           <p className="text-muted-foreground">
             Frete grátis para Joinville. Demais localidades: R$ 19,90.
           </p>
-          <p className="text-muted-foreground">Seg–Sex 8h–18h · Sáb 8h–12h</p>
+          <p className="flex items-center gap-2 text-muted-foreground">
+            <Clock className="w-4 h-4" aria-hidden="true" /> {COMPANY.hours}
+          </p>
         </div>
       </div>
 
       <div className="border-t border-border">
         <div className="container-custom py-5 flex flex-col sm:flex-row gap-3 justify-between text-xs text-muted-foreground">
-          <span>© {new Date().getFullYear()} FNZ Supply · CNPJ 56.008.033/0001-32. Todos os direitos reservados.</span>
+          <span>© {new Date().getFullYear()} FNZ Supply · CNPJ {COMPANY.cnpj}. Todos os direitos reservados.</span>
           <span className="flex gap-4">
             <Link to="/termos" className="hover:text-foreground transition-colors">Termos de Uso</Link>
             <Link to="/privacidade" className="hover:text-foreground transition-colors">Política de Privacidade</Link>

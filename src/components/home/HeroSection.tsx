@@ -2,8 +2,7 @@ import { Link } from "react-router-dom";
 import { ArrowRight, FileText, MessageCircle, Truck } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { PriceCalculator } from "./PriceCalculator";
-
-const WHATSAPP_URL = "https://wa.me/5547991490027";
+import { WHATSAPP_URL } from "@/lib/company";
 
 export function HeroSection() {
   const { user } = useAuth();

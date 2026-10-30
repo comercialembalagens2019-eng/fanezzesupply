@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
-import { COMPANY, CompanyIdentification, LegalPage } from "@/components/legal/LegalPage";
+import { CompanyIdentification, LegalPage } from "@/components/legal/LegalPage";
+import { COMPANY } from "@/lib/company";
 import { SHIPPING_FEE, formatBRL } from "@/lib/pricing";
 
 const linkClass = "text-foreground underline underline-offset-4";
