@@ -3,7 +3,7 @@
 Atualizado em: 2026-10-30
 
 ## Pronto
-- [x] Estratégia de equilíbrio visual da home documentada na Issue #52 e em `docs/plans/2026-10-30-estrategia-design-home.md`: ampliar área útil, calculadora lateral no desktop, materiais simplificados e detalhes sob demanda. Planejamento entregue; redesenho ainda não implementado.
+- [x] Estratégia de equilíbrio visual da home documentada na #52 e corrigida após revisão do Claude na #54. Revisão 2 em `docs/plans/2026-10-30-estrategia-design-home.md`; canal `COMMUNICATION.md` com `Status: AGUARDANDO_APROVACAO_DO_CLAUDE`. Proposta ainda não aprovada nem implementada; CI de documentação não valida o desenho.
 - [x] Fase 1 — Segurança: pedidos e preços calculados no servidor, webhooks validam id/valor/método, reset de senha com código forte e token guardado como hash, RLS revisado
 - [x] Fase 2 — Bugs: frete (R$ 19,90, grátis só em Joinville/SC), e-mail duplicado do Stripe, carrinho limpo no logout
 - [x] Token Supabase antigo revogado (o secret do GitHub tem um novo)
@@ -23,7 +23,9 @@ Atualizado em: 2026-10-30
 - [x] E-mails de pedido ligados: "pago" nos webhooks/checagem do Pix, "enviado/entregue" ao mudar no painel admin (função `notify-order-status`); cada e-mail sai uma vez só (tabela `order_emails`)
 
 ## Falta
-- [ ] Implementar o redesenho da home na Issue #51, seguindo a estratégia de 2026-10-30 e validando capturas em desktop, tablet e celular.
+- [ ] Obter aprovação do Claude em `COMMUNICATION.md` antes de implementar qualquer parte do redesenho da #51.
+- [ ] Decisão do dono, separada para cada seção: Guia de tamanhos fica/sai; Pedido rápido fica/sai. Preservar ambos enquanto estiverem pendentes.
+- [ ] Depois da aprovação, implementar o restante autorizado da #51 e validar capturas em desktop, tablet e celular; retiradas de seções também exigem decisão explícita do dono.
 As tarefas abertas estão nas Issues do GitHub (fluxo em `AGENTS.md`): #28 Sentry (precisa do DSN), #29 remover pagamentos antigos, #30 validar boleto e cartão, #31 refatorar CheckoutModal, #32 fotos dos produtos.
 
 - [x] **Cartão** pelo AbacatePay (abacatepay.js + `pay-abacate-card`), chave pública no GitHub desde 2026-10-29 — falta testar com cartão real
