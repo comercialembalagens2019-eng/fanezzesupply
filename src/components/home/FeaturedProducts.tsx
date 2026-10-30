@@ -2,7 +2,7 @@ import type { CSSProperties } from "react";
 import { Link } from "react-router-dom";
 import { productImageClass } from "@/lib/productImage";
 import { products } from "@/data/products";
-import { formatBRL } from "@/lib/pricing";
+import { formatBRL, fromPrice } from "@/lib/pricing";
 
 export function FeaturedProducts() {
   const featured = products.filter((p) => p.featured && !p.quoteOnly).slice(0, 4);
@@ -10,7 +10,7 @@ export function FeaturedProducts() {
   return (
     <section className="container-custom mt-4" aria-labelledby="featured-heading">
       <h2 id="featured-heading" className="sr-only">Produtos em destaque</h2>
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className={`grid grid-cols-2 gap-4 ${featured.length === 3 ? "lg:grid-cols-3" : "lg:grid-cols-4"}`}>
         {featured.map((p, i) => (
           <Link
             key={p.id}
@@ -30,7 +30,7 @@ export function FeaturedProducts() {
             <div className="flex flex-col sm:flex-row sm:items-baseline sm:justify-between gap-0.5 mt-1">
               <span className="font-extrabold text-lg whitespace-nowrap">
                 {p.sizePricing ? <span className="text-xs font-semibold text-muted-foreground">a partir de </span> : null}
-                {formatBRL(p.sizePricing ? Math.min(...p.sizePricing.flatMap((sp) => sp.tiers.map((t) => t.price))) : p.price)}
+                {formatBRL(fromPrice(p))}
                 <span className="text-xs text-muted-foreground font-semibold">/{p.unit === "kg" ? "kg" : "un."}</span>
               </span>
               <span className="text-xs text-muted-foreground">

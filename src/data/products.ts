@@ -1,5 +1,6 @@
 import { Product, SizePricing } from "@/types";
 import envelopeImg from "@/assets/envelope.webp";
+import envelopeCinzaImg from "@/assets/envelope-cinza.webp";
 // Single source of truth for prices: the same catalog the edge functions charge from.
 import {
   PRODUCT_UNIT_PRICE_CENTS,
@@ -59,7 +60,7 @@ export const products: Product[] = [
     unit: "unidade",
     minOrder: 500,
     minOrderUnit: "unidades",
-    image: envelopeImg,
+    image: envelopeCinzaImg,
     imageFit: "cover",
     category: "Envelopes",
     featured: true,

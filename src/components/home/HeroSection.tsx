@@ -3,6 +3,11 @@ import { ArrowRight, FileText, MessageCircle, Truck } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { PriceCalculator } from "./PriceCalculator";
 import { WHATSAPP_URL } from "@/lib/company";
+import { products } from "@/data/products";
+import { formatBRL, fromPrice } from "@/lib/pricing";
+
+// Product shown in the banner; its photo and starting price come from the catalog.
+const spotlight = products.find((p) => p.id === "envelope-cinza")!;
 
 export function HeroSection() {
   const { user } = useAuth();
@@ -12,6 +17,17 @@ export function HeroSection() {
       {/* Main tile */}
       <div className="md:col-span-6 lg:col-span-7 lg:row-span-2 rounded-3xl bg-primary text-primary-foreground p-8 md:p-10 flex flex-col justify-between min-h-[360px] relative overflow-hidden">
         <div className="absolute -right-16 -bottom-16 w-72 h-72 rounded-full bg-navy-light/60" aria-hidden="true" />
+        {/* Real product in the banner, linking straight to it */}
+        <Link
+          to={`/produtos?q=${encodeURIComponent(spotlight.name)}`}
+          className="hidden md:block absolute right-8 bottom-8 w-48 rounded-2xl bg-white text-navy p-2 shadow-xl shadow-black/20 rotate-2 hover:rotate-0 hover:-translate-y-0.5 transition-transform duration-200 motion-reduce:transition-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
+        >
+          <img src={spotlight.image} alt="" width={1200} height={900} className="w-full aspect-[4/3] object-cover rounded-xl" />
+          <span className="block px-1.5 pt-2 pb-1">
+            <span className="block text-sm font-extrabold">{spotlight.name}</span>
+            <span className="block text-xs text-navy/70">a partir de {formatBRL(fromPrice(spotlight))}/un.</span>
+          </span>
+        </Link>
         <div className="relative">
           <span className="text-xs font-bold uppercase tracking-wider bg-white/10 px-3 py-1.5 rounded-full">
             Atacado B2B · Joinville/SC
