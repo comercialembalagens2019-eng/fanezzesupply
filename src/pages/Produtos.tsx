@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect, type CSSProperties } from "react";
+import { useState, useMemo, type CSSProperties } from "react";
 import { useSearchParams } from "react-router-dom";
 import { Search, Grid3X3, LayoutList } from "lucide-react";
 import { Layout } from "@/components/layout/Layout";
@@ -8,30 +8,27 @@ import { ProductCard } from "@/components/products/ProductCard";
 import { products, categories } from "@/data/products";
 import { useAuth } from "@/contexts/AuthContext";
 import { cn } from "@/lib/utils";
-import { matchesProduct } from "@/lib/productSearch";
+import { filterCatalog } from "@/lib/productSearch";
 
 type SortOption = "name-asc" | "name-desc";
 
 const Produtos = () => {
-  const [searchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
   const { isAdmin } = useAuth();
-  const [searchTerm, setSearchTerm] = useState(searchParams.get("q") ?? "");
-
-  // The header search navigates here with ?q=
-  useEffect(() => {
-    setSearchTerm(searchParams.get("q") ?? "");
-  }, [searchParams]);
+  // URL changes, including browser history, are reflected without remounting the page.
+  const searchTerm = searchParams.get("q") ?? "";
+  const productId = searchParams.get("produto");
   const [selectedCategory, setSelectedCategory] = useState("Todos");
   const [sortBy, setSortBy] = useState<SortOption>("name-asc");
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
 
-  const filteredProducts = useMemo(() => {
-    let result = products.filter((p) => !p.adminOnly || isAdmin);
+  const { items, selectedProduct, invalidProduct } = useMemo(
+    () => filterCatalog(products, { productId, query: searchTerm, isAdmin }),
+    [productId, searchTerm, isAdmin]
+  );
 
-    // Filter by search term
-    if (searchTerm) {
-      result = result.filter((p) => matchesProduct(p, searchTerm));
-    }
+  const filteredProducts = useMemo(() => {
+    let result = [...items];
 
     // Filter by category
     if (selectedCategory !== "Todos") {
@@ -49,7 +46,24 @@ const Produtos = () => {
     }
 
     return result;
-  }, [searchTerm, selectedCategory, sortBy, isAdmin]);
+  }, [items, selectedCategory, sortBy]);
+
+  const updateSearch = (query: string) => {
+    setSearchParams((current) => {
+      const next = new URLSearchParams(current);
+      if (query) next.set("q", query);
+      else next.delete("q");
+      return next;
+    }, { replace: true });
+  };
+
+  const clearMaterial = () => {
+    setSearchParams((current) => {
+      const next = new URLSearchParams(current);
+      next.delete("produto");
+      return next;
+    });
+  };
 
   return (
     <Layout>
@@ -93,7 +107,7 @@ const Produtos = () => {
                 type="search"
                 placeholder="Buscar produtos..."
                 value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
+                onChange={(e) => updateSearch(e.target.value)}
                 className="w-full h-11 pl-9 pr-4 rounded-xl bg-muted text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
               />
             </label>
@@ -145,16 +159,30 @@ const Produtos = () => {
               </div>
             </div>
           </div>
+          {productId !== null && (
+            <div className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm" role="status">
+              <span className="font-semibold">
+                {selectedProduct ? `Material: ${selectedProduct.name}` : "Material indisponível"}
+              </span>
+              <button
+                type="button"
+                onClick={clearMaterial}
+                className="min-h-11 px-3 rounded-xl font-semibold underline underline-offset-4 hover:bg-card focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+              >
+                Limpar material
+              </button>
+            </div>
+          )}
         </div>
       </section>
 
       {/* Products Grid */}
-      <section className="pt-4">
+      <section className="pt-4" aria-label="Resultados do catálogo">
         <div className="container-custom">
           {filteredProducts.length === 0 ? (
             <div className="text-center py-16">
               <p className="text-muted-foreground text-lg">
-                Nenhum produto encontrado.
+                {invalidProduct ? "Material indisponível. Limpe o filtro para ver outros produtos." : "Nenhum produto encontrado."}
               </p>
             </div>
           ) : (

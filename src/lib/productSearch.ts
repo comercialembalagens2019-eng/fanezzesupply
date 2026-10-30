@@ -14,6 +14,23 @@ export function matchesProduct(product: Product, term: string): boolean {
   return q.split(/\s+/).every((word) => haystack.includes(word));
 }
 
+// Resolve access before the exact material filter; an unavailable id must not broaden the search.
+export function filterCatalog(
+  products: Product[],
+  { productId = null, query = "", isAdmin = false }: { productId?: string | null; query?: string; isAdmin?: boolean } = {}
+) {
+  const accessible = products.filter((product) => !product.adminOnly || isAdmin);
+  const selectedProduct = productId === null ? undefined : accessible.find((product) => product.id === productId);
+  const invalidProduct = productId !== null && !selectedProduct;
+  const selected = productId === null ? accessible : selectedProduct ? [selectedProduct] : [];
+
+  return {
+    items: selected.filter((product) => matchesProduct(product, query)),
+    selectedProduct,
+    invalidProduct,
+  };
+}
+
 export interface SearchSuggestion {
   key: string;
   label: string;

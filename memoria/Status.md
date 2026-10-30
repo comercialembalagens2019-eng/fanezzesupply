@@ -3,6 +3,7 @@
 Atualizado em: 2026-10-30
 
 ## Pronto
+- [x] Etapa 1 da #51 implementada na #56: filtro exato `produto` separado da busca `q`, limpeza preservando parâmetros e histórico, estados inválidos/admin sem exposição e links da home/guia corrigidos. Verificação local: 47 testes unitários, 22 E2E, 5 Deno, lint, tipos, Knip e build. Aguardando conclusão do PR e revisão do Claude antes de cadastro.
 - [x] Estratégia da home corrigida na #54 / PR #55; Claude aprovou a revisão 2 com condições em `COMMUNICATION.md`. Condições incorporadas ao plano: três PRs separados (filtro → cadastro → layout), revisão entre etapas, foco de campos e links nos dois sentidos e capturas nas larguras críticas. Nenhuma implementação nesta entrega; CI documental não valida o desenho.
 - [x] Fase 1 — Segurança: pedidos e preços calculados no servidor, webhooks validam id/valor/método, reset de senha com código forte e token guardado como hash, RLS revisado
 - [x] Fase 2 — Bugs: frete (R$ 19,90, grátis só em Joinville/SC), e-mail duplicado do Stripe, carrinho limpo no logout

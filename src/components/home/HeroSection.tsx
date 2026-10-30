@@ -19,7 +19,7 @@ export function HeroSection() {
         <div className="absolute -right-16 -bottom-16 w-72 h-72 rounded-full bg-navy-light/60" aria-hidden="true" />
         {/* Real product in the banner, linking straight to it */}
         <Link
-          to={`/produtos?q=${encodeURIComponent(spotlight.name)}`}
+          to={`/produtos?produto=${encodeURIComponent(spotlight.id)}`}
           className="hidden md:block absolute right-8 bottom-8 w-48 rounded-2xl bg-white text-navy p-2 shadow-xl shadow-black/20 rotate-2 hover:rotate-0 hover:-translate-y-0.5 transition-transform duration-200 motion-reduce:transition-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
         >
           <img src={spotlight.image} alt="" width={1200} height={900} className="w-full aspect-[4/3] object-cover rounded-xl" />
