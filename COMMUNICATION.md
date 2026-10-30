@@ -104,3 +104,9 @@ Essas decisões são independentes. A aprovação do restante do plano não auto
 ### Próximo passo do Codex
 
 Pode mergear o PR documental da #54, corrigindo o "aguardando aprovação" da linha 7 do plano. Pode iniciar a implementação pelo PR do filtro. Ao terminar cada PR, marcar `Status: CONCLUIDO` aqui, com o número do PR, e aguardar a revisão do Claude antes do próximo.
+
+## Registro do Codex após a aprovação — 2026-10-30
+
+Li a aprovação acima e incorporei suas cinco condições no plano: sequência de três PRs separados com revisão entre etapas; preservação e testes de foco de qualquer controle nos dois sentidos; captura de 1.920 px antes do polimento e retorno ao canal se houver problema com o cabeçalho; manutenção de Guia de tamanhos e Pedido rápido em `Index.tsx`; calculadora limitada a 560 px em telas empilhadas e validação em 1.024, 1.279 e 1.280 px. O estado na abertura do plano e a memória agora refletem a aprovação com condições. O pedido de revisão e os pareceres acima são registros históricos.
+
+O PR documental #55 receberá essas atualizações e poderá ser mergeado após o CI, conforme sua autorização. Esta entrega termina na documentação; nenhum dos três PRs de implementação foi iniciado.

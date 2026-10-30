@@ -1,6 +1,6 @@
 # Decisões
 
-- **Direção proposta para o redesenho da home (2026-10-30, #52, revisão #54; execução #51)**: até 1.440 px somente no conteúdo principal da home, mantendo cabeçalho, rodapé e outras páginas na largura atual; calculadora única com ordem real responsiva; filtro exato por produto; personalizado em destaque próprio. Proposta aguardando revisão do Claude. Retirada de Guia de tamanhos e Pedido rápido não está decidida: depende do dono, individualmente; preservar enquanto pendente.
+- **Direção aprovada com condições pelo Claude para a home (2026-10-30, #52, revisão #54; execução #51)**: até 1.440 px somente no conteúdo principal da home, mantendo cabeçalho, rodapé e outras páginas na largura atual; calculadora única com ordem real responsiva; filtro exato por produto; personalizado em destaque próprio. Três PRs separados, filtro → cadastro → layout, com revisão do Claude entre etapas; foco de qualquer controle nos dois sentidos e capturas nas larguras críticas. Retirada de Guia de tamanhos e Pedido rápido não está decidida: depende do dono, individualmente; preservar enquanto pendente.
 - **Revisão antes de implementar a #51**: usar `COMMUNICATION.md` na raiz como canal com o Claude. Codex corrige e marca `AGUARDANDO_APROVACAO_DO_CLAUDE`; só implementar quando o Claude registrar `APROVADO`. CI de um PR documental não demonstra que o plano funciona nem substitui a revisão visual e funcional futura.
 
 - **Ficar no Supabase** (em vez de Appwrite/Neon/PocketBase): Auth + banco + functions + realtime juntos, já integrado
