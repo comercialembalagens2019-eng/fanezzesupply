@@ -51,3 +51,7 @@ export function bestTierDiscount(product: Product): number {
 
 export const formatBRL = (value: number) =>
   new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(value);
+
+// Lowest unit price across sizes and quantity tiers: the "a partir de" price.
+export const fromPrice = (product: Product) =>
+  product.sizePricing ? Math.min(...product.sizePricing.flatMap((sp) => sp.tiers.map((t) => t.price))) : product.price;

@@ -1,10 +1,12 @@
-import { useState, FormEvent } from "react";
+import { useMemo, useState, FormEvent, KeyboardEvent } from "react";
 import { Logo } from "@/components/Logo";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Menu, X, ShoppingCart, User, LogOut, Users, Search } from "lucide-react";
 import { useCart } from "@/contexts/CartContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { cn } from "@/lib/utils";
+import { products } from "@/data/products";
+import { searchSuggestions, type SearchSuggestion } from "@/lib/productSearch";
 
 const baseNavLinks = [
   { href: "/produtos", label: "Produtos" },
@@ -30,11 +32,42 @@ export function Header() {
     setIsMobileMenuOpen(false);
   };
 
+  const [showSuggestions, setShowSuggestions] = useState(false);
+  const [activeIndex, setActiveIndex] = useState(-1);
+  const suggestions = useMemo(
+    () => searchSuggestions(products.filter((p) => !p.adminOnly || isAdmin), query),
+    [query, isAdmin]
+  );
+  const suggestionsOpen = showSuggestions && suggestions.length > 0;
+
+  const goSearch = (q: string) => {
+    const term = q.trim();
+    navigate(term ? `/produtos?q=${encodeURIComponent(term)}` : "/produtos");
+    setShowSuggestions(false);
+    setActiveIndex(-1);
+    setIsMobileMenuOpen(false);
+  };
+
   const handleSearch = (e: FormEvent) => {
     e.preventDefault();
-    const q = query.trim();
-    navigate(q ? `/produtos?q=${encodeURIComponent(q)}` : "/produtos");
-    setIsMobileMenuOpen(false);
+    const picked: SearchSuggestion | undefined = suggestionsOpen ? suggestions[activeIndex] : undefined;
+    if (picked) setQuery(picked.query);
+    goSearch(picked ? picked.query : query);
+  };
+
+  // Arrow keys move through the suggestions; Enter picks one, Escape closes the list.
+  const handleSearchKeys = (e: KeyboardEvent<HTMLInputElement>) => {
+    if (!suggestionsOpen) return;
+    if (e.key === "ArrowDown") {
+      e.preventDefault();
+      setActiveIndex((i) => (i + 1) % suggestions.length);
+    } else if (e.key === "ArrowUp") {
+      e.preventDefault();
+      setActiveIndex((i) => (i <= 0 ? suggestions.length - 1 : i - 1));
+    } else if (e.key === "Escape") {
+      setShowSuggestions(false);
+      setActiveIndex(-1);
+    }
   };
 
   const isActive = (href: string) => location.pathname === href || location.pathname.startsWith(`${href}/`);
@@ -52,26 +85,69 @@ export function Header() {
         <div className="flex items-center gap-3 md:gap-5 h-16">
           {/* Logo */}
           <Link to="/" className="flex items-center shrink-0" aria-label="FNZ Supply — início">
-            <Logo className="h-11" />
+            <Logo className="h-10 md:h-12" />
           </Link>
 
           {/* Search */}
-          <form onSubmit={handleSearch} role="search" className="flex-1 max-w-xl">
+          <form onSubmit={handleSearch} role="search" className="relative flex-1 max-w-xl">
             <label className="flex items-center gap-2 h-11 rounded-xl bg-card ring-1 ring-black/5 px-3.5 focus-within:ring-2 focus-within:ring-ring transition-shadow">
               <Search className="w-4 h-4 text-muted-foreground shrink-0" aria-hidden="true" />
               <span className="sr-only">Buscar produtos</span>
               <input
                 type="search"
+                role="combobox"
+                aria-expanded={suggestionsOpen}
+                aria-controls="search-suggestions"
+                aria-autocomplete="list"
+                aria-activedescendant={suggestionsOpen && activeIndex >= 0 ? `search-option-${activeIndex}` : undefined}
                 value={query}
-                onChange={(e) => setQuery(e.target.value)}
+                onChange={(e) => {
+                  setQuery(e.target.value);
+                  setShowSuggestions(true);
+                  setActiveIndex(-1);
+                }}
+                onFocus={() => setShowSuggestions(true)}
+                onBlur={() => setShowSuggestions(false)}
+                onKeyDown={handleSearchKeys}
                 placeholder="Buscar envelope ou tamanho…"
                 className="w-full bg-transparent text-sm text-foreground placeholder:text-muted-foreground focus:outline-none"
               />
             </label>
+            {suggestionsOpen && (
+              <ul
+                id="search-suggestions"
+                role="listbox"
+                aria-label="Sugestões"
+                className="absolute left-0 right-0 top-full mt-2 z-50 rounded-xl bg-card ring-1 ring-black/10 shadow-lg p-1.5 animate-enter"
+              >
+                {suggestions.map((s, i) => (
+                  <li
+                    key={s.key}
+                    id={`search-option-${i}`}
+                    role="option"
+                    aria-selected={i === activeIndex}
+                    // mousedown keeps focus in the input so blur does not close the list first
+                    onMouseDown={(e) => {
+                      e.preventDefault();
+                      setQuery(s.query);
+                      goSearch(s.query);
+                    }}
+                    onMouseEnter={() => setActiveIndex(i)}
+                    className={cn(
+                      "flex items-center justify-between gap-3 px-3 py-2.5 rounded-lg cursor-pointer text-sm",
+                      i === activeIndex ? "bg-muted" : ""
+                    )}
+                  >
+                    <span className="font-semibold text-foreground truncate">{s.label}</span>
+                    <span className="text-xs text-muted-foreground shrink-0">{s.detail}</span>
+                  </li>
+                ))}
+              </ul>
+            )}
           </form>
 
           {/* Desktop Navigation */}
-          <nav className="hidden lg:flex items-center gap-6" aria-label="Principal">
+          <nav className="hidden lg:flex items-center gap-6 ml-auto" aria-label="Principal">
             {navLinks.map((link) => (
               <Link key={link.href} to={link.href} className={linkClass(link.href)} aria-current={isActive(link.href) ? "page" : undefined}>
                 {link.label}

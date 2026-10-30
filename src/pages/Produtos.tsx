@@ -8,6 +8,7 @@ import { ProductCard } from "@/components/products/ProductCard";
 import { products, categories } from "@/data/products";
 import { useAuth } from "@/contexts/AuthContext";
 import { cn } from "@/lib/utils";
+import { matchesProduct } from "@/lib/productSearch";
 
 type SortOption = "name-asc" | "name-desc";
 
@@ -29,11 +30,7 @@ const Produtos = () => {
 
     // Filter by search term
     if (searchTerm) {
-      result = result.filter(
-        (p) =>
-          p.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          p.description.toLowerCase().includes(searchTerm.toLowerCase())
-      );
+      result = result.filter((p) => matchesProduct(p, searchTerm));
     }
 
     // Filter by category
