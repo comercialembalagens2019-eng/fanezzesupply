@@ -1,5 +1,7 @@
 # Histórico
 
+- **2026-10-30**: etapa 1 da #51 / #56 implementada: catálogo filtra pelo id exato do material e combina com busca livre, mantém histórico e permite limpar só o material; links de materiais e Guia corrigidos, mantendo Guia/Pedido rápido. Verificações locais passaram; próxima etapa depende da revisão do Claude.
+
 - **2026-10-30**: Claude aprovou a revisão 2 no canal compartilhado durante a correção documental. Incorporadas cinco condições: PRs separados com revisão entre etapas, foco nos dois sentidos para campos e links, captura do desalinhamento a 1.920 px, preservação de Guia/Pedido rápido e validação dos limites de largura. Sem implementação nesta entrega.
 
 - **2026-10-30**: parecer do Claude lido em `COMMUNICATION.md`; plano da #51 corrigido na #54 nos seis itens (filtro exato, calculadora única, largura isolada, Knip, cadastro e fotos). Canal atualizado para `AGUARDANDO_APROVACAO_DO_CLAUDE`; retiradas de Guia e Pedido rápido pendentes do dono. Nenhuma implementação nesta revisão.

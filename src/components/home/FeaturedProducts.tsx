@@ -86,7 +86,7 @@ export function FeaturedProducts() {
                 </a>
               ) : (
                 <Link
-                  to={`/produtos?q=${encodeURIComponent(p.name)}`}
+                  to={`/produtos?produto=${encodeURIComponent(p.id)}`}
                   className="mt-3 inline-flex justify-center items-center gap-2 h-11 rounded-xl bg-primary text-primary-foreground font-bold hover:bg-navy-light transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
                 >
                   Ver tamanhos e preços <ArrowRight className="w-4 h-4" aria-hidden="true" />

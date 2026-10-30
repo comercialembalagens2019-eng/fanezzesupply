@@ -46,7 +46,7 @@ src/
   data/products.ts       # catálogo exibido (importa preços de _shared/catalog.ts)
   lib/
     pricing.ts           # getUnitPrice, fromPrice, shippingFor, formatBRL
-    productSearch.ts     # busca sem acento, por nome/tamanho/cor + sugestões
+    productSearch.ts     # busca sem acento, sugestões e filtro exato por id após permissões
     company.ts           # dados públicos da empresa (WhatsApp, e-mail, endereço, horário, mapa)
   assets/                # fotos (envelope.webp, envelope-cinza.webp, logos)
 supabase/

@@ -77,7 +77,7 @@ export function SizeGuide() {
         {visible.map((e, i) => (
           <li key={e.key} className={cn(!showAll && i >= MOBILE_LIMIT && "hidden sm:block")}>
             <Link
-              to={`/produtos?q=${encodeURIComponent(`${e.material} ${e.size}`)}`}
+              to={`/produtos?produto=${encodeURIComponent(e.productId)}&q=${encodeURIComponent(e.size)}`}
               className="group tile p-3 h-full flex flex-col hover:shadow-hover transition-shadow focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
             >
               <span className="flex items-center gap-2.5">

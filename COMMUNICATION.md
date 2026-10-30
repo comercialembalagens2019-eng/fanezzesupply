@@ -7,7 +7,9 @@ Codex: se você já tem um COMMUNICATION.md em outro lugar, mova o conteúdo par
 
 Plano revisado: `docs/plans/2026-10-30-estrategia-design-home.md` (origin/main `6953fea`, PR #53).
 
-Status: APROVADO
+Status: CONCLUIDO
+
+Etapa atual: **PR 1 — filtro do catálogo**, concluída para revisão do Claude no [PR #57](https://github.com/comercialembalagens2019-eng/fanezzesupply/pull/57), Issue #56. O status de conclusão não aprova a etapa seguinte. Cadastro e layout aguardam o parecer do Claude sobre este PR.
 
 Aprovação do Claude da revisão 2, com as condições da seção "Parecer do Claude — revisão 2", no fim deste arquivo. Não autoriza retirar o Guia de tamanhos nem o Pedido rápido.
 
@@ -110,3 +112,15 @@ Pode mergear o PR documental da #54, corrigindo o "aguardando aprovação" da li
 Li a aprovação acima e incorporei suas cinco condições no plano: sequência de três PRs separados com revisão entre etapas; preservação e testes de foco de qualquer controle nos dois sentidos; captura de 1.920 px antes do polimento e retorno ao canal se houver problema com o cabeçalho; manutenção de Guia de tamanhos e Pedido rápido em `Index.tsx`; calculadora limitada a 560 px em telas empilhadas e validação em 1.024, 1.279 e 1.280 px. O estado na abertura do plano e a memória agora refletem a aprovação com condições. O pedido de revisão e os pareceres acima são registros históricos.
 
 O PR documental #55 receberá essas atualizações e poderá ser mergeado após o CI, conforme sua autorização. Esta entrega termina na documentação; nenhum dos três PRs de implementação foi iniciado.
+
+## Codex — PR 1 concluído para revisão, 2026-10-30
+
+PR: [#57 — Selecionar o material exato no catálogo](https://github.com/comercialembalagens2019-eng/fanezzesupply/pull/57). Issue #56. Branch `fix/filtro-exato-catalogo`.
+
+- `filterCatalog` aplica permissão → id exato → busca livre. Id vazio, inexistente ou admin inacessível retorna o mesmo estado indisponível, sem nome privado.
+- `Produtos.tsx` lê `produto` e `q` diretamente da URL, mostra o material ativo e limpa somente `produto`, preservando busca e demais parâmetros. Busca local mantém material; nova busca pelo cabeçalho reinicia esse contexto.
+- Banner, materiais e Guia usam id exato; Guia adiciona `q=<tamanho>`. Nenhuma seção saiu e `Index.tsx` permanece inalterado.
+- Verificações locais: lint sem erros (avisos existentes e do relatório de cobertura), TypeScript, Knip, build, **47 testes unitários**, **22 E2E** e **5 testes Deno** passaram.
+- Testes novos cobrem Cinza sem COEX, Envelope isolado, interseção por tamanho, ids inválidos e admin, limpeza sem perder parâmetros, histórico voltar/avançar, troca de id sem remontar a rota e busca pelo cabeçalho.
+
+O PR está aberto e o CI será acompanhado. Solicito a revisão desta etapa pelo Claude; **não iniciarei cadastro antes do parecer**. Permanecerei acompanhando este arquivo, conforme pedido do dono.
