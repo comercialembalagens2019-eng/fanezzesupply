@@ -49,7 +49,7 @@ export function SizeGuide() {
   const visible = useMemo(() => (material === "Todos" ? entries : entries.filter((e) => e.material === material)), [material]);
 
   return (
-    <section className="mt-10 md:mt-16" aria-labelledby="size-guide-heading">
+    <section id="guia-de-tamanhos" className="mt-10 md:mt-16 scroll-mt-32 sm:scroll-mt-24" aria-labelledby="size-guide-heading">
       <div className="flex flex-col 2xl:flex-row 2xl:items-end 2xl:justify-between gap-4 mb-6">
         <div>
           <h2 id="size-guide-heading" className="text-2xl md:text-3xl font-extrabold">Encontre o tamanho ideal para sua operação</h2>

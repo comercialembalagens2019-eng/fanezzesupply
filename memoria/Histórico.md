@@ -50,3 +50,4 @@
 - **2026-10-30**: foto própria do Envelope Cinza; banner mostra o produto real; busca do cabeçalho com sugestões e que acha tamanhos (ex.: 32x40) (#45)
 - **2026-10-30**: home ampliada: banner 8/4 com calculadora, faixa de diferenciais, "Escolha o material", guia de tamanhos com filtro, "Como funciona" e FAQ; tamanho 40x00 do Envelope Cinza corrigido para 40x60 (#47)
 - **2026-10-30**: CLAUDE.md reescrito com o contexto completo do projeto para o Claude Code no terminal (#49)
+- **2026-10-31**: dicas de embalagem ("Antes de comprar" e "Na hora de embalar") nas laterais da home em telas largas (#65)

@@ -152,3 +152,14 @@ test("catalog search stays usable after scrolling with the taller mobile header"
     await expect(search).toHaveValue("32x40");
   }
 });
+
+test("side packing tips only appear where they fit, without horizontal scroll", async ({ page }) => {
+  for (const width of [2079, 2080, 2200, 2287, 2288, 2560]) {
+    await page.setViewportSize({ width, height: 1000 });
+    await page.goto("/");
+    const tips = page.getByRole("complementary", { name: "Na hora de embalar" });
+    if (width >= 2288) await expect(tips).toBeVisible();
+    else await expect(tips).toBeHidden();
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+  }
+});
