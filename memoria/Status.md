@@ -5,7 +5,7 @@ Atualizado em: 2026-10-30
 ## Pronto
 - [x] PR #59 aprovado pelo Claude no commit `32094b6` e mergeado; CI e deploy passaram. Correção das sugestões concluída.
 - [x] Cadastro/retorno ao carrinho #60 / PR #61 aprovado pelo Claude, mergeado e publicado: `returnTo` restrito, links e confirmação por e-mail preservam destino, admin mantém padrão e carrinho fica intacto. Checagens locais e CI passaram: 65 unitários, 44 E2E, 5 Deno, lint, tipos, Knip e build. Teste real de confirmação segue pendente abaixo.
-- [x] Layout da home implementado na #62, branch `feat/layout-home-amplo`: conteúdo de até 1.440 px, calculadora única com ordem real responsiva e foco/estado preservados, 3 materiais e personalizado separado, Guia e Pedido rápido mantidos. Capturas antes/protótipo/depois e relatório em `docs/reviews/home-2026-10-30/`. Verificações locais: 65 unitários, 58 E2E e 5 Deno, lint, tipos, Knip e build passaram. Aguardando PR/CI e parecer específico do Claude.
+- [x] Layout da home implementado na #62 / PR #63, branch `feat/layout-home-amplo`: conteúdo de até 1.440 px, calculadora única com ordem real responsiva e foco/estado preservados, 3 materiais e personalizado separado, Guia e Pedido rápido mantidos. Capturas antes/protótipo/depois e relatório em `docs/reviews/home-2026-10-30/`. Verificações locais: 65 unitários, 58 E2E e 5 Deno, lint, tipos, Knip e build passaram. Aguardando CI e parecer específico do Claude.
 - [x] Etapa 1 da #51 / #56 mergeada no PR #57 e aprovada pelo Claude: filtro exato `produto`, busca `q`, limpeza preservando parâmetros/histórico e links da home/guia corrigidos. O Claude pediu a correção adicional das sugestões do cabeçalho antes do cadastro (#58).
 - [x] Correção adicional #58 implementada e aprovada: sugestões carregam id e tamanho separado, clique/teclado abrem material exato; Enter sem seleção mantém busca livre. Verificações locais: 48 unitários, 28 E2E e 5 Deno, lint, tipos, Knip e build.
 - [x] Estratégia da home corrigida na #54 / PR #55; Claude aprovou a revisão 2 com condições em `COMMUNICATION.md`. Condições incorporadas ao plano: três PRs separados (filtro → cadastro → layout), revisão entre etapas, foco de campos e links nos dois sentidos e capturas nas larguras críticas. Nenhuma implementação nesta entrega; CI documental não valida o desenho.
@@ -29,7 +29,7 @@ Atualizado em: 2026-10-30
 
 ## Falta
 - [ ] Fazer um cadastro real com e-mail novo, partindo do carrinho, e confirmar que o link do e-mail volta para `/carrinho`. Se cair na home, o Supabase recusou o `redirect_to` com `?returnTo=`. Pendência indicada pelo Claude no parecer do PR #61; testes desta entrega usam auth simulada e não criam contas reais.
-- [ ] Concluir PR/CI e revisão específica do Claude para o layout #62 antes do merge; preservar Guia e Pedido rápido.
+- [ ] Acompanhar CI e revisão específica do Claude no PR #63 antes do merge; preservar Guia e Pedido rápido.
 - [ ] Implementar a #51 em três PRs separados, após a aprovação do plano já registrada; marcar cada conclusão no canal e aguardar revisão do Claude antes do próximo PR.
 - [ ] Decisão do dono, separada para cada seção: Guia de tamanhos fica/sai; Pedido rápido fica/sai. Preservar ambos enquanto estiverem pendentes.
 - [ ] Validar o layout nas larguras de 1.024, 1.279, 1.280 e 1.920 px e demais referências; trazer ao canal qualquer problema com desalinhamento do cabeçalho antes de alargá-lo. Retiradas de seções exigem decisão explícita do dono.
