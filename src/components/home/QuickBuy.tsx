@@ -66,7 +66,7 @@ export function QuickBuy() {
             </Field>
           ) : null}
           <Field label="Quantidade" id="qb-quantity" value={String(quantity)} onChange={(v) => setQuantity(Number(v))}>
-            {quantitiesOf(product).map((q) => <option key={q} value={q}>{q.toLocaleString("pt-BR")} unidades</option>)}
+            {quantitiesOf(product).map((q) => <option key={q} value={q}>{q.toLocaleString("pt-BR")} un.</option>)}
           </Field>
         </div>
         <div className="xl:border-l xl:border-border xl:pl-8 min-w-[150px]" aria-live="polite">
