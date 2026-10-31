@@ -7,10 +7,10 @@ test.beforeEach(({ page }) => {
   });
 });
 
-test("home shows the logo, price calculator and products", async ({ page }) => {
+test("home shows the logo, quick buy and products", async ({ page }) => {
   await page.goto("/");
   await expect(page.getByRole("link", { name: "FNZ Supply — início" }).first()).toBeVisible();
-  await expect(page.getByText("Calculadora de preço")).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Já sabe o que precisa?" })).toBeVisible();
   await expect(page.getByText("Envelope COEX", { exact: true }).filter({ visible: true }).first()).toBeVisible();
   await expect(page.getByText(/stretch/i)).toHaveCount(0);
 });
@@ -22,7 +22,7 @@ test("products page lists the envelopes", async ({ page }) => {
   await expect(page.getByText("Produto teste (admin)")).toHaveCount(0);
 });
 
-test("calculator adds to the cart", async ({ page }) => {
+test("quick buy adds to the cart", async ({ page }) => {
   await page.goto("/");
   await page.getByRole("button", { name: "Adicionar ao carrinho" }).click();
   await page.goto("/carrinho");

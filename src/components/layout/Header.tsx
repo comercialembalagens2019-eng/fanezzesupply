@@ -10,6 +10,11 @@ import { searchSuggestions, type SearchSuggestion } from "@/lib/productSearch";
 
 const baseNavLinks = [
   { href: "/produtos", label: "Produtos" },
+  { href: "/#personalizados", label: "Personalizados" },
+  { href: "/#guia-de-tamanhos", label: "Guia de medidas" },
+];
+// Institutional pages stay in the phone menu and the footer.
+const moreLinks = [
   { href: "/sobre", label: "Sobre" },
   { href: "/contato", label: "Contato" },
 ];
@@ -24,7 +29,7 @@ export function Header() {
   // Number of distinct products; quantities run into the thousands in B2B orders.
   const itemCount = items.length;
   const navLinks = user
-    ? [baseNavLinks[0], { href: "/pedidos", label: "Meus pedidos" }, ...baseNavLinks.slice(1)]
+    ? [...baseNavLinks, { href: "/pedidos", label: "Meus pedidos" }]
     : baseNavLinks;
 
   const handleSignOut = async () => {
@@ -88,7 +93,7 @@ export function Header() {
     );
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 bg-background/90 backdrop-blur-md">
+    <header className="fixed top-0 left-0 right-0 z-50 bg-card shadow-[0_1px_0_hsl(var(--border))]">
       <div className="container-custom">
         <div className="grid grid-cols-[minmax(0,1fr)_auto_auto] items-center gap-x-3 gap-y-2 py-2 sm:flex sm:gap-3 md:gap-5 sm:h-[var(--header-height)] sm:py-0">
           {/* Logo */}
@@ -98,7 +103,7 @@ export function Header() {
 
           {/* Search */}
           <form onSubmit={handleSearch} role="search" className="relative flex-1 max-w-xl">
-            <label className="flex items-center gap-2 h-11 rounded-xl bg-card ring-1 ring-black/5 px-3.5 focus-within:ring-2 focus-within:ring-ring transition-shadow">
+            <label className="flex items-center gap-2 h-11 rounded-md bg-muted/60 ring-1 ring-black/5 px-3.5 focus-within:ring-2 focus-within:ring-ring transition-shadow">
               <Search className="w-4 h-4 text-muted-foreground shrink-0" aria-hidden="true" />
               <span className="sr-only">Buscar produtos</span>
               <input
@@ -183,12 +188,13 @@ export function Header() {
           {/* Cart */}
           <Link
             to="/carrinho"
-            className="relative w-11 h-11 rounded-xl bg-primary text-primary-foreground grid place-items-center shrink-0 hover:bg-navy-light transition-colors"
+            className="relative h-11 min-w-11 px-3 sm:px-4 rounded-md bg-sun text-navy-dark font-bold text-sm flex items-center justify-center gap-2 shrink-0 hover:brightness-105 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
             aria-label={itemCount > 0 ? `Carrinho, ${itemCount} ${itemCount === 1 ? "produto" : "produtos"}` : "Carrinho"}
           >
             <ShoppingCart className="w-5 h-5" aria-hidden="true" />
+            <span className="hidden sm:inline" aria-hidden="true">Carrinho</span>
             {itemCount > 0 && (
-              <span className="absolute -top-1.5 -right-1.5 min-w-5 h-5 px-1 bg-beige text-navy text-[10px] font-extrabold rounded-full grid place-items-center">
+              <span className="absolute -top-1.5 -right-1.5 min-w-5 h-5 px-1 bg-primary text-primary-foreground text-[10px] font-extrabold rounded-full grid place-items-center">
                 {itemCount > 99 ? "99+" : itemCount}
               </span>
             )}
@@ -209,7 +215,7 @@ export function Header() {
         {isMobileMenuOpen && (
           <div className="lg:hidden tile mb-3 p-2 animate-fade-in">
             <nav className="flex flex-col" aria-label="Menu">
-              {[{ href: "/", label: "Início" }, ...navLinks].map((link) => (
+              {[{ href: "/", label: "Início" }, ...navLinks, ...moreLinks].map((link) => (
                 <Link
                   key={link.href}
                   to={link.href}

@@ -159,14 +159,13 @@ test("explicit cart destination takes precedence over admin landing page", async
   await expectCart(page);
 });
 
-test("home keeps explicit visitor signup and omits the banner invitation after login", async ({ page }) => {
+test("footer keeps the visitor signup link before and after login", async ({ page }) => {
   await mockAuth(page);
   await page.goto("/");
-  const banner = page.locator(".home-banner");
-  await expect(banner.getByRole("link", { name: "Cadastre sua empresa", exact: true })).toHaveAttribute("href", "/cadastro?returnTo=%2Fprodutos");
+  const footerSignup = page.locator("footer").getByRole("link", { name: "Cadastre sua empresa", exact: true });
+  await expect(footerSignup).toBeVisible();
   await page.goto("/login");
   await login(page);
   await expect(page).toHaveURL("http://127.0.0.1:4173/");
-  await expect(banner.getByRole("link", { name: "Cadastre sua empresa", exact: true })).toHaveCount(0);
-  await expect(page.locator("footer").getByRole("link", { name: "Cadastre sua empresa", exact: true })).toBeVisible();
+  await expect(footerSignup).toBeVisible();
 });

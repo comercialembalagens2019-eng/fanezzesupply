@@ -1,72 +1,47 @@
 import { Logo } from "@/components/Logo";
 import { Link } from "react-router-dom";
-import { Clock, Mail, MapPin, MessageCircle } from "lucide-react";
 import { COMPANY, MAPS_URL, WHATSAPP_URL } from "@/lib/company";
+
+const navLinks = [
+  { to: "/produtos", label: "Produtos" },
+  { to: "/#personalizados", label: "Personalizados" },
+  { to: "/pedidos", label: "Meus pedidos" },
+  { to: "/cadastro", label: "Cadastre sua empresa" },
+  { to: "/sobre", label: "Sobre" },
+  { to: "/contato", label: "Contato" },
+];
+
+const linkClass = "inline-flex items-center min-h-11 hover:underline underline-offset-4 rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring";
 
 export function Footer() {
   return (
-    <footer className="bg-card border-t border-border mt-16">
-      <div className="container-custom py-10 grid gap-8 sm:grid-cols-2 lg:grid-cols-4 text-sm">
-        <div className="space-y-3">
-          <Link to="/" className="flex items-center" aria-label="FNZ Supply — início">
-            <Logo className="h-9" />
+    <footer className="mt-16">
+      <div className="container-custom">
+        <div className="border-t border-border py-6 flex flex-col lg:flex-row lg:items-center gap-4 lg:gap-10">
+          <Link to="/" className="flex items-center w-fit rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring" aria-label="FNZ Supply — início">
+            <Logo className="h-10" />
           </Link>
-          <p className="text-muted-foreground leading-relaxed">
-            Distribuição de embalagens para empresas, com nota fiscal e preço de atacado.
-          </p>
+          <nav aria-label="Rodapé" className="flex flex-wrap gap-x-8 gap-y-0 text-[15px] font-semibold text-primary lg:mx-auto">
+            {navLinks.map((l) => (
+              <Link key={l.to} to={l.to} className={linkClass}>{l.label}</Link>
+            ))}
+          </nav>
+          <div className="flex items-center gap-4 text-[15px] font-semibold text-primary lg:border-l lg:border-border lg:pl-8">
+            <Link to="/termos" className={linkClass}>Termos de uso</Link>
+            <span className="w-px h-4 bg-border" aria-hidden="true" />
+            <Link to="/privacidade" className={linkClass}>Privacidade</Link>
+          </div>
         </div>
-
-        <div className="space-y-3">
-          <h2 className="font-display font-bold text-base text-foreground">Navegação</h2>
-          <ul className="space-y-2 text-muted-foreground">
-            <li><Link to="/produtos" className="hover:text-foreground transition-colors">Produtos</Link></li>
-            <li><Link to="/pedidos" className="hover:text-foreground transition-colors">Meus pedidos</Link></li>
-            <li><Link to="/cadastro" className="hover:text-foreground transition-colors">Cadastre sua empresa</Link></li>
-            <li><Link to="/sobre" className="hover:text-foreground transition-colors">Sobre nós</Link></li>
-            <li><Link to="/contato" className="hover:text-foreground transition-colors">Contato</Link></li>
-          </ul>
-        </div>
-
-        <div className="space-y-3">
-          <h2 className="font-display font-bold text-base text-foreground">Contato</h2>
-          <ul className="space-y-2 text-muted-foreground">
-            <li>
-              <a href={WHATSAPP_URL} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 hover:text-foreground transition-colors">
-                <MessageCircle className="w-4 h-4" aria-hidden="true" /> WhatsApp {COMPANY.phone}
-              </a>
-            </li>
-            <li>
-              <a href={`mailto:${COMPANY.email}`} className="flex items-center gap-2 hover:text-foreground transition-colors">
-                <Mail className="w-4 h-4" aria-hidden="true" /> {COMPANY.email}
-              </a>
-            </li>
-            <li>
-              <a href={MAPS_URL} target="_blank" rel="noopener noreferrer" className="flex items-start gap-2 hover:text-foreground transition-colors">
-                <MapPin className="w-4 h-4 mt-0.5 shrink-0" aria-hidden="true" />
-                {COMPANY.shortAddress}
-              </a>
-            </li>
-          </ul>
-        </div>
-
-        <div className="space-y-3">
-          <h2 className="font-display font-bold text-base text-foreground">Entrega</h2>
-          <p className="text-muted-foreground">
-            Frete grátis para Joinville. Demais localidades: R$ 19,90.
-          </p>
-          <p className="flex items-center gap-2 text-muted-foreground">
-            <Clock className="w-4 h-4" aria-hidden="true" /> {COMPANY.hours}
-          </p>
-        </div>
-      </div>
-
-      <div className="border-t border-border">
-        <div className="container-custom py-5 flex flex-col sm:flex-row gap-3 justify-between text-xs text-muted-foreground">
-          <span>© {new Date().getFullYear()} FNZ Supply · CNPJ {COMPANY.cnpj}. Todos os direitos reservados.</span>
-          <span className="flex gap-4">
-            <Link to="/termos" className="hover:text-foreground transition-colors">Termos de Uso</Link>
-            <Link to="/privacidade" className="hover:text-foreground transition-colors">Política de Privacidade</Link>
-          </span>
+        <div className="border-t border-border py-5 text-sm text-muted-foreground flex flex-wrap gap-x-2 gap-y-1">
+          <span>© {new Date().getFullYear()} FNZ Supply · CNPJ {COMPANY.cnpj}</span>
+          <span aria-hidden="true">·</span>
+          <a href={MAPS_URL} target="_blank" rel="noopener noreferrer" className="hover:text-foreground">{COMPANY.shortAddress}</a>
+          <span aria-hidden="true">·</span>
+          <a href={WHATSAPP_URL} target="_blank" rel="noopener noreferrer" className="hover:text-foreground">WhatsApp {COMPANY.phone}</a>
+          <span aria-hidden="true">·</span>
+          <a href={`mailto:${COMPANY.email}`} className="hover:text-foreground">{COMPANY.email}</a>
+          <span aria-hidden="true">·</span>
+          <span>{COMPANY.hours}. Frete grátis em Joinville; demais localidades R$ 19,90.</span>
         </div>
       </div>
     </footer>

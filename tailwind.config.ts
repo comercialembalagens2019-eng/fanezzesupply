@@ -65,6 +65,11 @@ export default {
           light: "hsl(var(--beige-light))",
         },
         cream: "hsl(var(--cream))",
+        sun: {
+          DEFAULT: "hsl(var(--sun))",
+          soft: "hsl(var(--sun-soft))",
+        },
+        wall: "hsl(var(--wall))",
         success: {
           DEFAULT: "hsl(var(--success))",
           foreground: "hsl(var(--success-foreground))",
