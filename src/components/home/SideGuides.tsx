@@ -2,13 +2,14 @@ import antesDeComprar from "@/assets/guia-antes-de-comprar.webp";
 import naHoraDeEmbalar from "@/assets/guia-na-hora-de-embalar.webp";
 
 // Packing tips in the empty side margins of very wide screens. The pictures are small,
-// so they stay at their natural size and only appear where there is room for them.
+// so they stay at their natural size. The wider (right) card needs 424px of margin
+// (32px gap + 392px): (2288 - 1440) / 2 = 424, so both appear from 2288px up.
 export function SideGuides() {
   return (
     <>
       <aside
         aria-label="Antes de comprar"
-        className="hidden min-[2080px]:block absolute top-0 bottom-0 right-full mr-8 w-[268px]"
+        className="hidden min-[2288px]:block absolute top-0 bottom-0 right-full mr-8 w-[268px]"
       >
         <a
           href="#guia-de-tamanhos"
@@ -26,7 +27,7 @@ export function SideGuides() {
       </aside>
       <aside
         aria-label="Na hora de embalar"
-        className="hidden min-[2080px]:block absolute top-0 bottom-0 left-full ml-8 w-[392px]"
+        className="hidden min-[2288px]:block absolute top-0 bottom-0 left-full ml-8 w-[392px]"
       >
         <div className="sticky top-[calc(var(--header-height)+24px)] tile p-2">
           <img
