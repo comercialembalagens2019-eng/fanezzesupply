@@ -154,12 +154,19 @@ test("catalog search stays usable after scrolling with the taller mobile header"
 });
 
 test("side packing tips only appear where they fit, without horizontal scroll", async ({ page }) => {
-  for (const width of [2079, 2080, 2200, 2287, 2288, 2560]) {
+  for (const width of [2103, 2104, 2200, 2560]) {
     await page.setViewportSize({ width, height: 1000 });
     await page.goto("/");
-    const tips = page.getByRole("complementary", { name: "Na hora de embalar" });
-    if (width >= 2288) await expect(tips).toBeVisible();
-    else await expect(tips).toBeHidden();
+    const tips = page.getByRole("complementary", { name: "Dicas de embalagem" });
+    if (width >= 2104) {
+      await expect(tips).toBeVisible();
+      // Both cards sit in the same (left) column, one above the other.
+      const [top, bottom] = await tips.locator("img").evaluateAll((imgs) => imgs.map((img) => img.getBoundingClientRect().toJSON()));
+      expect(bottom.y).toBeGreaterThan(top.y + top.height);
+      expect(Math.abs(bottom.x - top.x)).toBeLessThan(1);
+    } else {
+      await expect(tips).toBeHidden();
+    }
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
   }
 });
