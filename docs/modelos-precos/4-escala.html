@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Modelo 4 · Tamanhos em escala · Tabela de preços FNZ</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root { --navy: #1b2845; --navy-2: #2c3e66; --beige: #f5e6d3; --beige-2: #fbf4ea; --bg: #f3f4f6; --tile: #fff;
+  --line: #e5e7eb; --muted: #5b6475; --green: #15803d; --green-bg: #e9f7ee; --r: 24px; --ease: cubic-bezier(.22,1,.36,1); }
+*, *::before, *::after { box-sizing: border-box; }
+html, body { margin: 0; overflow-x: clip; }
+body { font-family: Manrope, system-ui, sans-serif; background: var(--bg); color: var(--navy); font-size: 16px; line-height: 1.5; -webkit-font-smoothing: antialiased; }
+h1, h2, h3, p { margin: 0; }
+a { color: inherit; }
+button, select { font: inherit; color: inherit; }
+img { display: block; max-width: 100%; height: auto; }
+:focus-visible { outline: 3px solid var(--navy-2); outline-offset: 2px; }
+.wrap { width: min(1440px, 100% - 48px); margin: 0 auto; padding: 56px 0 80px; }
+.model { font-size: 13px; font-weight: 700; color: var(--muted); margin-bottom: 20px; }
+.head { display: flex; flex-wrap: wrap; align-items: end; justify-content: space-between; gap: 20px 32px; margin-bottom: 28px; }
+.head h2 { font-size: clamp(28px, 2.6vw, 38px); font-weight: 800; letter-spacing: -.03em; line-height: 1.1; }
+.head p { color: var(--muted); margin-top: 6px; font-size: 17px; }
+.tabs { display: flex; flex-wrap: wrap; gap: 8px; }
+.tab { min-height: 44px; padding: 0 18px; border-radius: 14px; border: 1px solid var(--line); background: var(--tile); font-weight: 600; cursor: pointer; transition: background-color .2s, color .2s, border-color .2s; }
+.tab:hover { border-color: #c9ced8; }
+.tab[aria-pressed="true"] { background: var(--navy); color: #fff; border-color: var(--navy); }
+.price { font-weight: 800; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.best { color: var(--green); font-weight: 700; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.pill { display: inline-flex; align-items: center; height: 24px; padding: 0 8px; border-radius: 999px; background: var(--green-bg); color: var(--green); font-size: 12.5px; font-weight: 700; }
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 44px; padding: 0 18px; border-radius: 14px; background: var(--navy); color: #fff; font-weight: 700; font-size: 15px; text-decoration: none; transition: background-color .2s, transform .2s var(--ease); }
+.btn:hover { background: var(--navy-2); }
+.btn:active { transform: scale(.97); }
+.btn.ghost { background: transparent; color: var(--navy); border: 1.5px solid var(--navy); }
+.btn.ghost:hover { background: var(--navy); color: #fff; }
+.note { margin-top: 18px; font-size: 14px; color: var(--muted); }
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { transition: none !important; animation: none !important; } }
+
+.layout { display: grid; grid-template-columns: minmax(0, 1fr) 360px; gap: 20px; align-items: start; }
+.tiles { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 12px; }
+.tile { background: var(--tile); border: 2px solid transparent; border-radius: 20px; padding: 14px; cursor: pointer; text-align: left; display: grid; gap: 8px; transition: border-color .2s, transform .2s var(--ease); }
+.tile:hover { transform: translateY(-2px); }
+.tile[aria-pressed="true"] { border-color: var(--navy); }
+.box { height: 110px; display: flex; align-items: flex-end; justify-content: center; }
+.env { border-radius: 3px; background: #fff; outline: 1.5px solid #c9ced8; position: relative; }
+.env::before { content: ""; position: absolute; inset: 0 0 auto; height: 10%; background: var(--strip); border-radius: 3px 3px 0 0; }
+.env.cinza { background: #7b7e83; outline-color: #666; }
+.tile b { font-size: 18px; font-weight: 800; }
+.tile small { display: block; color: var(--muted); font-size: 12.5px; }
+.tile .price { font-size: 15px; }
+.side { position: sticky; top: 24px; background: var(--navy); color: #fff; border-radius: var(--r); padding: 26px; display: grid; gap: 16px; }
+.side h3 { font-size: 26px; font-weight: 800; letter-spacing: -.02em; }
+.side .sub { color: #c9d2e6; font-size: 14px; }
+.cmp { background: #fff; border-radius: 16px; height: 240px; display: flex; align-items: flex-end; justify-content: center; gap: 20px; padding: 16px; }
+.cmp .a4 { background: #e9ebef; display: grid; place-items: center; color: var(--muted); font-size: 12px; font-weight: 700; }
+.cmp div { transition: width .3s var(--ease), height .3s var(--ease); }
+.rows { display: grid; gap: 6px; font-size: 15px; }
+.rows div { display: flex; justify-content: space-between; gap: 12px; }
+.rows .best { color: #86efac; }
+.side .btn { background: var(--beige); color: var(--navy); }
+.side .btn:hover { background: #fff; }
+@media (max-width: 1000px) { .layout { grid-template-columns: 1fr; } .side { position: static; order: -1; } }
+@media (max-width: 640px) { .wrap { width: calc(100% - 32px); } .tiles { grid-template-columns: 1fr 1fr; } }
+</style>
+</head>
+<body>
+<main class="wrap">
+<p class="model">Modelo 4 · Tamanhos em escala</p>
+
+<div class="head"><div><h2>Veja o tamanho antes de comprar</h2><p>Cada envelope desenhado na mesma escala. Toque em um para comparar com uma folha A4.</p></div><div class="tabs" role="group" aria-label="Filtrar por material"><button type="button" class="tab" data-filter="all" aria-pressed="true">Todos</button><button type="button" class="tab" data-filter="envelope" aria-pressed="false">Envelope</button><button type="button" class="tab" data-filter="envelope-coex" aria-pressed="false">Envelope COEX</button><button type="button" class="tab" data-filter="envelope-cinza" aria-pressed="false">Envelope Cinza</button></div></div>
+<div class="layout"><div class="tiles"><button type="button" class="tile" data-mat="envelope" data-r="{&quot;mat&quot;: &quot;envelope&quot;, &quot;name&quot;: &quot;Envelope&quot;, &quot;img&quot;: &quot;assets/envelope-p.webp&quot;, &quot;min&quot;: 2000, &quot;size&quot;: &quot;20x30&quot;, &quot;w&quot;: 20, &quot;h&quot;: 30, &quot;low&quot;: 8, &quot;best&quot;: null}" aria-pressed="true"><div class="box" aria-hidden="true"><div class="env" style="width:23px;height:35px;--strip:#2b2b2b"></div></div><div><b>20x30</b><small>Envelope</small></div><span class="price">R$ 0,08<small style="display:inline;font-weight:500"> /un.</small></span></button><button type="button" class="tile" data-mat="envelope" data-r="{&quot;mat&quot;: &quot;envelope&quot;, &quot;name&quot;: &quot;Envelope&quot;, &quot;img&quot;: &quot;assets/envelope-p.webp&quot;, &quot;min&quot;: 2000, &quot;size&quot;: &quot;20x36&quot;, &quot;w&quot;: 20, &quot;h&quot;: 36, &quot;low&quot;: 8, &quot;best&quot;: null}" aria-pressed="false"><div class="box" aria-hidden="true"><div class="env" style="width:23px;height:42px;--strip:#2b2b2b"></div></div><div><b>20x36</b><small>Envelope</small></div><span class="price">R$ 0,08<small style="display:inline;font-weight:500"> /un.</small></span></button><button type="button" class="tile" data-mat="envelope" data-r="{&quot;mat&quot;: &quot;envelope&quot;, &quot;name&quot;: &quot;Envelope&quot;, &quot;img&quot;: &quot;assets/envelope-p.webp&quot;, &quot;min&quot;: 2000, &quot;size&quot;: &quot;32x40&quot;, &quot;w&quot;: 32, &quot;h&quot;: 40, &quot;low&quot;: 8, &quot;best&quot;: null}" aria-pressed="false"><div class="box" aria-hidden="true"><div class="env" style="width:37px;height:46px;--strip:#2b2b2b"></div></div><div><b>32x40</b><small>Envelope</small></div><span class="price">R$ 0,08<small style="display:inline;font-weight:500"> /un.</small></span></button><button type="button" class="tile" data-mat="envelope" data-r="{&quot;mat&quot;: &quot;envelope&quot;, &quot;name&quot;: &quot;Envelope&quot;, &quot;img&quot;: &quot;assets/envelope-p.webp&quot;, &quot;min&quot;: 2000, &quot;size&quot;: &quot;40x60&quot;, &quot;w&quot;: 40, &quot;h&quot;: 60, &quot;low&quot;: 8, &quot;best&quot;: null}" aria-pressed="false"><div class="box" aria-hidden="true"><div class="env" style="width:46px;height:69px;--strip:#2b2b2b"></div></div><div><b>40x60</b><small>Envelope</small></div><span class="price">R$ 0,08<small style="display:inline;font-weight:500"> /un.</small></span></button><button type="button" class="tile" data-mat="envelope" data-r="{&quot;mat&quot;: &quot;envelope&quot;, &quot;name&quot;: &quot;Envelope&quot;, &quot;img&quot;: &quot;assets/envelope-p.webp&quot;, &quot;min&quot;: 2000, &quot;size&quot;: &quot;30x70&quot;, &quot;w&quot;: 30, &quot;h&quot;: 70, &quot;low&quot;: 8, &quot;best&quot;: null}" aria-pressed="false"><div class="box" aria-hidden="true"><div class="env" style="width:35px;height:81px;--strip:#2b2b2b"></div></div><div><b>30x70</b><small>Envelope</small></div><span class="price">R$ 0,08<small style="display:inline;font-weight:500"> /un.</small></span></button><button type="button" class="tile" data-mat="envelope-coex" data-r="{&quot;mat&quot;: &quot;envelope-coex&quot;, &quot;name&quot;: &quot;Envelope COEX&quot;, &quot;img&quot;: &quot;assets/envelope-p.webp&quot;, &quot;min&quot;: 500, &quot;size&quot;: &quot;19x25&quot;, &quot;w&quot;: 19, &quot;h&quot;: 25, &quot;low&quot;: 27, &quot;best&quot;: 24}" aria-pressed="false"><div class="box" aria-hidden="true"><div class="env" style="width:22px;height:29px;--strip:#2b2b2b"></div></div><div><b>19x25</b><small>Envelope COEX</small></div><span class="price">R$ 0,24<small style="display:inline;font-weight:500"> /un.</small></span></button><button type="button" class="tile" data-mat="envelope-coex" data-r="{&quot;mat&quot;: &quot;envelope-coex&quot;, &quot;name&quot;: &quot;Envelope COEX&quot;, &quot;img&quot;: &quot;assets/envelope-p.webp&quot;, &quot;min&quot;: 500, &quot;size&quot;: &quot;32x20&quot;, &quot;w&quot;: 32, &quot;h&quot;: 20, &quot;low&quot;: 36, &quot;best&quot;: 31}" aria-pressed="false"><div class="box" aria-hidden="true"><div class="env" style="width:37px;height:23px;--strip:#2b2b2b"></div></div><div><b>32x20</b><small>Envelope COEX</small></div><span class="price">R$ 0,31<small style="display:inline;font-weight:500"> /un.</small></span></button><button type="button" class="tile" data-mat="envelope-coex" data-r="{&quot;mat&quot;: &quot;envelope-coex&quot;, &quot;name&quot;: &quot;Envelope COEX&quot;, &quot;img&quot;: &quot;assets/envelope-p.webp&quot;, &quot;min&quot;: 500, &quot;size&quot;: &quot;30x40&quot;, &quot;w&quot;: 30, &quot;h&quot;: 40, &quot;low&quot;: 66, &quot;best&quot;: 56}" aria-pressed="false"><div class="box" aria-hidden="true"><div class="env" style="width:35px;height:46px;--strip:#2b2b2b"></div></div><div><b>30x40</b><small>Envelope COEX</small></div><span class="price">R$ 0,56<small style="display:inline;font-weight:500"> /un.</small></span></button><button type="button" class="tile" data-mat="envelope-coex" data-r="{&quot;mat&quot;: &quot;envelope-coex&quot;, &quot;name&quot;: &quot;Envelope COEX&quot;, &quot;img&quot;: &quot;assets/envelope-p.webp&quot;, &quot;min&quot;: 500, &quot;size&quot;: &quot;40x60&quot;, &quot;w&quot;: 40, &quot;h&quot;: 60, &quot;low&quot;: 136, &quot;best&quot;: 117}" aria-pressed="false"><div class="box" aria-hidden="true"><div class="env" style="width:46px;height:69px;--strip:#2b2b2b"></div></div><div><b>40x60</b><small>Envelope COEX</small></div><span class="price">R$ 1,17<small style="display:inline;font-weight:500"> /un.</small></span></button><button type="button" class="tile" data-mat="envelope-coex" data-r="{&quot;mat&quot;: &quot;envelope-coex&quot;, &quot;name&quot;: &quot;Envelope COEX&quot;, &quot;img&quot;: &quot;assets/envelope-p.webp&quot;, &quot;min&quot;: 500, &quot;size&quot;: &quot;50x70&quot;, &quot;w&quot;: 50, &quot;h&quot;: 70, &quot;low&quot;: 171, &quot;best&quot;: 146}" aria-pressed="false"><div class="box" aria-hidden="true"><div class="env" style="width:58px;height:81px;--strip:#2b2b2b"></div></div><div><b>50x70</b><small>Envelope COEX</small></div><span class="price">R$ 1,46<small style="display:inline;font-weight:500"> /un.</small></span></button><button type="button" class="tile" data-mat="envelope-cinza" data-r="{&quot;mat&quot;: &quot;envelope-cinza&quot;, &quot;name&quot;: &quot;Envelope Cinza&quot;, &quot;img&quot;: &quot;assets/envelope-cinza-p.webp&quot;, &quot;min&quot;: 500, &quot;size&quot;: &quot;20x30&quot;, &quot;w&quot;: 20, &quot;h&quot;: 30, &quot;low&quot;: 16, &quot;best&quot;: 14}" aria-pressed="false"><div class="box" aria-hidden="true"><div class="env cinza" style="width:23px;height:35px;--strip:#55585c"></div></div><div><b>20x30</b><small>Envelope Cinza</small></div><span class="price">R$ 0,14<small style="display:inline;font-weight:500"> /un.</small></span></button><button type="button" class="tile" data-mat="envelope-cinza" data-r="{&quot;mat&quot;: &quot;envelope-cinza&quot;, &quot;name&quot;: &quot;Envelope Cinza&quot;, &quot;img&quot;: &quot;assets/envelope-cinza-p.webp&quot;, &quot;min&quot;: 500, &quot;size&quot;: &quot;26x36&quot;, &quot;w&quot;: 26, &quot;h&quot;: 36, &quot;low&quot;: 26, &quot;best&quot;: 20}" aria-pressed="false"><div class="box" aria-hidden="true"><div class="env cinza" style="width:30px;height:42px;--strip:#55585c"></div></div><div><b>26x36</b><small>Envelope Cinza</small></div><span class="price">R$ 0,20<small style="display:inline;font-weight:500"> /un.</small></span></button><button type="button" class="tile" data-mat="envelope-cinza" data-r="{&quot;mat&quot;: &quot;envelope-cinza&quot;, &quot;name&quot;: &quot;Envelope Cinza&quot;, &quot;img&quot;: &quot;assets/envelope-cinza-p.webp&quot;, &quot;min&quot;: 500, &quot;size&quot;: &quot;32x40&quot;, &quot;w&quot;: 32, &quot;h&quot;: 40, &quot;low&quot;: 36, &quot;best&quot;: 26}" aria-pressed="false"><div class="box" aria-hidden="true"><div class="env cinza" style="width:37px;height:46px;--strip:#55585c"></div></div><div><b>32x40</b><small>Envelope Cinza</small></div><span class="price">R$ 0,26<small style="display:inline;font-weight:500"> /un.</small></span></button><button type="button" class="tile" data-mat="envelope-cinza" data-r="{&quot;mat&quot;: &quot;envelope-cinza&quot;, &quot;name&quot;: &quot;Envelope Cinza&quot;, &quot;img&quot;: &quot;assets/envelope-cinza-p.webp&quot;, &quot;min&quot;: 500, &quot;size&quot;: &quot;40x50&quot;, &quot;w&quot;: 40, &quot;h&quot;: 50, &quot;low&quot;: 55, &quot;best&quot;: 46}" aria-pressed="false"><div class="box" aria-hidden="true"><div class="env cinza" style="width:46px;height:58px;--strip:#55585c"></div></div><div><b>40x50</b><small>Envelope Cinza</small></div><span class="price">R$ 0,46<small style="display:inline;font-weight:500"> /un.</small></span></button><button type="button" class="tile" data-mat="envelope-cinza" data-r="{&quot;mat&quot;: &quot;envelope-cinza&quot;, &quot;name&quot;: &quot;Envelope Cinza&quot;, &quot;img&quot;: &quot;assets/envelope-cinza-p.webp&quot;, &quot;min&quot;: 500, &quot;size&quot;: &quot;40x60&quot;, &quot;w&quot;: 40, &quot;h&quot;: 60, &quot;low&quot;: 64, &quot;best&quot;: 55}" aria-pressed="false"><div class="box" aria-hidden="true"><div class="env cinza" style="width:46px;height:69px;--strip:#55585c"></div></div><div><b>40x60</b><small>Envelope Cinza</small></div><span class="price">R$ 0,55<small style="display:inline;font-weight:500"> /un.</small></span></button><button type="button" class="tile" data-mat="envelope-cinza" data-r="{&quot;mat&quot;: &quot;envelope-cinza&quot;, &quot;name&quot;: &quot;Envelope Cinza&quot;, &quot;img&quot;: &quot;assets/envelope-cinza-p.webp&quot;, &quot;min&quot;: 500, &quot;size&quot;: &quot;50x70&quot;, &quot;w&quot;: 50, &quot;h&quot;: 70, &quot;low&quot;: 105, &quot;best&quot;: 77}" aria-pressed="false"><div class="box" aria-hidden="true"><div class="env cinza" style="width:58px;height:81px;--strip:#55585c"></div></div><div><b>50x70</b><small>Envelope Cinza</small></div><span class="price">R$ 0,77<small style="display:inline;font-weight:500"> /un.</small></span></button><button type="button" class="tile" data-mat="envelope-cinza" data-r="{&quot;mat&quot;: &quot;envelope-cinza&quot;, &quot;name&quot;: &quot;Envelope Cinza&quot;, &quot;img&quot;: &quot;assets/envelope-cinza-p.webp&quot;, &quot;min&quot;: 500, &quot;size&quot;: &quot;70x60&quot;, &quot;w&quot;: 70, &quot;h&quot;: 60, &quot;low&quot;: 120, &quot;best&quot;: 87}" aria-pressed="false"><div class="box" aria-hidden="true"><div class="env cinza" style="width:81px;height:69px;--strip:#55585c"></div></div><div><b>70x60</b><small>Envelope Cinza</small></div><span class="price">R$ 0,87<small style="display:inline;font-weight:500"> /un.</small></span></button><button type="button" class="tile" data-mat="envelope-cinza" data-r="{&quot;mat&quot;: &quot;envelope-cinza&quot;, &quot;name&quot;: &quot;Envelope Cinza&quot;, &quot;img&quot;: &quot;assets/envelope-cinza-p.webp&quot;, &quot;min&quot;: 500, &quot;size&quot;: &quot;50x90&quot;, &quot;w&quot;: 50, &quot;h&quot;: 90, &quot;low&quot;: 140, &quot;best&quot;: 102}" aria-pressed="false"><div class="box" aria-hidden="true"><div class="env cinza" style="width:58px;height:104px;--strip:#55585c"></div></div><div><b>50x90</b><small>Envelope Cinza</small></div><span class="price">R$ 1,02<small style="display:inline;font-weight:500"> /un.</small></span></button></div>
+<aside class="side" aria-live="polite">
+  <div><h3 id="s-t">19x25</h3><p class="sub" id="s-n">Envelope COEX</p></div>
+  <div class="cmp" aria-hidden="true"><div class="a4" id="s-a4">A4</div><div class="env" id="s-env"></div></div>
+  <div class="rows"><div><span>Até 999 un.</span><b id="s-lo"></b></div><div><span>1.000 ou mais</span><b class="best" id="s-be"></b></div><div><span>Mínimo</span><b id="s-mn"></b></div></div>
+  <a class="btn" id="s-buy" href="https://fanezzesupply.com.br/produtos?produto=envelope-coex">Comprar este tamanho</a>
+</aside></div>
+<p class="note">Medidas em centímetros (largura x altura). Preços por unidade.</p>
+</main>
+<script>
+document.querySelectorAll('[data-filter]').forEach((b) => b.addEventListener('click', () => {
+  document.querySelectorAll('[data-filter]').forEach((x) => x.setAttribute('aria-pressed', String(x === b)));
+  const f = b.dataset.filter;
+  document.querySelectorAll('[data-mat]').forEach((el) => { el.hidden = f !== 'all' && el.dataset.mat !== f; });
+}));
+
+const brl = (c) => (c / 100).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+const $ = (id) => document.getElementById(id);
+function show(r) {
+  const cm = 200 / Math.max(29.7, r.h, (21 + r.w) * 0.75);
+  $('s-a4').style.width = 21 * cm + 'px'; $('s-a4').style.height = 29.7 * cm + 'px';
+  const env = $('s-env'); env.style.width = r.w * cm + 'px'; env.style.height = r.h * cm + 'px';
+  env.className = r.mat === 'envelope-cinza' ? 'env cinza' : 'env';
+  env.style.setProperty('--strip', r.mat === 'envelope-cinza' ? '#55585c' : '#2b2b2b');
+  $('s-t').textContent = r.size + ' cm'; $('s-n').textContent = r.name;
+  $('s-lo').textContent = brl(r.low) + '/un.'; $('s-be').textContent = r.best ? brl(r.best) + '/un.' : 'mesmo preço';
+  $('s-mn').textContent = r.min.toLocaleString('pt-BR') + ' un.'; $('s-buy').href = 'https://fanezzesupply.com.br/produtos?produto=' + r.mat;
+}
+document.querySelectorAll('.tile').forEach((t) => t.addEventListener('click', () => {
+  document.querySelectorAll('.tile').forEach((x) => x.setAttribute('aria-pressed', String(x === t)));
+  show(JSON.parse(t.dataset.r));
+}));
+show(JSON.parse(document.querySelector('.tile').dataset.r));</script>
+</body>
+</html>

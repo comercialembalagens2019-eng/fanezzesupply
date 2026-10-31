@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Modelo 3 · Preço pela quantidade · Tabela de preços FNZ</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root { --navy: #1b2845; --navy-2: #2c3e66; --beige: #f5e6d3; --beige-2: #fbf4ea; --bg: #f3f4f6; --tile: #fff;
+  --line: #e5e7eb; --muted: #5b6475; --green: #15803d; --green-bg: #e9f7ee; --r: 24px; --ease: cubic-bezier(.22,1,.36,1); }
+*, *::before, *::after { box-sizing: border-box; }
+html, body { margin: 0; overflow-x: clip; }
+body { font-family: Manrope, system-ui, sans-serif; background: var(--bg); color: var(--navy); font-size: 16px; line-height: 1.5; -webkit-font-smoothing: antialiased; }
+h1, h2, h3, p { margin: 0; }
+a { color: inherit; }
+button, select { font: inherit; color: inherit; }
+img { display: block; max-width: 100%; height: auto; }
+:focus-visible { outline: 3px solid var(--navy-2); outline-offset: 2px; }
+.wrap { width: min(1440px, 100% - 48px); margin: 0 auto; padding: 56px 0 80px; }
+.model { font-size: 13px; font-weight: 700; color: var(--muted); margin-bottom: 20px; }
+.head { display: flex; flex-wrap: wrap; align-items: end; justify-content: space-between; gap: 20px 32px; margin-bottom: 28px; }
+.head h2 { font-size: clamp(28px, 2.6vw, 38px); font-weight: 800; letter-spacing: -.03em; line-height: 1.1; }
+.head p { color: var(--muted); margin-top: 6px; font-size: 17px; }
+.tabs { display: flex; flex-wrap: wrap; gap: 8px; }
+.tab { min-height: 44px; padding: 0 18px; border-radius: 14px; border: 1px solid var(--line); background: var(--tile); font-weight: 600; cursor: pointer; transition: background-color .2s, color .2s, border-color .2s; }
+.tab:hover { border-color: #c9ced8; }
+.tab[aria-pressed="true"] { background: var(--navy); color: #fff; border-color: var(--navy); }
+.price { font-weight: 800; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.best { color: var(--green); font-weight: 700; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.pill { display: inline-flex; align-items: center; height: 24px; padding: 0 8px; border-radius: 999px; background: var(--green-bg); color: var(--green); font-size: 12.5px; font-weight: 700; }
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 44px; padding: 0 18px; border-radius: 14px; background: var(--navy); color: #fff; font-weight: 700; font-size: 15px; text-decoration: none; transition: background-color .2s, transform .2s var(--ease); }
+.btn:hover { background: var(--navy-2); }
+.btn:active { transform: scale(.97); }
+.btn.ghost { background: transparent; color: var(--navy); border: 1.5px solid var(--navy); }
+.btn.ghost:hover { background: var(--navy); color: #fff; }
+.note { margin-top: 18px; font-size: 14px; color: var(--muted); }
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { transition: none !important; animation: none !important; } }
+
+.panel { background: var(--tile); border-radius: var(--r); padding: 28px; }
+.ctrl { display: flex; flex-wrap: wrap; gap: 16px 32px; align-items: center; justify-content: space-between; padding-bottom: 22px; border-bottom: 1px solid var(--line); }
+.ctrl h3 { font-size: 15px; font-weight: 700; margin-bottom: 8px; }
+.seg { display: inline-flex; flex-wrap: wrap; gap: 4px; padding: 4px; border-radius: 16px; background: var(--bg); }
+.seg button { min-height: 44px; padding: 0 16px; border: 0; border-radius: 12px; background: transparent; font-weight: 700; cursor: pointer; transition: background-color .2s, color .2s; font-variant-numeric: tabular-nums; }
+.seg button[aria-pressed="true"] { background: var(--navy); color: #fff; }
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 12px; margin-top: 22px; }
+.card { border: 1px solid var(--line); border-radius: 18px; padding: 16px 18px; display: grid; grid-template-columns: 52px minmax(0, 1fr); gap: 4px 14px; transition: border-color .2s, opacity .2s; }
+.card img { grid-row: span 3; width: 52px; height: 52px; object-fit: cover; border-radius: 12px; background: #eee; }
+.card .t { display: flex; flex-direction: column; }
+.card b { font-size: 19px; font-weight: 800; line-height: 1.2; }
+.card small { color: var(--muted); font-size: 13px; }
+.card .total { font-size: 22px; font-weight: 800; letter-spacing: -.02em; font-variant-numeric: tabular-nums; }
+.card .unit { font-size: 13.5px; color: var(--muted); font-variant-numeric: tabular-nums; }
+.card .unit .best { font-size: 13.5px; }
+.card.off { opacity: .45; }
+.card.off .total { font-size: 15px; font-weight: 700; }
+@media (max-width: 640px) { .wrap { width: calc(100% - 32px); } .panel { padding: 18px; } }
+</style>
+</head>
+<body>
+<main class="wrap">
+<p class="model">Modelo 3 · Preço pela quantidade</p>
+
+<div class="head"><div><h2>Quanto custa o seu pedido?</h2><p>Escolha a quantidade e veja o total de cada tamanho, já com o preço da faixa.</p></div><div class="tabs" role="group" aria-label="Filtrar por material"><button type="button" class="tab" data-filter="all" aria-pressed="true">Todos</button><button type="button" class="tab" data-filter="envelope" aria-pressed="false">Envelope</button><button type="button" class="tab" data-filter="envelope-coex" aria-pressed="false">Envelope COEX</button><button type="button" class="tab" data-filter="envelope-cinza" aria-pressed="false">Envelope Cinza</button></div></div>
+<div class="panel">
+  <div class="ctrl"><div><h3 id="q-l">Quantidade por tamanho</h3><div class="seg" role="group" aria-labelledby="q-l" id="qty"></div></div>
+  <p class="note" style="margin:0">Total sem frete. Joinville/SC: frete grátis; demais cidades R$ 19,90.</p></div>
+  <div class="grid" id="grid" aria-live="polite"></div>
+</div>
+</main>
+<script>
+const ROWS = [{"mat": "envelope", "name": "Envelope", "img": "assets/envelope-p.webp", "min": 2000, "size": "20x30", "low": 8, "best": null}, {"mat": "envelope", "name": "Envelope", "img": "assets/envelope-p.webp", "min": 2000, "size": "20x36", "low": 8, "best": null}, {"mat": "envelope", "name": "Envelope", "img": "assets/envelope-p.webp", "min": 2000, "size": "32x40", "low": 8, "best": null}, {"mat": "envelope", "name": "Envelope", "img": "assets/envelope-p.webp", "min": 2000, "size": "40x60", "low": 8, "best": null}, {"mat": "envelope", "name": "Envelope", "img": "assets/envelope-p.webp", "min": 2000, "size": "30x70", "low": 8, "best": null}, {"mat": "envelope-coex", "name": "Envelope COEX", "img": "assets/envelope-p.webp", "min": 500, "size": "19x25", "low": 27, "best": 24}, {"mat": "envelope-coex", "name": "Envelope COEX", "img": "assets/envelope-p.webp", "min": 500, "size": "32x20", "low": 36, "best": 31}, {"mat": "envelope-coex", "name": "Envelope COEX", "img": "assets/envelope-p.webp", "min": 500, "size": "30x40", "low": 66, "best": 56}, {"mat": "envelope-coex", "name": "Envelope COEX", "img": "assets/envelope-p.webp", "min": 500, "size": "40x60", "low": 136, "best": 117}, {"mat": "envelope-coex", "name": "Envelope COEX", "img": "assets/envelope-p.webp", "min": 500, "size": "50x70", "low": 171, "best": 146}, {"mat": "envelope-cinza", "name": "Envelope Cinza", "img": "assets/envelope-cinza-p.webp", "min": 500, "size": "20x30", "low": 16, "best": 14}, {"mat": "envelope-cinza", "name": "Envelope Cinza", "img": "assets/envelope-cinza-p.webp", "min": 500, "size": "26x36", "low": 26, "best": 20}, {"mat": "envelope-cinza", "name": "Envelope Cinza", "img": "assets/envelope-cinza-p.webp", "min": 500, "size": "32x40", "low": 36, "best": 26}, {"mat": "envelope-cinza", "name": "Envelope Cinza", "img": "assets/envelope-cinza-p.webp", "min": 500, "size": "40x50", "low": 55, "best": 46}, {"mat": "envelope-cinza", "name": "Envelope Cinza", "img": "assets/envelope-cinza-p.webp", "min": 500, "size": "40x60", "low": 64, "best": 55}, {"mat": "envelope-cinza", "name": "Envelope Cinza", "img": "assets/envelope-cinza-p.webp", "min": 500, "size": "50x70", "low": 105, "best": 77}, {"mat": "envelope-cinza", "name": "Envelope Cinza", "img": "assets/envelope-cinza-p.webp", "min": 500, "size": "70x60", "low": 120, "best": 87}, {"mat": "envelope-cinza", "name": "Envelope Cinza", "img": "assets/envelope-cinza-p.webp", "min": 500, "size": "50x90", "low": 140, "best": 102}];
+const brl = (c) => (c / 100).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+let qty = 1000, mat = 'all';
+const seg = document.getElementById('qty');
+[500, 1000, 2000, 5000, 10000].forEach((q) => {
+  const b = document.createElement('button'); b.type = 'button'; b.textContent = q.toLocaleString('pt-BR');
+  b.setAttribute('aria-pressed', String(q === qty));
+  b.onclick = () => { qty = q; seg.querySelectorAll('button').forEach((x) => x.setAttribute('aria-pressed', String(x === b))); draw(); };
+  seg.append(b);
+});
+function draw() {
+  document.getElementById('grid').innerHTML = ROWS.filter((r) => mat === 'all' || r.mat === mat).map((r) => {
+    const ok = qty >= r.min, unit = qty >= 1000 && r.best ? r.best : r.low;
+    return `<article class="card${ok ? '' : ' off'}"><img src="${r.img}" alt="" width="240" height="180" loading="lazy">
+      <div class="t"><b>${r.size}</b><small>${r.name}</small></div>
+      <div class="total" style="margin-top:6px">${ok ? brl(unit * qty) : 'mínimo ' + r.min.toLocaleString('pt-BR') + ' un.'}</div>
+      <div class="unit">${brl(unit)}/un.${r.best && qty < 1000 ? ` · <span class="best">${brl(r.best)} a partir de 1.000</span>` : ''}</div></article>`;
+  }).join('');
+}
+document.querySelectorAll('[data-filter]').forEach((b) => b.addEventListener('click', () => {
+  document.querySelectorAll('[data-filter]').forEach((x) => x.setAttribute('aria-pressed', String(x === b)));
+  mat = b.dataset.filter; draw();
+}));
+draw();</script>
+</body>
+</html>

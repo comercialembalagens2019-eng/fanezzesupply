@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Modelo 1 · Tabela comparativa · Tabela de preços FNZ</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root { --navy: #1b2845; --navy-2: #2c3e66; --beige: #f5e6d3; --beige-2: #fbf4ea; --bg: #f3f4f6; --tile: #fff;
+  --line: #e5e7eb; --muted: #5b6475; --green: #15803d; --green-bg: #e9f7ee; --r: 24px; --ease: cubic-bezier(.22,1,.36,1); }
+*, *::before, *::after { box-sizing: border-box; }
+html, body { margin: 0; overflow-x: clip; }
+body { font-family: Manrope, system-ui, sans-serif; background: var(--bg); color: var(--navy); font-size: 16px; line-height: 1.5; -webkit-font-smoothing: antialiased; }
+h1, h2, h3, p { margin: 0; }
+a { color: inherit; }
+button, select { font: inherit; color: inherit; }
+img { display: block; max-width: 100%; height: auto; }
+:focus-visible { outline: 3px solid var(--navy-2); outline-offset: 2px; }
+.wrap { width: min(1440px, 100% - 48px); margin: 0 auto; padding: 56px 0 80px; }
+.model { font-size: 13px; font-weight: 700; color: var(--muted); margin-bottom: 20px; }
+.head { display: flex; flex-wrap: wrap; align-items: end; justify-content: space-between; gap: 20px 32px; margin-bottom: 28px; }
+.head h2 { font-size: clamp(28px, 2.6vw, 38px); font-weight: 800; letter-spacing: -.03em; line-height: 1.1; }
+.head p { color: var(--muted); margin-top: 6px; font-size: 17px; }
+.tabs { display: flex; flex-wrap: wrap; gap: 8px; }
+.tab { min-height: 44px; padding: 0 18px; border-radius: 14px; border: 1px solid var(--line); background: var(--tile); font-weight: 600; cursor: pointer; transition: background-color .2s, color .2s, border-color .2s; }
+.tab:hover { border-color: #c9ced8; }
+.tab[aria-pressed="true"] { background: var(--navy); color: #fff; border-color: var(--navy); }
+.price { font-weight: 800; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.best { color: var(--green); font-weight: 700; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.pill { display: inline-flex; align-items: center; height: 24px; padding: 0 8px; border-radius: 999px; background: var(--green-bg); color: var(--green); font-size: 12.5px; font-weight: 700; }
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 44px; padding: 0 18px; border-radius: 14px; background: var(--navy); color: #fff; font-weight: 700; font-size: 15px; text-decoration: none; transition: background-color .2s, transform .2s var(--ease); }
+.btn:hover { background: var(--navy-2); }
+.btn:active { transform: scale(.97); }
+.btn.ghost { background: transparent; color: var(--navy); border: 1.5px solid var(--navy); }
+.btn.ghost:hover { background: var(--navy); color: #fff; }
+.note { margin-top: 18px; font-size: 14px; color: var(--muted); }
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { transition: none !important; animation: none !important; } }
+
+.table { background: var(--tile); border-radius: var(--r); overflow: hidden; }
+table { width: 100%; border-collapse: collapse; }
+thead th { position: sticky; top: 0; background: var(--beige-2); text-align: left; font-size: 13px; font-weight: 700; color: var(--muted); padding: 14px 20px; }
+thead th.num, td.num { text-align: right; }
+tbody td { padding: 14px 20px; border-top: 1px solid var(--line); vertical-align: middle; }
+tbody tr { transition: background-color .15s; }
+tbody tr:hover { background: #fafbfc; }
+.prod { display: flex; align-items: center; gap: 14px; }
+.prod img { width: 56px; height: 42px; object-fit: cover; border-radius: 10px; background: #eee; }
+.prod small { display: block; color: var(--muted); font-size: 13px; }
+.size { font-size: 20px; font-weight: 800; letter-spacing: -.02em; }
+td .pill { margin-left: 8px; }
+.min { color: var(--muted); white-space: nowrap; }
+.sort { display: flex; align-items: center; gap: 8px; font-size: 14px; font-weight: 600; }
+.sort select { height: 44px; border-radius: 14px; border: 1px solid var(--line); background: var(--tile); padding: 0 14px; font-weight: 600; cursor: pointer; }
+.tools { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; }
+@media (max-width: 860px) {
+  thead { display: none; }
+  table, tbody, tr, td { display: block; }
+  tbody tr { display: grid; grid-template-columns: 1fr auto; gap: 4px 12px; padding: 16px; border-top: 1px solid var(--line); }
+  tbody td { border: 0; padding: 0; }
+  td.num { text-align: left; }
+  td[data-l]::before { content: attr(data-l) ": "; color: var(--muted); font-weight: 500; }
+  td.act { grid-column: 1 / -1; margin-top: 8px; }
+  td.act .btn { width: 100%; }
+}
+</style>
+</head>
+<body>
+<main class="wrap">
+<p class="model">Modelo 1 · Tabela comparativa</p>
+
+<div class="head"><div><h2>Encontre o tamanho ideal para sua operação</h2><p>Preço por unidade nas duas faixas de quantidade e o pedido mínimo de cada tamanho.</p></div>
+<div class="tools"><div class="tabs" role="group" aria-label="Filtrar por material"><button type="button" class="tab" data-filter="all" aria-pressed="true">Todos</button><button type="button" class="tab" data-filter="envelope" aria-pressed="false">Envelope</button><button type="button" class="tab" data-filter="envelope-coex" aria-pressed="false">Envelope COEX</button><button type="button" class="tab" data-filter="envelope-cinza" aria-pressed="false">Envelope Cinza</button></div><label class="sort">Ordenar<select id="sort"><option value="cat">Material</option><option value="area">Tamanho</option><option value="price">Menor preço</option></select></label></div></div>
+<div class="table"><table><thead><tr><th>Tamanho (cm)</th><th class="num">Até 999 un.</th><th class="num">1.000 ou mais</th><th class="num">Mínimo</th><th></th></tr></thead><tbody id="rows"><tr data-mat="envelope" data-area="600" data-price="8"><td><div class="prod"><img src="assets/envelope-p.webp" alt="" width="240" height="180" loading="lazy"><div><span class="size">20x30</span><small>Envelope</small></div></div></td><td class="num" data-l="Até 999 un."><span class="price">R$ 0,08</span></td><td class="num" data-l="1.000 ou mais"><span class="min">mesmo preço</span></td><td class="num min" data-l="Mínimo">2.000 un.</td><td class="num act"><a class="btn ghost" href="https://fanezzesupply.com.br/produtos?produto=envelope">Comprar</a></td></tr><tr data-mat="envelope" data-area="720" data-price="8"><td><div class="prod"><img src="assets/envelope-p.webp" alt="" width="240" height="180" loading="lazy"><div><span class="size">20x36</span><small>Envelope</small></div></div></td><td class="num" data-l="Até 999 un."><span class="price">R$ 0,08</span></td><td class="num" data-l="1.000 ou mais"><span class="min">mesmo preço</span></td><td class="num min" data-l="Mínimo">2.000 un.</td><td class="num act"><a class="btn ghost" href="https://fanezzesupply.com.br/produtos?produto=envelope">Comprar</a></td></tr><tr data-mat="envelope" data-area="1280" data-price="8"><td><div class="prod"><img src="assets/envelope-p.webp" alt="" width="240" height="180" loading="lazy"><div><span class="size">32x40</span><small>Envelope</small></div></div></td><td class="num" data-l="Até 999 un."><span class="price">R$ 0,08</span></td><td class="num" data-l="1.000 ou mais"><span class="min">mesmo preço</span></td><td class="num min" data-l="Mínimo">2.000 un.</td><td class="num act"><a class="btn ghost" href="https://fanezzesupply.com.br/produtos?produto=envelope">Comprar</a></td></tr><tr data-mat="envelope" data-area="2400" data-price="8"><td><div class="prod"><img src="assets/envelope-p.webp" alt="" width="240" height="180" loading="lazy"><div><span class="size">40x60</span><small>Envelope</small></div></div></td><td class="num" data-l="Até 999 un."><span class="price">R$ 0,08</span></td><td class="num" data-l="1.000 ou mais"><span class="min">mesmo preço</span></td><td class="num min" data-l="Mínimo">2.000 un.</td><td class="num act"><a class="btn ghost" href="https://fanezzesupply.com.br/produtos?produto=envelope">Comprar</a></td></tr><tr data-mat="envelope" data-area="2100" data-price="8"><td><div class="prod"><img src="assets/envelope-p.webp" alt="" width="240" height="180" loading="lazy"><div><span class="size">30x70</span><small>Envelope</small></div></div></td><td class="num" data-l="Até 999 un."><span class="price">R$ 0,08</span></td><td class="num" data-l="1.000 ou mais"><span class="min">mesmo preço</span></td><td class="num min" data-l="Mínimo">2.000 un.</td><td class="num act"><a class="btn ghost" href="https://fanezzesupply.com.br/produtos?produto=envelope">Comprar</a></td></tr><tr data-mat="envelope-coex" data-area="475" data-price="24"><td><div class="prod"><img src="assets/envelope-p.webp" alt="" width="240" height="180" loading="lazy"><div><span class="size">19x25</span><small>Envelope COEX</small></div></div></td><td class="num" data-l="Até 999 un."><span class="price">R$ 0,27</span></td><td class="num" data-l="1.000 ou mais"><span class="best">R$ 0,24</span><span class="pill">−11%</span></td><td class="num min" data-l="Mínimo">500 un.</td><td class="num act"><a class="btn ghost" href="https://fanezzesupply.com.br/produtos?produto=envelope-coex">Comprar</a></td></tr><tr data-mat="envelope-coex" data-area="640" data-price="31"><td><div class="prod"><img src="assets/envelope-p.webp" alt="" width="240" height="180" loading="lazy"><div><span class="size">32x20</span><small>Envelope COEX</small></div></div></td><td class="num" data-l="Até 999 un."><span class="price">R$ 0,36</span></td><td class="num" data-l="1.000 ou mais"><span class="best">R$ 0,31</span><span class="pill">−14%</span></td><td class="num min" data-l="Mínimo">500 un.</td><td class="num act"><a class="btn ghost" href="https://fanezzesupply.com.br/produtos?produto=envelope-coex">Comprar</a></td></tr><tr data-mat="envelope-coex" data-area="1200" data-price="56"><td><div class="prod"><img src="assets/envelope-p.webp" alt="" width="240" height="180" loading="lazy"><div><span class="size">30x40</span><small>Envelope COEX</small></div></div></td><td class="num" data-l="Até 999 un."><span class="price">R$ 0,66</span></td><td class="num" data-l="1.000 ou mais"><span class="best">R$ 0,56</span><span class="pill">−15%</span></td><td class="num min" data-l="Mínimo">500 un.</td><td class="num act"><a class="btn ghost" href="https://fanezzesupply.com.br/produtos?produto=envelope-coex">Comprar</a></td></tr><tr data-mat="envelope-coex" data-area="2400" data-price="117"><td><div class="prod"><img src="assets/envelope-p.webp" alt="" width="240" height="180" loading="lazy"><div><span class="size">40x60</span><small>Envelope COEX</small></div></div></td><td class="num" data-l="Até 999 un."><span class="price">R$ 1,36</span></td><td class="num" data-l="1.000 ou mais"><span class="best">R$ 1,17</span><span class="pill">−14%</span></td><td class="num min" data-l="Mínimo">500 un.</td><td class="num act"><a class="btn ghost" href="https://fanezzesupply.com.br/produtos?produto=envelope-coex">Comprar</a></td></tr><tr data-mat="envelope-coex" data-area="3500" data-price="146"><td><div class="prod"><img src="assets/envelope-p.webp" alt="" width="240" height="180" loading="lazy"><div><span class="size">50x70</span><small>Envelope COEX</small></div></div></td><td class="num" data-l="Até 999 un."><span class="price">R$ 1,71</span></td><td class="num" data-l="1.000 ou mais"><span class="best">R$ 1,46</span><span class="pill">−15%</span></td><td class="num min" data-l="Mínimo">500 un.</td><td class="num act"><a class="btn ghost" href="https://fanezzesupply.com.br/produtos?produto=envelope-coex">Comprar</a></td></tr><tr data-mat="envelope-cinza" data-area="600" data-price="14"><td><div class="prod"><img src="assets/envelope-cinza-p.webp" alt="" width="240" height="180" loading="lazy"><div><span class="size">20x30</span><small>Envelope Cinza</small></div></div></td><td class="num" data-l="Até 999 un."><span class="price">R$ 0,16</span></td><td class="num" data-l="1.000 ou mais"><span class="best">R$ 0,14</span><span class="pill">−12%</span></td><td class="num min" data-l="Mínimo">500 un.</td><td class="num act"><a class="btn ghost" href="https://fanezzesupply.com.br/produtos?produto=envelope-cinza">Comprar</a></td></tr><tr data-mat="envelope-cinza" data-area="936" data-price="20"><td><div class="prod"><img src="assets/envelope-cinza-p.webp" alt="" width="240" height="180" loading="lazy"><div><span class="size">26x36</span><small>Envelope Cinza</small></div></div></td><td class="num" data-l="Até 999 un."><span class="price">R$ 0,26</span></td><td class="num" data-l="1.000 ou mais"><span class="best">R$ 0,20</span><span class="pill">−23%</span></td><td class="num min" data-l="Mínimo">500 un.</td><td class="num act"><a class="btn ghost" href="https://fanezzesupply.com.br/produtos?produto=envelope-cinza">Comprar</a></td></tr><tr data-mat="envelope-cinza" data-area="1280" data-price="26"><td><div class="prod"><img src="assets/envelope-cinza-p.webp" alt="" width="240" height="180" loading="lazy"><div><span class="size">32x40</span><small>Envelope Cinza</small></div></div></td><td class="num" data-l="Até 999 un."><span class="price">R$ 0,36</span></td><td class="num" data-l="1.000 ou mais"><span class="best">R$ 0,26</span><span class="pill">−28%</span></td><td class="num min" data-l="Mínimo">500 un.</td><td class="num act"><a class="btn ghost" href="https://fanezzesupply.com.br/produtos?produto=envelope-cinza">Comprar</a></td></tr><tr data-mat="envelope-cinza" data-area="2000" data-price="46"><td><div class="prod"><img src="assets/envelope-cinza-p.webp" alt="" width="240" height="180" loading="lazy"><div><span class="size">40x50</span><small>Envelope Cinza</small></div></div></td><td class="num" data-l="Até 999 un."><span class="price">R$ 0,55</span></td><td class="num" data-l="1.000 ou mais"><span class="best">R$ 0,46</span><span class="pill">−16%</span></td><td class="num min" data-l="Mínimo">500 un.</td><td class="num act"><a class="btn ghost" href="https://fanezzesupply.com.br/produtos?produto=envelope-cinza">Comprar</a></td></tr><tr data-mat="envelope-cinza" data-area="2400" data-price="55"><td><div class="prod"><img src="assets/envelope-cinza-p.webp" alt="" width="240" height="180" loading="lazy"><div><span class="size">40x60</span><small>Envelope Cinza</small></div></div></td><td class="num" data-l="Até 999 un."><span class="price">R$ 0,64</span></td><td class="num" data-l="1.000 ou mais"><span class="best">R$ 0,55</span><span class="pill">−14%</span></td><td class="num min" data-l="Mínimo">500 un.</td><td class="num act"><a class="btn ghost" href="https://fanezzesupply.com.br/produtos?produto=envelope-cinza">Comprar</a></td></tr><tr data-mat="envelope-cinza" data-area="3500" data-price="77"><td><div class="prod"><img src="assets/envelope-cinza-p.webp" alt="" width="240" height="180" loading="lazy"><div><span class="size">50x70</span><small>Envelope Cinza</small></div></div></td><td class="num" data-l="Até 999 un."><span class="price">R$ 1,05</span></td><td class="num" data-l="1.000 ou mais"><span class="best">R$ 0,77</span><span class="pill">−27%</span></td><td class="num min" data-l="Mínimo">500 un.</td><td class="num act"><a class="btn ghost" href="https://fanezzesupply.com.br/produtos?produto=envelope-cinza">Comprar</a></td></tr><tr data-mat="envelope-cinza" data-area="4200" data-price="87"><td><div class="prod"><img src="assets/envelope-cinza-p.webp" alt="" width="240" height="180" loading="lazy"><div><span class="size">70x60</span><small>Envelope Cinza</small></div></div></td><td class="num" data-l="Até 999 un."><span class="price">R$ 1,20</span></td><td class="num" data-l="1.000 ou mais"><span class="best">R$ 0,87</span><span class="pill">−28%</span></td><td class="num min" data-l="Mínimo">500 un.</td><td class="num act"><a class="btn ghost" href="https://fanezzesupply.com.br/produtos?produto=envelope-cinza">Comprar</a></td></tr><tr data-mat="envelope-cinza" data-area="4500" data-price="102"><td><div class="prod"><img src="assets/envelope-cinza-p.webp" alt="" width="240" height="180" loading="lazy"><div><span class="size">50x90</span><small>Envelope Cinza</small></div></div></td><td class="num" data-l="Até 999 un."><span class="price">R$ 1,40</span></td><td class="num" data-l="1.000 ou mais"><span class="best">R$ 1,02</span><span class="pill">−27%</span></td><td class="num min" data-l="Mínimo">500 un.</td><td class="num act"><a class="btn ghost" href="https://fanezzesupply.com.br/produtos?produto=envelope-cinza">Comprar</a></td></tr></tbody></table></div>
+<p class="note">Preço por unidade. Frete grátis em Joinville/SC; demais cidades R$ 19,90 por pedido.</p>
+</main>
+<script>
+document.querySelectorAll('[data-filter]').forEach((b) => b.addEventListener('click', () => {
+  document.querySelectorAll('[data-filter]').forEach((x) => x.setAttribute('aria-pressed', String(x === b)));
+  const f = b.dataset.filter;
+  document.querySelectorAll('[data-mat]').forEach((el) => { el.hidden = f !== 'all' && el.dataset.mat !== f; });
+}));
+
+const tbody = document.getElementById('rows'), orig = [...tbody.children];
+document.getElementById('sort').addEventListener('change', (e) => {
+  const k = e.target.value, list = k === 'cat' ? orig : [...orig].sort((a, b) => Number(a.dataset[k]) - Number(b.dataset[k]));
+  list.forEach((r) => tbody.append(r));
+});</script>
+</body>
+</html>
