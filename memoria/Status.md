@@ -27,6 +27,7 @@ Atualizado em: 2026-10-30
 - [x] Foto nova dos envelopes (`src/assets/envelope.webp`)
 - [x] E-mails de pedido ligados: "pago" nos webhooks/checagem do Pix, "enviado/entregue" ao mudar no painel admin (função `notify-order-status`); cada e-mail sai uma vez só (tabela `order_emails`)
 - [x] Banner da home com o Envelope Cinza girando em 3D (arrastar gira; foto como reserva) (#71)
+- [x] Guia de tamanhos em escala, com comparação à folha A4 (#73)
 
 ## Falta
 - [ ] Fazer um cadastro real com e-mail novo, partindo do carrinho, e confirmar que o link do e-mail volta para `/carrinho`. Se cair na home, o Supabase recusou o `redirect_to` com `?returnTo=`. Pendência indicada pelo Claude no parecer do PR #61; testes desta entrega usam auth simulada e não criam contas reais.

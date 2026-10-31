@@ -54,3 +54,4 @@
 - **2026-10-31**: dicas de embalagem empilhadas na lateral esquerda, "Antes de comprar" em alta resolução, aparecem a partir de 2104 px (#67)
 - **2026-10-31**: instaladas as skills de design impeccable, taste-skill e hallmark em `.claude/skills/` (sem os hooks automáticos do impeccable) (#69)
 - **2026-10-31**: envelope cinza do banner da home girando em 3D (three.js, carregado só quando usado; foto como reserva) (#71)
+- **2026-10-31**: guia de tamanhos da home trocado pelo modelo "tamanhos em escala": envelopes desenhados na mesma escala e painel com comparação à folha A4 (#73)
