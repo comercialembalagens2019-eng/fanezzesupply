@@ -1,0 +1,341 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>FNZ Supply · Envelopes de segurança no atacado (modelo I)</title>
+<meta name="description" content="Envelopes de segurança no atacado, direto de Joinville/SC: preço por quantidade, NF-e para o seu CNPJ e frete grátis na cidade.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+/* Modelo I: fiel à referência aprovada pelo dono (azul, amarelo, foto de cena) */
+:root {
+  --navy: #0f2a5f;          /* títulos e bordas dos botões */
+  --navy-deep: #0b1f47;
+  --wall: #023672;          /* azul da parede da foto */
+  --yellow: #ffc629;
+  --yellow-hover: #ffd456;
+  --yellow-soft: #fff3cf;
+  --sky: #eef4fb;
+  --card: #ffffff;
+  --line: #dbe3ee;
+  --muted: #4d5a72;
+  --radius: 10px;
+  --shadow: 0 1px 2px rgb(15 42 95 / .06), 0 10px 30px -14px rgb(15 42 95 / .22);
+  --ease: cubic-bezier(.22, 1, .36, 1);
+}
+*, *::before, *::after { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+html, body { margin: 0; overflow-x: clip; }
+body { font-family: Manrope, system-ui, sans-serif; color: var(--navy); background: linear-gradient(#fff 0, var(--sky) 900px); font-size: 17px; line-height: 1.55; -webkit-font-smoothing: antialiased; }
+img { display: block; max-width: 100%; height: auto; }
+a { color: inherit; text-decoration: none; }
+h1, h2, h3, p { margin: 0; }
+button, select { font: inherit; color: inherit; }
+:focus-visible { outline: 3px solid var(--yellow); outline-offset: 3px; border-radius: 6px; }
+.wrap { width: min(1280px, 100% - 48px); margin-inline: auto; }
+svg.i { width: 20px; height: 20px; flex: none; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+
+/* Botões */
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 10px; min-height: 48px; padding: 0 24px; border-radius: 6px; font-weight: 700; font-size: 16px; border: 1.5px solid transparent; cursor: pointer; transition: background-color .2s, border-color .2s, color .2s, transform .2s var(--ease); }
+.btn:active { transform: scale(.98); }
+.btn .i { transition: transform .2s var(--ease); }
+.btn:hover .i { transform: translateX(3px); }
+.btn-yellow { background: var(--yellow); color: var(--navy-deep); }
+.btn-yellow:hover { background: var(--yellow-hover); }
+.btn-outline { border-color: var(--navy); color: var(--navy); background: #fff; }
+.btn-outline .i { color: #e0a800; }
+.btn-outline:hover { background: var(--navy); color: #fff; }
+.btn-outline:hover .i { color: var(--yellow); }
+
+/* Cabeçalho */
+.top { background: #fff; border-bottom: 1px solid var(--line); position: sticky; top: 0; z-index: 20; }
+.top .wrap { display: flex; align-items: center; gap: 32px; height: 84px; }
+.top .logo img { height: 48px; width: auto; }
+.top nav { display: flex; gap: 40px; margin-inline: auto; font-weight: 600; font-size: 15px; }
+.top nav a { padding: 8px 0; border-bottom: 2px solid transparent; transition: border-color .2s; }
+.top nav a:hover { border-color: var(--yellow); }
+.tools { display: flex; align-items: center; gap: 6px; margin-left: auto; }
+.icon-btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-width: 44px; height: 44px; padding: 0 10px; border-radius: 8px; font-weight: 600; font-size: 15px; transition: background-color .2s; }
+.icon-btn:hover { background: var(--sky); }
+.icon-btn .i { width: 22px; height: 22px; }
+.tools .sep { width: 1px; height: 26px; background: var(--line); margin: 0 8px; }
+.tools .btn { min-height: 46px; padding: 0 18px; border-radius: 6px; }
+
+/* Abertura: título centralizado sobre a foto */
+.hero { position: relative; background: var(--wall); color: #fff; overflow: hidden; }
+.hero__photo { position: absolute; inset: auto 0 0 0; width: 100%; height: auto; min-height: 100%; object-fit: cover; object-position: 50% 100%; }
+.hero .wrap { position: relative; min-height: clamp(640px, 54vw, 820px); padding-block: 48px 150px; text-align: center; }
+.hero h1 { font-size: clamp(44px, 5.4vw, 80px); font-weight: 800; line-height: 1; letter-spacing: -.045em; }
+.hero h1 span { display: block; }
+.hero__lead { margin-top: 18px; font-size: clamp(18px, 1.6vw, 22px); font-weight: 500; color: #fff; }
+.hero .btn { margin-top: 28px; min-height: 54px; padding: 0 32px; font-size: 17px; }
+
+/* Faixa de compra rápida */
+.quick { position: relative; z-index: 2; margin-top: -110px; }
+.quick__box { background: var(--card); border-radius: var(--radius); box-shadow: 0 2px 4px rgb(15 42 95 / .06), 0 24px 48px -24px rgb(15 42 95 / .35); padding: 24px 28px; display: grid; grid-template-columns: auto minmax(0, 1fr) auto auto; gap: 32px; align-items: center; }
+.quick h2 { font-size: 24px; font-weight: 800; line-height: 1.12; letter-spacing: -.03em; max-width: 10ch; }
+.fields { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+.field label { display: block; font-size: 13px; font-weight: 600; margin-bottom: 6px; }
+.select { position: relative; }
+.select select { appearance: none; width: 100%; height: 48px; border: 1.5px solid var(--line); border-radius: 6px; background: #fff; padding: 0 40px 0 14px; font-weight: 600; font-size: 15px; cursor: pointer; transition: border-color .2s; }
+.select select:hover { border-color: #a9b6c9; }
+.select .i { position: absolute; right: 12px; top: 50%; margin-top: -10px; pointer-events: none; }
+.total { border-left: 1px solid var(--line); padding-left: 32px; min-width: 150px; }
+.total b { display: block; font-size: 28px; font-weight: 800; letter-spacing: -.04em; font-variant-numeric: tabular-nums; }
+.total span { font-size: 14px; color: var(--muted); font-variant-numeric: tabular-nums; }
+.quick .btn { min-height: 54px; padding: 0 28px; }
+
+/* Seções */
+section { padding-top: 88px; }
+.head { text-align: center; margin: 0 auto 32px; }
+.head h2 { font-size: clamp(32px, 3.4vw, 48px); font-weight: 800; letter-spacing: -.045em; line-height: 1.08; }
+.head p { margin-top: 8px; font-size: 19px; color: var(--muted); }
+
+/* Encontre seu envelope */
+.products { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+.product { background: var(--card); border-radius: var(--radius); padding: 14px 14px 24px; box-shadow: var(--shadow); display: flex; flex-direction: column; transition: transform .25s var(--ease), box-shadow .25s; }
+.product:hover { transform: translateY(-3px); box-shadow: 0 2px 4px rgb(15 42 95 / .06), 0 18px 36px -16px rgb(15 42 95 / .3); }
+.product .ph { aspect-ratio: 1.1; border-radius: 6px; overflow: hidden; }
+.product .ph img { width: 100%; height: 100%; object-fit: cover; transition: transform .5s var(--ease); }
+.product:hover .ph img { transform: scale(1.03); }
+.product h3 { font-size: 24px; font-weight: 800; letter-spacing: -.035em; margin: 18px 8px 2px; }
+.product p { color: var(--muted); font-size: 17px; margin: 0 8px 22px; }
+.product .btn { margin: auto 8px 0; }
+
+/* Sua marca */
+.brand { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); align-items: center; gap: 40px; background: var(--navy-deep); color: #fff; border-radius: var(--radius); padding: 18px; }
+.brand__ph { position: relative; aspect-ratio: 1.6; border-radius: 6px; overflow: hidden; }
+.brand__ph img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 40% 55%; }
+.mark { position: absolute; left: 44%; top: 40%; transform: translate(-50%, -50%) rotate(-17deg) skewX(-6deg); color: var(--navy-deep); font-weight: 800; font-size: clamp(22px, 3vw, 40px); line-height: .95; letter-spacing: -.02em; text-align: left; opacity: .9; mix-blend-mode: multiply; }
+.mark::after { content: ""; display: block; width: 72%; height: 6px; margin-top: 8px; background: var(--yellow); border-radius: 3px; mix-blend-mode: normal; }
+.brand__ph small { position: absolute; left: 14px; bottom: 12px; font-size: 13px; color: var(--navy-deep); background: rgb(255 255 255 / .85); padding: 2px 8px; border-radius: 4px; font-weight: 600; }
+.brand__copy { padding: 24px 32px 24px 0; }
+.brand h2 { font-size: clamp(34px, 3.6vw, 52px); font-weight: 800; letter-spacing: -.045em; line-height: 1.02; }
+.brand p { margin: 16px 0 28px; font-size: 18px; color: #dfe8f6; }
+
+/* Ajuda */
+.help { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+.help__card { background: var(--card); border-radius: var(--radius); box-shadow: var(--shadow); padding: 12px; }
+.help__in { border-radius: 6px; padding: 24px 28px; display: grid; grid-template-columns: 190px minmax(0, 1fr); gap: 28px; align-items: center; height: 100%; }
+.help__card.warm .help__in { background: var(--yellow-soft); }
+.help__card h3 { font-size: 24px; font-weight: 800; letter-spacing: -.035em; line-height: 1.15; }
+.help__card p { color: var(--muted); margin: 6px 0 18px; font-size: 16px; }
+.help__card svg.art { width: 100%; height: auto; }
+
+/* Rodapé */
+footer { margin-top: 24px; }
+footer .wrap { display: flex; flex-wrap: wrap; align-items: center; gap: 24px 48px; padding-block: 32px 40px; border-top: 1px solid var(--line); }
+footer img { height: 44px; width: auto; }
+footer nav { display: flex; flex-wrap: wrap; gap: 8px 40px; font-weight: 600; font-size: 15px; margin-inline: auto; }
+footer nav a:hover, .legal a:hover { text-decoration: underline; text-underline-offset: 4px; }
+.legal { display: flex; align-items: center; gap: 16px; font-size: 15px; font-weight: 600; padding-left: 32px; border-left: 1px solid var(--line); }
+.legal span { width: 1px; height: 18px; background: var(--line); }
+.imprint { font-size: 14px; color: var(--muted); padding-bottom: 32px; }
+
+/* Entrada suave */
+@keyframes rise { from { opacity: 0; transform: translateY(14px); } }
+.hero .wrap > * { animation: rise .6s var(--ease) both; }
+.hero .wrap > :nth-child(2) { animation-delay: .07s; } .hero .wrap > :nth-child(3) { animation-delay: .14s; }
+
+@media (max-width: 1100px) {
+  .top nav { display: none; }
+  .quick__box { grid-template-columns: 1fr; gap: 18px; }
+  .quick h2 { max-width: none; }
+  .total { border-left: 0; padding-left: 0; }
+  .products { grid-template-columns: 1fr 1fr; }
+  .brand { grid-template-columns: 1fr; }
+  .brand__copy { padding: 8px 16px 24px; }
+  .help { grid-template-columns: 1fr; }
+}
+@media (max-width: 640px) {
+  .wrap { width: calc(100% - 32px); }
+  .top .wrap { gap: 12px; height: 72px; }
+  .top .logo img { height: 38px; }
+  .tools .label, .tools .sep { display: none; }
+  .hero .wrap { min-height: 660px; padding-block: 40px 140px; }
+  .quick { margin-top: -90px; }
+  .hero h1 { font-size: 44px; }
+  .hero .btn { width: 100%; }
+  .fields { grid-template-columns: 1fr; }
+  .products { grid-template-columns: 1fr; }
+  .help__in { grid-template-columns: 1fr; padding: 20px; }
+  .help__card svg.art { max-width: 170px; }
+  .legal { padding-left: 0; border-left: 0; }
+  footer nav { margin-inline: 0; }
+  section { padding-top: 64px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
+}
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="arrow" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></symbol>
+  <symbol id="chev" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></symbol>
+  <symbol id="search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></symbol>
+  <symbol id="user" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></symbol>
+  <symbol id="cart" viewBox="0 0 24 24"><path d="M3 4h2l2.4 11.2a2 2 0 0 0 2 1.6h7.7a2 2 0 0 0 2-1.5L21 8H6.2"/><circle cx="10" cy="20.5" r="1"/><circle cx="17" cy="20.5" r="1"/></symbol>
+</svg>
+
+<header class="top">
+  <div class="wrap">
+    <a class="logo" href="https://fanezzesupply.com.br"><img src="assets/fnz-logo.png" alt="FNZ Supply" width="378" height="160"></a>
+    <nav aria-label="Principal">
+      <a href="#envelopes">Produtos</a>
+      <a href="#personalizados">Personalizados</a>
+      <a href="#ajuda">Guia de medidas</a>
+    </nav>
+    <div class="tools">
+      <a class="icon-btn" href="https://fanezzesupply.com.br/produtos" aria-label="Buscar produtos"><svg class="i"><use href="#search"/></svg></a>
+      <a class="icon-btn" href="https://fanezzesupply.com.br/login"><svg class="i"><use href="#user"/></svg><span class="label">Entrar</span></a>
+      <span class="sep" aria-hidden="true"></span>
+      <a class="btn btn-yellow" href="https://fanezzesupply.com.br/carrinho"><svg class="i"><use href="#cart"/></svg><span class="label">Carrinho</span></a>
+    </div>
+  </div>
+</header>
+
+<main>
+  <div class="hero">
+    <img class="hero__photo" src="assets/hero.webp" alt="Envelopes de segurança FNZ, um branco com uma camiseta dentro e um cinza" width="1546" height="1017" fetchpriority="high">
+    <div class="wrap">
+      <h1><span>Pequenos detalhes.</span> <span>Grandes envios.</span></h1>
+      <p class="hero__lead">Envelopes para a rotina de quem vende e envia.</p>
+      <a class="btn btn-yellow" href="#envelopes">Encontrar minha embalagem <svg class="i"><use href="#arrow"/></svg></a>
+    </div>
+  </div>
+
+  <div class="wrap quick" id="rapido">
+    <form class="quick__box" action="https://fanezzesupply.com.br/produtos" onsubmit="return false">
+      <h2>Já sabe o que precisa?</h2>
+      <div class="fields">
+        <div class="field"><label for="q-mat">Material</label><div class="select"><select id="q-mat"></select><svg class="i"><use href="#chev"/></svg></div></div>
+        <div class="field"><label for="q-tam">Tamanho</label><div class="select"><select id="q-tam"></select><svg class="i"><use href="#chev"/></svg></div></div>
+        <div class="field"><label for="q-qtd">Quantidade</label><div class="select"><select id="q-qtd"></select><svg class="i"><use href="#chev"/></svg></div></div>
+      </div>
+      <div class="total" aria-live="polite"><b id="q-total">R$ 240,00</b><span id="q-unit">R$ 0,24/un.</span></div>
+      <a class="btn btn-yellow" id="q-go" href="https://fanezzesupply.com.br/produtos">Adicionar ao carrinho</a>
+    </form>
+  </div>
+
+  <section id="envelopes" class="wrap">
+    <div class="head">
+      <h2>Encontre seu envelope</h2>
+      <p>Três opções para diferentes necessidades.</p>
+    </div>
+    <div class="products">
+      <article class="product">
+        <div class="ph"><img src="assets/envelope.webp" alt="Envelope de segurança branco" width="700" height="525" loading="lazy"></div>
+        <h3>Envelope</h3>
+        <p>Preto ou branco.</p>
+        <a class="btn btn-outline" href="https://fanezzesupply.com.br/produtos">Ver opções <svg class="i"><use href="#arrow"/></svg></a>
+      </article>
+      <article class="product">
+        <div class="ph"><img src="assets/coex.webp" alt="Envelope COEX aberto" width="700" height="457" loading="lazy"></div>
+        <h3>Envelope COEX</h3>
+        <p>Branco por fora, cinza por dentro.</p>
+        <a class="btn btn-outline" href="https://fanezzesupply.com.br/produtos">Ver opções <svg class="i"><use href="#arrow"/></svg></a>
+      </article>
+      <article class="product">
+        <div class="ph"><img src="assets/cinza.webp" alt="Envelope de segurança cinza" width="746" height="560" loading="lazy"></div>
+        <h3>Envelope Cinza</h3>
+        <p>Acabamento cinza.</p>
+        <a class="btn btn-outline" href="https://fanezzesupply.com.br/produtos">Ver opções <svg class="i"><use href="#arrow"/></svg></a>
+      </article>
+    </div>
+  </section>
+
+  <section id="personalizados" class="wrap" style="padding-top:56px">
+    <div class="brand">
+      <div class="brand__ph">
+        <img src="assets/marca.webp" alt="" width="1000" height="717" loading="lazy">
+        <span class="mark" aria-hidden="true">SUA<br>MARCA</span>
+        <small>Exemplo ilustrativo</small>
+      </div>
+      <div class="brand__copy">
+        <h2>Sua marca acompanha cada pedido.</h2>
+        <p>Envelopes personalizados sob orçamento.</p>
+        <a class="btn btn-yellow" href="https://wa.me/5547991490027?text=Ol%C3%A1!%20Quero%20um%20or%C3%A7amento%20de%20envelope%20personalizado." target="_blank" rel="noopener">Criar meu personalizado <svg class="i"><use href="#arrow"/></svg></a>
+      </div>
+    </div>
+  </section>
+
+  <section id="ajuda" class="wrap" style="padding-top:16px">
+    <div class="help">
+      <div class="help__card"><div class="help__in">
+        <svg class="art" viewBox="0 0 190 120" aria-hidden="true">
+          <circle cx="120" cy="34" r="22" fill="#fff3cf"/>
+          <rect x="8" y="30" width="12" height="82" rx="2" fill="#fff" stroke="#0f2a5f" stroke-width="2"/>
+          <path d="M8 42h6M8 54h4M8 66h6M8 78h4M8 90h6M8 102h4" stroke="#0f2a5f" stroke-width="2"/>
+          <rect x="34" y="14" width="80" height="62" rx="2" fill="#fff" stroke="#0f2a5f" stroke-width="2"/>
+          <path d="M34 22h80" stroke="#0f2a5f" stroke-width="2"/>
+          <path d="M46 40h56M46 50h40" stroke="#c8d3e4" stroke-width="2" stroke-dasharray="4 4"/>
+          <rect x="70" y="44" width="104" height="70" rx="2" fill="#fff" stroke="#0f2a5f" stroke-width="2" transform="rotate(-4 122 79)"/>
+          <path d="M70 54l104-7" stroke="#0f2a5f" stroke-width="2"/>
+          <path d="M84 84l70-5" stroke="#c8d3e4" stroke-width="2" stroke-dasharray="4 4"/>
+        </svg>
+        <div>
+          <h3>Qual tamanho escolher?</h3>
+          <p>Confira nosso guia de medidas.</p>
+          <a class="btn btn-outline" href="https://fanezzesupply.com.br/#guia-de-tamanhos">Abrir guia de medidas <svg class="i"><use href="#arrow"/></svg></a>
+        </div>
+      </div></div>
+      <div class="help__card warm"><div class="help__in">
+        <svg class="art" viewBox="0 0 190 120" aria-hidden="true">
+          <circle cx="54" cy="74" r="34" fill="#ffe08a"/>
+          <rect x="78" y="40" width="76" height="72" rx="2" fill="#fff" stroke="#0f2a5f" stroke-width="2" transform="rotate(8 116 76)"/>
+          <path d="M82 48l74 10" stroke="#0f2a5f" stroke-width="2"/>
+          <path d="M28 10h62a8 8 0 0 1 8 8v30a8 8 0 0 1-8 8H56l-14 12V56H28a8 8 0 0 1-8-8V18a8 8 0 0 1 8-8z" fill="#fff" stroke="#0f2a5f" stroke-width="2"/>
+          <circle cx="45" cy="33" r="3.5" fill="#0f2a5f"/><circle cx="59" cy="33" r="3.5" fill="#0f2a5f"/><circle cx="73" cy="33" r="3.5" fill="#0f2a5f"/>
+        </svg>
+        <div>
+          <h3>Vamos encontrar sua embalagem?</h3>
+          <p>Tire suas dúvidas e fale com a FNZ.</p>
+          <a class="btn btn-outline" href="https://wa.me/5547991490027" target="_blank" rel="noopener">Falar com a FNZ <svg class="i"><use href="#arrow"/></svg></a>
+        </div>
+      </div></div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <img src="assets/fnz-logo.png" alt="FNZ Supply" width="378" height="160" loading="lazy">
+    <nav aria-label="Rodapé">
+      <a href="#envelopes">Produtos</a>
+      <a href="#personalizados">Personalizados</a>
+      <a href="#ajuda">Ajuda</a>
+      <a href="https://fanezzesupply.com.br/contato">Contato</a>
+    </nav>
+    <div class="legal"><a href="https://fanezzesupply.com.br/termos">Termos de uso</a><span aria-hidden="true"></span><a href="https://fanezzesupply.com.br/privacidade">Privacidade</a></div>
+  </div>
+  <div class="wrap imprint">FNZ Supply Embalagens · CNPJ 56.008.033/0001-32 · Joinville/SC · WhatsApp (47) 99149-0027 · vendas@fnzsupply.com.br</div>
+</footer>
+<script>
+(() => {
+  // Mesmos valores de supabase/functions/_shared/catalog.ts (centavos: preço até 999 un., preço a partir de 1.000)
+  const CAT = {
+    'Envelope COEX': { min: 500, sizes: { '19x25': [27, 24], '32x20': [36, 31], '30x40': [66, 56], '40x60': [136, 117], '50x70': [171, 146] } },
+    'Envelope Cinza': { min: 500, sizes: { '20x30': [16, 14], '26x36': [26, 20], '32x40': [36, 26], '40x50': [55, 46], '40x60': [64, 55], '50x70': [105, 77], '70x60': [120, 87], '50x90': [140, 102] } },
+    'Envelope preto ou branco': { min: 2000, sizes: { '20x30': [8, 8], '20x36': [8, 8], '32x40': [8, 8], '40x60': [8, 8], '30x70': [8, 8] } },
+  };
+  const brl = (c) => (c / 100).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+  const mat = document.getElementById('q-mat'), tam = document.getElementById('q-tam'), qtd = document.getElementById('q-qtd');
+  const fill = (sel, items, pick) => { sel.innerHTML = items.map(([v, t]) => `<option value="${v}"${v === pick ? ' selected' : ''}>${t}</option>`).join(''); };
+  fill(mat, Object.keys(CAT).map((k) => [k, k.replace('Envelope ', '')]), 'Envelope COEX');
+  const sizes = () => { fill(tam, Object.keys(CAT[mat.value].sizes).map((s) => [s, s.replace('x', ' × ') + ' cm']), tam.value); };
+  const qty = () => { const m = CAT[mat.value].min; fill(qtd, [m, m * 2, m * 5, m * 10].filter((v, i, a) => a.indexOf(v) === i).map((n) => [String(n), n.toLocaleString('pt-BR') + ' unidades']), qtd.value || '1000'); };
+  const total = () => {
+    const [low, best] = CAT[mat.value].sizes[tam.value], n = Number(qtd.value), unit = n >= 1000 ? best : low;
+    document.getElementById('q-total').textContent = brl(unit * n);
+    document.getElementById('q-unit').textContent = brl(unit) + '/un.';
+  };
+  mat.addEventListener('change', () => { sizes(); qty(); total(); });
+  [tam, qtd].forEach((s) => s.addEventListener('change', total));
+  sizes(); qty(); total();
+})();
+</script>
+</body>
+</html>
