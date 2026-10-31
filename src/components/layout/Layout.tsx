@@ -13,11 +13,11 @@ export function Layout({ children, contentWidth = "default" }: LayoutProps) {
   const { pathname } = useLocation();
   return (
     <div className="flex flex-col min-h-screen">
-      <Header />
+      <Header wide={contentWidth === "wide"} />
       <main key={pathname} className="flex-1 pt-[var(--header-height)] animate-enter">
         {contentWidth === "wide" ? <div className="container-wide">{children}</div> : children}
       </main>
-      <Footer />
+      <Footer wide={contentWidth === "wide"} />
     </div>
   );
 }

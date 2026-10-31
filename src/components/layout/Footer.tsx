@@ -3,10 +3,11 @@ import { Link } from "react-router-dom";
 import { Clock, Mail, MapPin, MessageCircle } from "lucide-react";
 import { COMPANY, MAPS_URL, WHATSAPP_URL } from "@/lib/company";
 
-export function Footer() {
+export function Footer({ wide = false }: { wide?: boolean }) {
+  const container = wide ? "container-wide" : "container-custom";
   return (
     <footer className="bg-card border-t border-border mt-16">
-      <div className="container-custom py-10 grid gap-8 sm:grid-cols-2 lg:grid-cols-4 text-sm">
+      <div className={`${container} py-10 grid gap-8 sm:grid-cols-2 lg:grid-cols-4 text-sm`}>
         <div className="space-y-3">
           <Link to="/" className="flex items-center" aria-label="FNZ Supply — início">
             <Logo className="h-9" />
@@ -61,7 +62,7 @@ export function Footer() {
       </div>
 
       <div className="border-t border-border">
-        <div className="container-custom py-5 flex flex-col sm:flex-row gap-3 justify-between text-xs text-muted-foreground">
+        <div className={`${container} py-5 flex flex-col sm:flex-row gap-3 justify-between text-xs text-muted-foreground`}>
           <span>© {new Date().getFullYear()} FNZ Supply · CNPJ {COMPANY.cnpj}. Todos os direitos reservados.</span>
           <span className="flex gap-4">
             <Link to="/termos" className="hover:text-foreground transition-colors">Termos de Uso</Link>

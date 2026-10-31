@@ -10,13 +10,13 @@ const items = [
 export function Differentials() {
   return (
     <section aria-label="Diferenciais da FNZ Supply">
-      <ul className="grid gap-5 sm:grid-cols-3 py-2">
+      <ul className="grid gap-5 sm:grid-cols-3 py-5 border-y border-border">
         {items.map((item) => (
           <li key={item.title} className="flex items-start gap-3 min-w-0">
             <item.icon className="w-5 h-5 mt-0.5 shrink-0 text-navy-light" aria-hidden="true" />
             <span>
-              <b className="block text-sm font-extrabold">{item.title}</b>
-              <span className="block text-xs leading-relaxed text-muted-foreground mt-1">{item.text}</span>
+              <b className="block font-extrabold">{item.title}</b>
+              <span className="block text-sm leading-relaxed text-muted-foreground mt-0.5">{item.text}</span>
             </span>
           </li>
         ))}

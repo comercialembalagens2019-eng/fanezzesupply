@@ -27,13 +27,10 @@ export function FeaturedProducts() {
           const bestTier = p.sizePricing ? Math.max(...p.sizePricing.flatMap((s) => s.tiers.map((t) => t.minQty))) : null;
           return (
             <li key={p.id} className="min-w-0 flex flex-col bg-card rounded-2xl overflow-hidden ring-1 ring-black/5">
-              <div className={p.id === "envelope-coex" ? "bg-beige-light" : "bg-card"}>
-                <p className="px-5 pt-4 text-xs font-semibold text-muted-foreground">{traits[p.id]}</p>
-                <img src={p.image} alt={p.name} loading="lazy" width={1200} height={900} className="w-full aspect-[4/3] object-cover mt-3" />
-              </div>
+              <img src={p.image} alt={p.name} loading="lazy" width={1200} height={900} className="w-full aspect-[3/2] object-cover bg-muted" />
               <div className="p-5 md:p-6 flex flex-col flex-1">
                 <h3 className="font-extrabold text-xl">{p.name}</h3>
-                <p className="text-sm text-muted-foreground mt-2">Mínimo de {p.minOrder.toLocaleString("pt-BR")} unidades.</p>
+                <p className="text-sm text-muted-foreground mt-1">{traits[p.id]}. Mínimo de {p.minOrder.toLocaleString("pt-BR")} unidades.</p>
                 <div className="mt-5">
                   <p className="text-xs text-muted-foreground">{bestTier ? "A partir de" : "Preço por unidade"}</p>
                   <p className="font-extrabold text-2xl mt-1">{formatBRL(fromPrice(p))}<span className="text-sm font-medium text-muted-foreground"> / un.</span></p>

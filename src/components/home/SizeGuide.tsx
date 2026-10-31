@@ -78,15 +78,10 @@ export function SizeGuide() {
           <li key={e.key} className={cn(!showAll && i >= MOBILE_LIMIT && "hidden sm:block")}>
             <Link
               to={`/produtos?produto=${encodeURIComponent(e.productId)}&q=${encodeURIComponent(e.size)}`}
-              className="group tile p-3 h-full flex flex-col hover:shadow-hover transition-shadow focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+              className="group tile p-4 h-full flex flex-col hover:shadow-hover transition-shadow focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
             >
-              <span className="flex items-center gap-2.5">
-                <img src={e.image} alt="" loading="lazy" width={48} height={36} className="w-12 h-9 rounded-lg object-cover bg-muted shrink-0" />
-                <span className="min-w-0">
-                  <b className="block text-lg font-extrabold leading-none tabular-nums">{e.size}</b>
-                  <span className="block text-xs text-muted-foreground truncate mt-1">{e.material}</span>
-                </span>
-              </span>
+              <span className="text-xs text-muted-foreground truncate">{e.material}</span>
+              <b className="block text-xl font-extrabold leading-tight tabular-nums mt-0.5">{e.size}</b>
               <span className="mt-3 text-sm">
                 <b className="tabular-nums">{formatBRL(e.price)}</b>
                 <span className="text-muted-foreground">/un.</span>

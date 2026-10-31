@@ -14,7 +14,7 @@ const baseNavLinks = [
   { href: "/contato", label: "Contato" },
 ];
 
-export function Header() {
+export function Header({ wide = false }: { wide?: boolean }) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [query, setQuery] = useState("");
   const location = useLocation();
@@ -89,7 +89,7 @@ export function Header() {
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50 bg-background/90 backdrop-blur-md">
-      <div className="container-custom">
+      <div className={wide ? "container-wide" : "container-custom"}>
         <div className="grid grid-cols-[minmax(0,1fr)_auto_auto] items-center gap-x-3 gap-y-2 py-2 sm:flex sm:gap-3 md:gap-5 sm:h-[var(--header-height)] sm:py-0">
           {/* Logo */}
           <Link to="/" className="col-span-3 sm:col-span-1 flex items-center shrink-0 w-fit" aria-label="FNZ Supply — início">

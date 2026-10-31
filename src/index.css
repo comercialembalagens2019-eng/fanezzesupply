@@ -180,6 +180,10 @@
   }
 
   .home-purchase-grid > * { min-width: 0; }
+
+  /* Browser surfaces in the brand colours */
+  ::selection { background: hsl(var(--beige)); color: hsl(var(--navy)); }
+  input, textarea, select { caret-color: hsl(var(--navy)); accent-color: hsl(var(--navy)); }
   .home-calculator { width: 100%; max-width: 560px; margin-inline: auto; }
 
   @media (min-width: 768px) {
@@ -191,11 +195,12 @@
     .container-wide { --page-gutter: 32px; }
     .home-purchase-grid {
       grid-template-columns: minmax(0, 1fr) 360px;
-      grid-template-areas: "banner calculator" "differentials calculator" "materials materials";
+      grid-template-areas: "banner calculator" "differentials differentials" "materials materials";
       gap: 24px 32px;
     }
     .home-banner { grid-area: banner; }
-    .home-calculator { grid-area: calculator; align-self: start; }
+    .home-calculator { grid-area: calculator; align-self: stretch; }
+    .home-calculator > .tile { height: 100%; }
     .home-differentials { grid-area: differentials; }
     .home-materials { grid-area: materials; padding-top: 24px; }
   }

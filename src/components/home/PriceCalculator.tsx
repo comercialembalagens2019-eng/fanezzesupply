@@ -89,7 +89,7 @@ export function PriceCalculator() {
         ))}
       </div>
 
-      <div className="mt-4 flex items-end justify-between gap-3">
+      <div className="mt-auto pt-5 flex items-end justify-between gap-3 border-t border-dashed border-border">
         <div>
           <span className="text-xs text-muted-foreground">Total estimado</span>
           <div className="text-3xl font-extrabold tabular-nums" aria-live="polite">{formatBRL(total)}</div>
@@ -102,7 +102,7 @@ export function PriceCalculator() {
       <button
         type="button"
         onClick={() => addToCart(buildCartProduct(product, quantity, activeSize), quantity)}
-        className="mt-4 h-11 rounded-xl bg-primary text-primary-foreground font-bold text-sm flex items-center justify-center gap-2 hover:bg-navy-light transition-colors"
+        className="mt-4 h-12 rounded-xl bg-primary text-primary-foreground font-bold text-sm flex items-center justify-center gap-2 hover:bg-navy-light transition-colors"
       >
         <ShoppingCart className="w-4 h-4" aria-hidden="true" />
         Adicionar ao carrinho
