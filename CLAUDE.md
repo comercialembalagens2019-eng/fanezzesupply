@@ -146,3 +146,9 @@ npx -y deno@2.5.6 test supabase/functions/_shared/
 - `brainstorming`, `writing-plans`, `executing-plans`, `subagent-driven-development`: planejamento.
 - `verification-before-completion`: rodar as checagens antes de dizer que está pronto.
 - `supabase`, `supabase-postgres-best-practices`: banco, RLS, migrations, edge functions.
+
+### Skills de design externas (instaladas em `.claude/skills/`)
+- `impeccable` (pbakaus/impeccable): auditar, criticar e polir telas existentes. **Preferida para o site atual**: modo "refinement" preserva identidade, textos e comportamento. Os hooks automáticos dela (`settings.json` do repositório original) **não foram instalados**; o lançador `scripts/impeccable` baixa o motor do GitHub (verificado por checksum) só quando a skill é usada.
+- `taste-skill` / `design-taste-frontend` (Leonxlnx/taste-skill): direção de arte e revisão por capturas em 3 larguras. Ela sorteia direções novas; aqui use só a parte de crítica/inspeção, sem trocar a identidade FNZ.
+- `hallmark` (Nutlope/hallmark): páginas novas e `audit <path>`. Só em página existente se o dono pedir pelo nome.
+- **Regras da casa vencem as das skills:** azul-marinho/bege, tokens e componentes atuais, sem dados inventados, sem carimbos/comentários de skill no CSS, sem reescrever tudo sem pedido explícito. Imagens geradas ou de banco (Openverse, Together AI) só com aprovação do dono.
