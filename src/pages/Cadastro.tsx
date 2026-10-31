@@ -1,12 +1,13 @@
 import { useState } from "react";
 import { Logo } from "@/components/Logo";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Loader2, Eye, EyeOff } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { toast } from "@/hooks/use-toast";
 import { SEO } from "@/components/SEO";
 import { translateAuthError } from "@/lib/authErrors";
 import { supabase } from "@/integrations/supabase/client";
+import { authPagePath, authReturnDestination } from "@/lib/authReturn";
 
 const maskPhone = (value: string) =>
   value
@@ -17,6 +18,9 @@ const maskPhone = (value: string) =>
 
 const Cadastro = () => {
   const navigate = useNavigate();
+  const location = useLocation();
+  const destination = authReturnDestination(location.search, location.state);
+  const loginPath = authPagePath("/login", destination);
   const [nome, setNome] = useState("");
   const [email, setEmail] = useState("");
   const [telefone, setTelefone] = useState("");
@@ -55,7 +59,7 @@ const Cadastro = () => {
       email: email.trim(),
       password: senha,
       options: {
-        emailRedirectTo: `${window.location.origin}/`,
+        emailRedirectTo: `${window.location.origin}${loginPath}`,
         data: { nome: nome.trim(), telefone },
       },
     });
@@ -76,7 +80,7 @@ const Cadastro = () => {
         title: "Confirme seu e-mail",
         description: `Enviamos um link de confirmação para ${email.trim()}. Verifique também o spam.`,
       });
-      navigate("/login");
+      navigate(loginPath);
       return;
     }
 
@@ -84,7 +88,7 @@ const Cadastro = () => {
       title: "Cadastro realizado!",
       description: "Sua conta foi criada com sucesso.",
     });
-    navigate("/");
+    navigate(destination ?? "/");
   };
 
   return (
@@ -100,7 +104,7 @@ const Cadastro = () => {
             <Link to="/" className="flex items-center" aria-label="FNZ Supply — início">
             <Logo className="h-10" />
           </Link>
-            <Link to="/login" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+            <Link to={loginPath} className="text-sm text-muted-foreground hover:text-foreground transition-colors">
               Já tem conta? Entrar
             </Link>
           </div>

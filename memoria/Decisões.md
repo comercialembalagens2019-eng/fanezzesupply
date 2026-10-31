@@ -1,5 +1,7 @@
 # Decisões
 
+- **Retorno de autenticação (#60)**: `returnTo` aceita somente `/carrinho` e `/produtos` por igualdade, tanto na query quanto ao converter `state.from`. Links entre telas e confirmação usam o destino na URL, sem armazenamento global de destino. Login mantém compatibilidade com `state.from` interno seguro; esse comportamento antigo não amplia a lista permitida de `returnTo`. Admin sem destino mantém `/admin`; retornar ao carrinho não reabre checkout.
+
 - **Sugestão selecionada é escolha exata (#58)**: sugestões carregam `productId` e tamanho opcional; navegação usa `produto=<id>` e `q=<tamanho>` quando houver. O texto exibido no campo não determina o id. Enter sem sugestão selecionada continua como busca livre por `q`.
 
 - **Seleção de material no catálogo (#56)**: usar `produto=<id>` por igualdade, após visibilidade por permissão; `q` continua busca livre e é aplicado por interseção. Id vazio, inexistente ou inacessível mostra o mesmo estado sem resultados. URL é a fonte da seleção e da busca, e limpar material preserva os demais parâmetros.

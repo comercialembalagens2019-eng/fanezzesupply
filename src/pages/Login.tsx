@@ -7,6 +7,7 @@ import { toast } from "@/hooks/use-toast";
 import { translateAuthError } from "@/lib/authErrors";
 import { useAuth } from "@/contexts/AuthContext";
 import { SEO } from "@/components/SEO";
+import { authPagePath, authReturnDestination, legacyLoginDestination } from "@/lib/authReturn";
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -18,11 +19,8 @@ const Login = () => {
   const navigate = useNavigate();
 
   const location = useLocation();
-  // Only same-site paths, so a crafted link can't redirect off the site after login
-  const from = (location.state as { from?: unknown } | null)?.from;
-  // Backslashes are rejected too: browsers treat "/\evil.com" like "//evil.com".
-  const redirectTo =
-    typeof from === "string" && /^\/(?![/\\])[^\\]*$/.test(from) ? from : null;
+  const destination = authReturnDestination(location.search, location.state);
+  const redirectTo = destination ?? legacyLoginDestination(location.state);
 
   useEffect(() => {
     if (user && !authLoading) {
@@ -200,7 +198,7 @@ const Login = () => {
           <p className="text-center mt-8 text-muted-foreground">
             Ainda não tem conta?{" "}
             <Link 
-              to="/cadastro"
+              to={authPagePath("/cadastro", destination)}
               className="text-primary font-medium hover:underline"
             >
               Cadastre-se

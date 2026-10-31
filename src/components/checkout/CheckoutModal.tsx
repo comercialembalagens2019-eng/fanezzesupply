@@ -18,6 +18,7 @@ import { Loader2, QrCode, Building2, User, ArrowRight, ArrowLeft, Check, CheckCi
 import { Link } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
+import { authPagePath } from "@/lib/authReturn";
 import type { SVGProps } from "react";
 
 interface CheckoutModalProps {
@@ -687,13 +688,13 @@ export const CheckoutModal = ({ open, onOpenChange }: CheckoutModalProps) => {
             </div>
             <div className="flex flex-col sm:flex-row gap-3 w-full max-w-sm">
               <Button asChild className="flex-1">
-                <Link to="/login" state={{ from: "/carrinho" }} onClick={() => onOpenChange(false)}>
+                <Link to={authPagePath("/login", "/carrinho")} onClick={() => onOpenChange(false)}>
                   <LogIn className="w-4 h-4 mr-2" />
                   Fazer Login
                 </Link>
               </Button>
               <Button asChild variant="outline" className="flex-1">
-                <Link to="/cadastro" onClick={() => onOpenChange(false)}>
+                <Link to={authPagePath("/cadastro", "/carrinho")} onClick={() => onOpenChange(false)}>
                   Criar Conta
                 </Link>
               </Button>

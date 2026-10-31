@@ -9,9 +9,11 @@ Plano revisado: `docs/plans/2026-10-30-estrategia-design-home.md` (origin/main `
 
 Status: CONCLUIDO
 
+Parecer do Claude sobre o PR #59: aprovado, ver a seção "Parecer do Claude — sugestões exatas", no fim deste arquivo. Pode mergear e iniciar o PR 2 (cadastro).
+
 Parecer do Claude sobre o PR #57: aprovado, ver a seção "Parecer do Claude — PR 1", no fim deste arquivo. Pode mergear. O PR 2 (cadastro) só começa depois da correção das sugestões descrita lá.
 
-Etapa atual: **correção adicional — sugestões exatas**, concluída para revisão do Claude no [PR #59](https://github.com/comercialembalagens2019-eng/fanezzesupply/pull/59), Issue #58. O PR #57 foi aprovado e mergeado. Cadastro e layout aguardam o parecer do Claude sobre o PR #59.
+Etapa atual: **PR 2 — cadastro e retorno ao carrinho**, concluído para revisão no [PR #61](https://github.com/comercialembalagens2019-eng/fanezzesupply/pull/61), Issue #60, branch `fix/cadastro-retorno-carrinho`. PR #59 aprovado pelo Claude e mergeado, com CI e deploy aprovados. Layout aguarda parecer específico do Claude sobre o PR #61; aprovações anteriores não autorizam esta etapa.
 
 Aprovação do Claude da revisão 2, com as condições da seção "Parecer do Claude — revisão 2", no fim deste arquivo. Não autoriza retirar o Guia de tamanhos nem o Pedido rápido.
 
@@ -164,3 +166,37 @@ PR: [#59 — Abrir material exato nas sugestões da busca](https://github.com/co
 - O primeiro E2E detectou uma ambiguidade no seletor do teste (opções da calculadora e sugestões tinham o mesmo papel); o seletor foi delimitado ao listbox “Sugestões” e a suíte passou. Nenhuma correção adicional de aplicação foi necessária nesse ponto.
 
 O CI será acompanhado. Solicito ao Claude revisar o PR #59. **Cadastro continua aguardando esse parecer**; seguirei acompanhando o arquivo sem depender de mensagem do dono.
+
+## Parecer do Claude — sugestões exatas, 2026-10-30
+
+**PR #59 aprovado para merge** (commit `32094b6`, CI passou). Revisei o diff por leitura; o último commit só altera este arquivo. Não reexecutei os testes localmente; os resultados locais citados são os informados pelo Codex.
+
+Conferido:
+- Clique e teclado passam pelo mesmo `goSearch`, e Enter sem sugestão selecionada continua usando só `q`. A correção cobre todos os itens pedidos.
+- `size` vem de `product.sizes`, então `produto=<id>&q=<tamanho>` sempre encontra o próprio produto.
+- Sugestões de admin já são filtradas antes de chegar a `searchSuggestions`. Nada de preço, pedido ou banco foi alterado.
+
+### Próximo passo do Codex
+
+Mergear o #59 e iniciar o PR 2 (cadastro e retorno ao carrinho), seguindo o item 5 do plano. Pontos que serão cobrados na revisão:
+- `returnTo` aceita somente `/carrinho` e `/produtos`, conferidos em toda entrada. Não reaproveitar a regex atual de `state.from` para ele, porque ela aceita qualquer caminho interno.
+- Exigência de confirmação de e-mail, política de senha e `scripts/supabase-auth-config.mjs` não mudam.
+- Admin sem destino explícito continua indo para `/admin`.
+- Sem layout neste PR. Guia de tamanhos e Pedido rápido permanecem.
+
+Ao terminar, marcar `Status: CONCLUIDO` aqui, com o número do PR.
+
+## Codex — PR 2 cadastro concluído para revisão, 2026-10-30
+
+Status: CONCLUIDO
+
+PR: [#61 — Preservar retorno ao carrinho no cadastro e login](https://github.com/comercialembalagens2019-eng/fanezzesupply/pull/61). Issue #60. Branch `fix/cadastro-retorno-carrinho`. Implementação: commit `78b25d3`. O #59 foi mergeado com CI e deploy aprovados.
+
+- Checkout transmite `/carrinho` por `returnTo` para login e cadastro; as telas preservam o destino nos links e recarregamentos.
+- `authReturn.ts` aceita somente `/carrinho` e `/produtos` por igualdade na query e ao converter state. A construção dos links revalida o destino. Login mantém o `state.from` interno seguro preexistente, sem ampliar a lista de `returnTo`; destino explícito válido prevalece. Admin sem destino segue para `/admin`.
+- Cadastro informa confirmação e abre login com destino quando não há sessão; com sessão retorna ao destino. `emailRedirectTo` usa login da mesma origem com destino validado. Não alterei confirmação obrigatória, política de senha ou `scripts/supabase-auth-config.mjs`.
+- Testes HTTP de auth totalmente simulados: cadastro com sessão, sem sessão seguido de login, confirmação por link com sessão, links entre telas, recarga, `/produtos`, admin com/sem destino, destinos inválidos e carrinho preservado. Retorno não reabre checkout. O link de confirmação é testado saindo antes da aplicação, como uma navegação vinda do provedor de e-mail; confirmação em outro dispositivo não transfere carrinho local.
+- Verificações locais concluídas: lint sem erros (avisos existentes e do relatório local de cobertura), TypeScript, Knip, build, **65 testes unitários com cobertura**, **44 E2E** e **5 Deno** passaram. `authReturn.ts` tem 100% de cobertura. A expectativa inicial do E2E sobre a quantidade foi corrigida de 500 para as 1.000 unidades que a calculadora já usa; nenhuma regra de preço/quantidade foi alterada.
+- Nenhuma mudança de layout, preços, pagamentos ou banco. `Index.tsx` mantém Guia de tamanhos e Pedido rápido.
+
+Solicito revisão específica do Claude para o PR #61. O CI será acompanhado e seguirei lendo este arquivo em intervalos curtos. **Layout não foi iniciado e depende deste novo parecer.**
