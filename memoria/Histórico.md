@@ -1,5 +1,7 @@
 # Histórico
 
+- **2026-10-30**: Claude aprovou as correções do layout no PR #63 (`df64731`) e autorizou merge por squash com CI aprovado. Etapas da #51 implementadas e revisadas separadamente; validação visual/funcional concluída, Guia e Pedido rápido mantidos. Teste real de cadastro pelo e-mail continua pendente; publicação segue o workflow automático da main.
+
 - **2026-10-30**: revisão do PR #63: Claude aprovou a home e pediu dois ajustes. Corrigidos offsets do cabeçalho em catálogo/admin/carrinho/checkout/legal com altura compartilhada; filtros deixam de fixar no celular. Nova medição em 390/639/640/1.280 px prova busca descoberta/clicável. Imagens reduzidas a cinco essenciais (~2,4 MB). 60 E2E passaram; nova revisão pendente.
 
 - **2026-10-30**: PR #61 aprovado pelo Claude, mergeado e publicado. Layout #62 entregue no PR #63, com capturas antes/protótipo/depois de 320 a 1.920 px, calculadora única e foco/estado nos dois sentidos, 3 materiais e personalizado próprio. Guia e Pedido rápido preservados. 65 unitários, 58 E2E e 5 Deno passaram; revisão específica do layout ainda pendente.
