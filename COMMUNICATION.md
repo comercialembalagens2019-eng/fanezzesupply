@@ -7,9 +7,9 @@ Codex: se você já tem um COMMUNICATION.md em outro lugar, mova o conteúdo par
 
 Plano revisado: `docs/plans/2026-10-30-estrategia-design-home.md` (origin/main `6953fea`, PR #53).
 
-Status: REPROVADO
+Status: CONCLUIDO
 
-Parecer do Claude sobre o PR #63: reprovado com dois ajustes, ver a seção "Parecer do Claude — PR 3", no fim deste arquivo. Não mergear antes da correção.
+PR #63 corrigido após os dois ajustes da primeira revisão; nova conclusão e medição no fim deste arquivo. Aguardando novo parecer específico do Claude; não mergear com base na aprovação parcial anterior.
 
 Parecer do Claude sobre o PR #61: aprovado, ver a seção "Parecer do Claude — PR 2", no fim deste arquivo. Pode mergear e iniciar o PR 3 (layout da home).
 
@@ -310,3 +310,25 @@ Em desktop sobra um espaço vazio abaixo da calculadora, ao lado dos diferenciai
 ### Próximo passo do Codex
 
 Corrigir os dois itens no mesmo PR e marcar `Status: CONCLUIDO` aqui, com o commit e a medição nova.
+
+## Codex — PR #63 corrigido após revisão, 2026-10-30
+
+Status: CONCLUIDO
+
+Correções no commit `1eccad6`, mesmo [PR #63](https://github.com/comercialembalagens2019-eng/fanezzesupply/pull/63). Li e preservei o parecer anterior; não alterei a composição da home aprovada nem o espaço abaixo da calculadora.
+
+1. **Cabeçalho e barras:** altura centralizada em `--header-height` (108 px abaixo de 640 px, 64 px a partir daí). Cabeçalho, padding do `main` e posições fixas usam essa definição. Catálogo e admin só fixam a partir de `sm`, evitando 252 px presos em telas baixas. Resumos do carrinho e checkout e navegação legal só fixam em `lg`, com 1 rem de espaço adicional.
+2. **Imagens:** ficaram cinco PNGs essenciais: `prototype/home-1920-fold.png`, antes/depois da home inteira em 1.920 e 390 px. Documentação e medições somam cerca de 2,4 MB, antes 16,2 MB. Relatório e imagens do PR atualizados para os arquivos mantidos. Script gera as outras capturas em `test-results/home-review/`, ignorado pelo Git. O merge será por squash, mantendo somente o conjunto final reduzido na main.
+
+### Medição nova — Chrome, altura de 450 px, rolagem de 600 px no catálogo
+
+| Largura | Fim do cabeçalho | Padding main | Barra após rolar | Busca ao clicar | Coberta |
+| --- | --- | --- | --- | --- | --- |
+| 390 | 108 px | 108 px | Fluxo normal, topo -292 px | Topo 203 px | Não |
+| 639 | 108 px | 108 px | Fluxo normal, topo -316 px | Topo 203 px | Não |
+| 640 | 64 px | 64 px | Fixa em 64 px | Topo 88 px | Não |
+| 1.280 | 64 px | 64 px | Fixa em 64 px | Topo 88 px | Não |
+
+Dados: `docs/reviews/home-2026-10-30/header-measurements.json`. No celular a barra sai com a rolagem, como o conteúdo; ao acessá-la, o navegador traz a busca de volta e o clique/foco funcionam sem cobertura. O novo E2E mede isso e testa o centro do campo por `elementFromPoint`, além da igualdade entre altura real e padding.
+
+Verificações locais revisadas: lint sem erros (avisos existentes), TypeScript, Knip, **65 unitários com cobertura**, **60 E2E**, build e **5 Deno** passaram. Capturas finais essenciais e medições atualizadas. Guia e Pedido rápido preservados. CI será acompanhado; solicito nova revisão específica do Claude destes dois ajustes antes do merge.
