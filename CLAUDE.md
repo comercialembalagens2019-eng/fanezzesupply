@@ -36,8 +36,8 @@ src/
   pages/                 # rotas (Index, Produtos, Carrinho, Pedidos, Sobre, Contato, Admin, Login…)
   components/
     layout/              # Header (busca com sugestões), Footer, Layout
-    home/                # HomePurchaseSection (grid responsivo), HeroSection, PriceCalculator, Differentials,
-                         # FeaturedProducts (3 materiais), SizeGuide, QuickOrder, CustomPackaging, HowItWorks, FAQ
+    home/                # HomeHero (foto inteira), QuickBuy ("Já sabe o que precisa?"), EnvelopeCards, SizeGuide (em escala),
+                         # BrandBanner (personalizado), HelpCards, FAQ
     checkout/            # CheckoutModal (fluxo de pagamento), CardPayment (abacatepay.js)
     orders/              # OrderProgress (linha do tempo do pedido)
     legal/               # LegalPage (Termos/Privacidade)
@@ -77,7 +77,7 @@ e2e/                     # Playwright (smoke.spec.ts)
 
 ### Convenções de código e UI
 - Identidade: azul-marinho (`navy`), bege (`beige`), branco, fundo cinza claro, `rounded-3xl` (`.tile`), sombras sutis. Container `container-custom` = `max-w-7xl` (1.280 px).
-- Home usa `Layout contentWidth="wide"` e `.container-wide` (até 1.440 px úteis); cabeçalho, rodapé e outras rotas mantêm `.container-custom`. `HomePurchaseSection` reordena filhos de chaves estáveis no limite de 1.280 px, com uma calculadora e restauração de foco. Guia e Pedido rápido permanecem até decisão explícita do dono. Capturas e evidências em `docs/reviews/home-2026-10-30/`.
+- Home segue o modelo I aprovado pelo dono (`docs/modelos-home/I-referencia/`): foto inteira com título centralizado, faixa "Já sabe o que precisa?" sobre a foto, cartões de envelope, guia de tamanhos em escala, faixa "Sua marca", cartões de ajuda e FAQ. Botões principais em amarelo (`bg-sun`), fundo da foto `bg-wall`. As fotos da home (`src/assets/home-*.webp`) foram geradas por IA e aprovadas pelo dono; o "SUA MARCA" leva o aviso "Exemplo ilustrativo".
 - `--header-height` é a altura compartilhada do cabeçalho e espaçamentos fixos. Filtros do catálogo/admin só fixam a partir de `sm`; resumos e navegação lateral só a partir de `lg`, evitando sobreposição no celular. Capturas adicionais do script ficam em `test-results/home-review/`, sem versionar.
 - Reaproveite componentes e tokens existentes; não duplique UI. Dados da empresa sempre de `src/lib/company.ts`.
 - Sem botões falsos ou links quebrados; toda ação precisa funcionar.
@@ -97,7 +97,7 @@ e2e/                     # Playwright (smoke.spec.ts)
 - E-mails de pedido (pago/enviado/entregue) com layout do mockup do dono.
 - Checkout redesenhado (mockup), "Meus pedidos" completo (indicadores, filtros, busca, linha do tempo, detalhes, "Comprar novamente", "Abrir boleto").
 - Sobre e Contato com dados confirmados; rodapé e cabeçalho consistentes.
-- Home ampliada: banner + calculadora (8/4), diferenciais, "Escolha o material", guia de tamanhos com filtro, "Como funciona", Pedido rápido, FAQ.
+- Home no modelo I: foto, compra rápida, cartões de envelope, guia de tamanhos em escala, personalizado, ajuda e FAQ.
 - Busca do cabeçalho com sugestões (produto + tamanho, sem acento). Foto própria do Envelope Cinza; tamanho 40x00 corrigido para 40x60.
 
 ### Falta (Issues abertas no GitHub)

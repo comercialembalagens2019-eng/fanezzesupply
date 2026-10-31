@@ -28,13 +28,13 @@ Atualizado em: 2026-10-30
 - [x] E-mails de pedido ligados: "pago" nos webhooks/checagem do Pix, "enviado/entregue" ao mudar no painel admin (função `notify-order-status`); cada e-mail sai uma vez só (tabela `order_emails`)
 - [x] Banner da home com o Envelope Cinza girando em 3D (arrastar gira; foto como reserva) (#71)
 - [x] Guia de tamanhos em escala, com comparação à folha A4 (#73)
+- [x] Home no modelo I (foto, compra rápida, cartões, guia em escala, personalizado, ajuda, FAQ) (#75)
 
 ## Falta
 - [ ] Fazer um cadastro real com e-mail novo, partindo do carrinho, e confirmar que o link do e-mail volta para `/carrinho`. Se cair na home, o Supabase recusou o `redirect_to` com `?returnTo=`. Pendência indicada pelo Claude no parecer do PR #61; testes desta entrega usam auth simulada e não criam contas reais.
 - [x] Implementação da #51 concluída e revisada em etapas separadas: filtro #57, sugestões #59, cadastro #61 e layout #63. Pareceres específicos registrados em `COMMUNICATION.md`.
 - [ ] Decisão do dono, separada para cada seção: Guia de tamanhos fica/sai; Pedido rápido fica/sai. Preservar ambos enquanto estiverem pendentes.
 - [x] Layout validado em 320, 390, 768, 1.024, 1.279, 1.280, 1.440 e 1.920 px, com foco/estado e reflow equivalente a zoom de 200%. Cabeçalho preservado em largura; recuo a 1.920 px considerado aceitável pelo Codex e Claude.
-- [ ] Dono pode revisar o título do banner e o recuo do cabeçalho a 1.920 px; manter a versão aprovada até novo pedido. Nenhuma dessas escolhas autoriza retirar Guia ou Pedido rápido.
 As tarefas abertas estão nas Issues do GitHub (fluxo em `AGENTS.md`): #28 Sentry (precisa do DSN), #29 remover pagamentos antigos, #30 validar boleto e cartão, #31 refatorar CheckoutModal, #32 fotos dos produtos.
 
 - [x] **Cartão** pelo AbacatePay (abacatepay.js + `pay-abacate-card`), chave pública no GitHub desde 2026-10-29 — falta testar com cartão real

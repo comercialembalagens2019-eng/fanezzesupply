@@ -41,17 +41,6 @@ export function buildCartProduct(product: Product, quantity: number, size?: stri
   };
 }
 
-// Discount of the best tier over the entry tier, e.g. 0.11 for 0.27 -> 0.24.
-export function bestTierDiscount(product: Product): number {
-  const tiers = product.sizePricing?.[0]?.tiers;
-  if (!tiers || tiers.length < 2) return 0;
-  const sorted = [...tiers].sort((a, b) => a.minQty - b.minQty);
-  return 1 - sorted[sorted.length - 1].price / sorted[0].price;
-}
-
 export const formatBRL = (value: number) =>
   new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(value);
 
-// Lowest unit price across sizes and quantity tiers: the "a partir de" price.
-export const fromPrice = (product: Product) =>
-  product.sizePricing ? Math.min(...product.sizePricing.flatMap((sp) => sp.tiers.map((t) => t.price))) : product.price;

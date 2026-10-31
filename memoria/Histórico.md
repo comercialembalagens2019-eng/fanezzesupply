@@ -55,3 +55,4 @@
 - **2026-10-31**: instaladas as skills de design impeccable, taste-skill e hallmark em `.claude/skills/` (sem os hooks automáticos do impeccable) (#69)
 - **2026-10-31**: envelope cinza do banner da home girando em 3D (three.js, carregado só quando usado; foto como reserva) (#71)
 - **2026-10-31**: guia de tamanhos da home trocado pelo modelo "tamanhos em escala": envelopes desenhados na mesma escala e painel com comparação à folha A4 (#73)
+- **2026-10-31**: home refeita no modelo I aprovado pelo dono (foto, "Já sabe o que precisa?", cartões, guia em escala, "Sua marca", ajuda); cabeçalho com "Personalizados"/"Guia de medidas" e carrinho amarelo; rodapé simplificado (#75)

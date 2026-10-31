@@ -1,28 +1,38 @@
+import { useEffect } from "react";
+import { useLocation } from "react-router-dom";
 import { Layout } from "@/components/layout/Layout";
 import { SEO } from "@/components/SEO";
-import { HomePurchaseSection } from "@/components/home/HomePurchaseSection";
-import { QuickOrder } from "@/components/home/QuickOrder";
-import { CustomPackaging } from "@/components/home/CustomPackaging";
+import { HomeHero } from "@/components/home/HomeHero";
+import { QuickBuy } from "@/components/home/QuickBuy";
+import { EnvelopeCards } from "@/components/home/EnvelopeCards";
 import { SizeGuide } from "@/components/home/SizeGuide";
-import { HowItWorks } from "@/components/home/HowItWorks";
+import { BrandBanner } from "@/components/home/BrandBanner";
+import { HelpCards } from "@/components/home/HelpCards";
 import { FAQ } from "@/components/home/FAQ";
-import { SideGuides } from "@/components/home/SideGuides";
 
 const Index = () => {
+  const { hash } = useLocation();
+  // Header links such as "/#guia-de-tamanhos" arrive from other pages; scroll once the sections exist.
+  useEffect(() => {
+    if (hash) document.getElementById(decodeURIComponent(hash.slice(1)))?.scrollIntoView();
+  }, [hash]);
+
   return (
-    <Layout contentWidth="wide">
+    <Layout>
       <SEO
         title="FNZ Supply — Distribuição de Embalagens B2B em Joinville/SC"
         description="Distribuidora B2B de envelopes de segurança. Preço por faixa de quantidade, nota fiscal e frete grátis em Joinville/SC."
         path="/"
       />
-      <div className="relative">
-        <SideGuides />
-        <HomePurchaseSection />
+      <HomeHero />
+      <QuickBuy />
+      <EnvelopeCards />
+      <div className="container-custom">
         <SizeGuide />
-        <QuickOrder />
-        <CustomPackaging />
-        <HowItWorks />
+      </div>
+      <BrandBanner />
+      <HelpCards />
+      <div className="container-custom">
         <FAQ />
       </div>
     </Layout>

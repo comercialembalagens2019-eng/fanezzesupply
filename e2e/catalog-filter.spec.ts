@@ -2,14 +2,12 @@ import { expect, test } from "@playwright/test";
 
 test("home material links select an exact product and retain the size guide", async ({ page }) => {
   await page.goto("/");
-  const materials = page.getByRole("region", { name: "Escolha o material" });
-  const grayCard = materials.getByRole("listitem").filter({ has: page.getByRole("heading", { name: "Envelope Cinza", exact: true }) });
-  await grayCard.getByRole("link", { name: "Ver tamanhos e preços" }).click();
+  await page.getByRole("region", { name: "Encontre seu envelope" }).getByRole("link", { name: "Ver opções de Envelope Cinza" }).click();
   const results = page.getByRole("region", { name: "Resultados do catálogo" });
   await expect(results.getByRole("heading", { level: 3 })).toHaveText(["Envelope Cinza"]);
   await page.goBack();
   await expect(page.getByRole("region", { name: "Veja o tamanho antes de comprar" }).getByRole("link", { name: "Comprar este tamanho" })).toHaveCount(1);
-  await expect(page.getByRole("heading", { name: "Pedido rápido" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Já sabe o que precisa?" })).toBeVisible();
 });
 
 test("clearing a material preserves the search and other URL parameters, including history", async ({ page }) => {
