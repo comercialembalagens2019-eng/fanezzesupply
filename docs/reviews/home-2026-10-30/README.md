@@ -65,6 +65,12 @@ Verificação local revisada: lint sem erros (avisos existentes), TypeScript, Kn
 
 Pendência já registrada em `memoria/Status.md`: confirmação real por e-mail com `returnTo` no Supabase de produção. Os mocks não demonstram a aceitação de `redirect_to` pelo serviço real.
 
+## Publicação confirmada
+
+Claude aprovou as correções; PR #63 mergeado por squash em `47ce6e9`. [CI da main aprovado](https://github.com/comercialembalagens2019-eng/fanezzesupply/actions/runs/41150213215) e [deploy aprovado](https://github.com/comercialembalagens2019-eng/fanezzesupply/actions/runs/41150213229).
+
+Conferência no site publicado: HTTP 200 em 1.920 e 390 px, conteúdo de 1.440/358 px, uma calculadora de 360/358 px, sem rolagem horizontal nem erro de JavaScript. Cabeçalho e padding iguais (64/108 px). Guia e Pedido rápido presentes. Busca do catálogo no celular testada após rolagem: campo focado, descoberto e clicável, abaixo do cabeçalho. Nenhuma conta, pedido ou pagamento real criado.
+
 ## Reproduzir as capturas
 
 Com o build servido pelo Vite Preview e Chrome instalado:

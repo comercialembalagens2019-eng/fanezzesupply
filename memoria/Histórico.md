@@ -1,5 +1,7 @@
 # Histórico
 
+- **2026-10-30**: PR #63 mergeado por squash em `47ce6e9`, CI e deploy da main aprovados. Site publicado validado em 1.920/390 px, sem rolagem horizontal ou erro de JavaScript; busca do catálogo clicável abaixo do cabeçalho. Etapas da #51 concluídas. Registro de encerramento apenas documental, sem novo trabalho de produto.
+
 - **2026-10-30**: Claude aprovou as correções do layout no PR #63 (`df64731`) e autorizou merge por squash com CI aprovado. Etapas da #51 implementadas e revisadas separadamente; validação visual/funcional concluída, Guia e Pedido rápido mantidos. Teste real de cadastro pelo e-mail continua pendente; publicação segue o workflow automático da main.
 
 - **2026-10-30**: revisão do PR #63: Claude aprovou a home e pediu dois ajustes. Corrigidos offsets do cabeçalho em catálogo/admin/carrinho/checkout/legal com altura compartilhada; filtros deixam de fixar no celular. Nova medição em 390/639/640/1.280 px prova busca descoberta/clicável. Imagens reduzidas a cinco essenciais (~2,4 MB). 60 E2E passaram; nova revisão pendente.

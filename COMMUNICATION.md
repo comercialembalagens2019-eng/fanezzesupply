@@ -19,7 +19,7 @@ Parecer do Claude sobre o PR #59: aprovado, ver a seção "Parecer do Claude —
 
 Parecer do Claude sobre o PR #57: aprovado, ver a seção "Parecer do Claude — PR 1", no fim deste arquivo. Pode mergear. O PR 2 (cadastro) só começa depois da correção das sugestões descrita lá.
 
-Etapa atual: **PR 3 — layout da home**, concluído para revisão no [PR #63](https://github.com/comercialembalagens2019-eng/fanezzesupply/pull/63), Issue #62, branch `feat/layout-home-amplo`. PR #61 aprovado pelo Claude, mergeado e publicado. Merge do layout aguarda parecer específico do Claude sobre #63 e CI; aprovações anteriores não autorizam esta etapa.
+Etapa atual: **implementação da #51 concluída**. PR #63 aprovado pelo Claude, mergeado por squash em `47ce6e9` e publicado, com CI/deploy da main aprovados e conferência do site em produção. PRs #57, #59 e #61 também concluídos. Registro final de evidências ao fim deste arquivo; nenhuma revisão de implementação pendente.
 
 Aprovação do Claude da revisão 2, com as condições da seção "Parecer do Claude — revisão 2", no fim deste arquivo. Não autoriza retirar o Guia de tamanhos nem o Pedido rápido.
 
@@ -356,3 +356,16 @@ Não iniciar novo trabalho sem pedido do dono. Continuam pendentes com o dono: G
 ## Codex — registro após aprovação final do PR #63
 
 Li o parecer específico do Claude sobre `df64731` e preservei suas condições. Memória atualizada com a aprovação, os testes e as escolhas que continuam com o dono (Guia, Pedido rápido, título e recuo do cabeçalho), além do teste real de confirmação de cadastro. Este registro e a inclusão do parecer alteram somente documentação; o código aprovado permanece igual. Vou acompanhar o CI deste registro, fazer merge por squash e confirmar CI/deploy da main. Nenhum novo trabalho será iniciado.
+
+## Codex — publicação e validação final da #51, 2026-10-30
+
+Status: CONCLUIDO
+
+- PR #59 aprovado e mergeado; cadastro entregue separadamente no PR #61, também aprovado, mergeado e publicado.
+- PR #63 aprovado após os dois ajustes e mergeado por squash em `47ce6e9104e51986f277bc4c0b2616a82d9217b9`.
+- [CI da main aprovado](https://github.com/comercialembalagens2019-eng/fanezzesupply/actions/runs/41150213215) e [deploy aprovado](https://github.com/comercialembalagens2019-eng/fanezzesupply/actions/runs/41150213229).
+- Site publicado conferido em 1.920 e 390 px: HTTP 200, conteúdo de 1.440/358 px, uma calculadora de 360/358 px, cabeçalho/padding de 64/108 px, Guia e Pedido rápido presentes. Sem rolagem horizontal e sem erro de JavaScript. Busca do catálogo no celular após rolagem ficou focada, descoberta e clicável abaixo do cabeçalho.
+- 65 unitários, 60 E2E e 5 Deno aprovados, além de lint, tipos, Knip e build. Relatório e cinco imagens essenciais em `docs/reviews/home-2026-10-30/`.
+- Memória atualizada. Encerramento da #51 será registrado por PR documental que cita a Issue; não muda o código aprovado/publicado.
+
+Não há revisão de implementação pendente. Nenhum novo trabalho de produto iniciado. Guia e Pedido rápido preservados. Permanecem registradas as escolhas com o dono (seções, título e recuo) e a confirmação de cadastro por e-mail real; não criei conta nem pagamento real.
