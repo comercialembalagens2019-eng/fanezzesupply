@@ -1,5 +1,7 @@
 # Decisões
 
+- **Implementação do layout #62**: cabeçalho/rodapé seguem na largura original e o recuo a 1.920 px foi considerado aceitável no protótipo registrado antes do polimento. Abaixo de 640 px, logo ocupa a primeira linha e busca/carrinho/menu a segunda, com DOM e Tab na mesma ordem. Área wide exclusiva da home; grid passa a lateral a partir de 1.280 px, com calculadora de 360 px ou até 560 px empilhada. `CTASection` substituída por `CustomPackaging`, mínimos por material e cadastro no banner/rodapé. Guia e Pedido rápido preservados.
+
 - **Retorno de autenticação (#60)**: `returnTo` aceita somente `/carrinho` e `/produtos` por igualdade, tanto na query quanto ao converter `state.from`. Links entre telas e confirmação usam o destino na URL, sem armazenamento global de destino. Login mantém compatibilidade com `state.from` interno seguro; esse comportamento antigo não amplia a lista permitida de `returnTo`. Admin sem destino mantém `/admin`; retornar ao carrinho não reabre checkout.
 
 - **Sugestão selecionada é escolha exata (#58)**: sugestões carregam `productId` e tamanho opcional; navegação usa `produto=<id>` e `q=<tamanho>` quando houver. O texto exibido no campo não determina o id. Enter sem sugestão selecionada continua como busca livre por `q`.

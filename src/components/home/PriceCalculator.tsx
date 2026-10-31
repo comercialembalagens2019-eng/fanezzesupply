@@ -36,11 +36,11 @@ export function PriceCalculator() {
   };
 
   const selectClass =
-    "w-full bg-transparent text-sm font-bold text-foreground focus:outline-none cursor-pointer";
+    "w-full min-h-11 bg-transparent text-sm font-bold text-foreground focus:outline-none cursor-pointer";
 
   return (
     <div className="tile p-6 flex flex-col">
-      <div className="flex items-center justify-between gap-2">
+      <div className="flex flex-wrap items-center justify-between gap-2">
         <h2 className="font-extrabold text-base">Calculadora de preço</h2>
         {discount > 0 && (
           <span className="text-xs font-bold text-success-soft-foreground bg-success-soft px-2 py-1 rounded-full whitespace-nowrap">
@@ -49,10 +49,10 @@ export function PriceCalculator() {
         )}
       </div>
 
-      <div className="mt-4 grid grid-cols-2 gap-3">
+      <div className="mt-4 grid grid-cols-1 min-[380px]:grid-cols-2 gap-3">
         <label className="rounded-xl bg-muted p-3 focus-within:ring-2 focus-within:ring-ring">
           <span className="text-muted-foreground text-xs block">Produto</span>
-          <select className={selectClass} value={productId} onChange={(e) => handleProductChange(e.target.value)}>
+          <select aria-label="Produto" className={selectClass} value={productId} onChange={(e) => handleProductChange(e.target.value)}>
             {calculatorProducts.map((p) => (
               <option key={p.id} value={p.id}>{p.name}</option>
             ))}
@@ -61,7 +61,7 @@ export function PriceCalculator() {
         <label className={cn("rounded-xl bg-muted p-3 focus-within:ring-2 focus-within:ring-ring", !sizes.length && "opacity-60")}>
           <span className="text-muted-foreground text-xs block">Tamanho</span>
           {sizes.length ? (
-            <select className={selectClass} value={activeSize} onChange={(e) => setSize(e.target.value)}>
+            <select aria-label="Tamanho" className={selectClass} value={activeSize} onChange={(e) => setSize(e.target.value)}>
               {sizes.map((s) => (
                 <option key={s} value={s}>{s}</option>
               ))}
@@ -80,7 +80,7 @@ export function PriceCalculator() {
             onClick={() => setQuantity(q)}
             aria-pressed={quantity === q}
             className={cn(
-              "py-2.5 rounded-xl transition-colors",
+              "min-h-11 py-2.5 rounded-xl transition-colors focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
               quantity === q ? "bg-primary text-primary-foreground" : "ring-1 ring-black/10 hover:bg-muted"
             )}
           >

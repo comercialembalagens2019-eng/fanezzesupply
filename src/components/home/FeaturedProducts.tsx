@@ -1,97 +1,48 @@
-import type { CSSProperties } from "react";
 import { Link } from "react-router-dom";
-import { ArrowRight, Check, MessageCircle } from "lucide-react";
-import { productImageClass } from "@/lib/productImage";
+import { ArrowRight } from "lucide-react";
 import { products } from "@/data/products";
 import { formatBRL, fromPrice } from "@/lib/pricing";
-import { whatsappWith } from "@/lib/company";
 
-// Short traits taken from each product's own description in the catalog.
-const TRAITS: Record<string, string[]> = {
-  envelope: ["Cores preto ou branco", "Para e-commerce e logística"],
-  "envelope-coex": ["Branco por fora, cinza por dentro", "Resistente e impermeável"],
-  "envelope-cinza": ["Privacidade no envio", "Resistente e impermeável"],
-  "envelope-personalizado": ["Com a sua logomarca", "Produção em 30 dias"],
+const traits: Record<string, string> = {
+  envelope: "Preto ou branco",
+  "envelope-coex": "Branco por fora, cinza por dentro",
+  "envelope-cinza": "Privacidade no envio",
 };
 
-const QUOTE_URL = whatsappWith("Olá! Gostaria de um orçamento de envelope personalizado com a minha logomarca.");
-
-// Side-by-side materials: the whole online catalog, so no product is repeated to fill space.
 export function FeaturedProducts() {
-  const featured = products.filter((p) => p.featured && !p.adminOnly);
-
+  const materials = products.filter((p) => p.featured && !p.adminOnly && !p.quoteOnly);
   return (
-    <section className="container-custom mt-12" aria-labelledby="featured-heading">
-      <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-2 mb-5">
+    <section id="materiais" className="scroll-mt-32 sm:scroll-mt-24" aria-labelledby="featured-heading">
+      <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-2 mb-6">
         <div>
           <h2 id="featured-heading" className="text-2xl md:text-3xl font-extrabold">Escolha o material</h2>
-          <p className="text-muted-foreground mt-1">Envelopes de segurança para cada tipo de envio.</p>
+          <p className="text-muted-foreground mt-2">Compare os envelopes e encontre o seu tamanho.</p>
         </div>
-        <Link to="/produtos" className="text-sm font-bold text-navy-light flex items-center gap-1 hover:text-foreground">
+        <Link to="/produtos" className="min-h-11 text-sm font-bold text-navy-light inline-flex items-center gap-1 rounded focus-visible:ring-2 focus-visible:ring-ring">
           Ver catálogo completo <ArrowRight className="w-4 h-4" aria-hidden="true" />
         </Link>
       </div>
-      <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        {featured.map((p, i) => {
-          const sizes = p.sizePricing?.map((sp) => sp.size) ?? p.sizes ?? [];
-          const unit = p.unit === "kg" ? "kg" : "un.";
+      <ul className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+        {materials.map((p) => {
+          const bestTier = p.sizePricing ? Math.max(...p.sizePricing.flatMap((s) => s.tiers.map((t) => t.minQty))) : null;
           return (
-            <li
-              key={p.id}
-              className="tile p-4 flex flex-col hover:shadow-hover transition-shadow animate-enter"
-              style={{ "--enter-delay": `${i * 40}ms` } as CSSProperties}
-            >
-              <div className="rounded-2xl bg-card ring-1 ring-black/5 aspect-[16/9] sm:aspect-[4/3] relative overflow-hidden">
-                <img src={p.image} alt={p.name} loading="lazy" width={400} height={300} className={productImageClass(p)} />
-                {p.quoteOnly && (
-                  <span className="absolute top-2 left-2 text-[11px] font-extrabold bg-beige text-navy px-2 py-1 rounded-lg">Sob orçamento</span>
-                )}
+            <li key={p.id} className="min-w-0 flex flex-col bg-card rounded-2xl overflow-hidden ring-1 ring-black/5">
+              <div className={p.id === "envelope-coex" ? "bg-beige-light" : "bg-card"}>
+                <p className="px-5 pt-4 text-xs font-semibold text-muted-foreground">{traits[p.id]}</p>
+                <img src={p.image} alt={p.name} loading="lazy" width={1200} height={900} className="w-full aspect-[4/3] object-cover mt-3" />
               </div>
-              <h3 className="mt-4 font-extrabold text-lg">{p.name}</h3>
-              <ul className="mt-2 space-y-1 text-sm text-muted-foreground">
-                {(TRAITS[p.id] ?? []).map((trait) => (
-                  <li key={trait} className="flex items-start gap-1.5">
-                    <Check className="w-4 h-4 mt-0.5 text-success shrink-0" aria-hidden="true" /> {trait}
-                  </li>
-                ))}
-              </ul>
-              {sizes.length > 0 && (
-                <p className="mt-3 text-xs text-muted-foreground">
-                  {sizes.length} tamanhos: {sizes.slice(0, 4).join(" · ")}
-                  {sizes.length > 4 ? " …" : ""}
-                </p>
-              )}
-              <div className="mt-auto pt-4 flex items-end justify-between gap-2">
-                {p.quoteOnly ? (
-                  <span className="text-sm text-muted-foreground">mín. {p.minOrder.toLocaleString("pt-BR")} {unit}</span>
-                ) : (
-                  <>
-                    <span className="font-extrabold text-lg whitespace-nowrap">
-                      {p.sizePricing && <span className="block text-xs font-semibold text-muted-foreground">a partir de</span>}
-                      {formatBRL(fromPrice(p))}
-                      <span className="text-xs text-muted-foreground font-semibold">/{unit}</span>
-                    </span>
-                    <span className="text-xs text-muted-foreground pb-1">mín. {p.minOrder.toLocaleString("pt-BR")} {unit}</span>
-                  </>
-                )}
-              </div>
-              {p.quoteOnly ? (
-                <a
-                  href={QUOTE_URL}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="mt-3 inline-flex justify-center items-center gap-2 h-11 rounded-xl bg-beige text-navy font-bold hover:bg-beige-light transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-                >
-                  <MessageCircle className="w-4 h-4" aria-hidden="true" /> Pedir orçamento
-                </a>
-              ) : (
-                <Link
-                  to={`/produtos?produto=${encodeURIComponent(p.id)}`}
-                  className="mt-3 inline-flex justify-center items-center gap-2 h-11 rounded-xl bg-primary text-primary-foreground font-bold hover:bg-navy-light transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-                >
+              <div className="p-5 md:p-6 flex flex-col flex-1">
+                <h3 className="font-extrabold text-xl">{p.name}</h3>
+                <p className="text-sm text-muted-foreground mt-2">Mínimo de {p.minOrder.toLocaleString("pt-BR")} unidades.</p>
+                <div className="mt-5">
+                  <p className="text-xs text-muted-foreground">{bestTier ? "A partir de" : "Preço por unidade"}</p>
+                  <p className="font-extrabold text-2xl mt-1">{formatBRL(fromPrice(p))}<span className="text-sm font-medium text-muted-foreground"> / un.</span></p>
+                  <p className="text-xs text-muted-foreground mt-1 min-h-8">{bestTier ? `Na faixa de ${bestTier.toLocaleString("pt-BR")}+ unidades; varia com o tamanho.` : "Mesmo preço nos tamanhos disponíveis."}</p>
+                </div>
+                <Link to={`/produtos?produto=${encodeURIComponent(p.id)}`} className="mt-5 min-h-11 px-4 py-3 inline-flex justify-center items-center gap-2 rounded-xl bg-primary text-primary-foreground text-sm font-bold hover:bg-navy-light focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2">
                   Ver tamanhos e preços <ArrowRight className="w-4 h-4" aria-hidden="true" />
                 </Link>
-              )}
+              </div>
             </li>
           );
         })}

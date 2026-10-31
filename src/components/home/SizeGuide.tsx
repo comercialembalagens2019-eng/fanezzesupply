@@ -49,13 +49,13 @@ export function SizeGuide() {
   const visible = useMemo(() => (material === "Todos" ? entries : entries.filter((e) => e.material === material)), [material]);
 
   return (
-    <section className="container-custom mt-12" aria-labelledby="size-guide-heading">
-      <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-4 mb-5">
+    <section className="mt-10 md:mt-16" aria-labelledby="size-guide-heading">
+      <div className="flex flex-col 2xl:flex-row 2xl:items-end 2xl:justify-between gap-4 mb-6">
         <div>
           <h2 id="size-guide-heading" className="text-2xl md:text-3xl font-extrabold">Encontre o tamanho ideal para sua operação</h2>
           <p className="text-muted-foreground mt-1">Todos os tamanhos disponíveis, com preço por unidade e pedido mínimo.</p>
         </div>
-        <div className="flex gap-2 overflow-x-auto -mx-4 px-4 lg:mx-0 lg:px-0 pb-1 lg:pb-0" role="tablist" aria-label="Filtrar por material">
+        <div className="flex gap-2 overflow-x-auto p-1 -m-1" role="tablist" aria-label="Filtrar por material">
           {["Todos", ...materials].map((m) => (
             <button
               key={m}
@@ -63,7 +63,7 @@ export function SizeGuide() {
               aria-selected={material === m}
               onClick={() => setMaterial(m)}
               className={cn(
-                "shrink-0 h-10 px-4 rounded-xl text-sm font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+                "shrink-0 h-11 px-4 rounded-xl text-sm font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
                 material === m ? "bg-primary text-primary-foreground" : "bg-card ring-1 ring-black/5 text-muted-foreground hover:text-foreground"
               )}
             >
@@ -73,7 +73,7 @@ export function SizeGuide() {
         </div>
       </div>
 
-      <ul className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-3">
+      <ul className="grid grid-cols-1 min-[360px]:grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4">
         {visible.map((e, i) => (
           <li key={e.key} className={cn(!showAll && i >= MOBILE_LIMIT && "hidden sm:block")}>
             <Link
