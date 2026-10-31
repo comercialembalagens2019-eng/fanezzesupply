@@ -1,0 +1,233 @@
+[
+  {
+    "name": "home-320-fold",
+    "viewport": 320,
+    "pageWidth": 320,
+    "headerWidthPreserved": true,
+    "logoPositionPreserved": true,
+    "footerWidthPreserved": true,
+    "mainWidthBefore": 320,
+    "mainWidthAfter": 288,
+    "calculatorWidth": 288
+  },
+  {
+    "name": "home-390-fold",
+    "viewport": 390,
+    "pageWidth": 390,
+    "headerWidthPreserved": true,
+    "logoPositionPreserved": true,
+    "footerWidthPreserved": true,
+    "mainWidthBefore": 390,
+    "mainWidthAfter": 358,
+    "calculatorWidth": 358
+  },
+  {
+    "name": "home-768-fold",
+    "viewport": 768,
+    "pageWidth": 768,
+    "headerWidthPreserved": true,
+    "logoPositionPreserved": true,
+    "footerWidthPreserved": true,
+    "mainWidthBefore": 768,
+    "mainWidthAfter": 720,
+    "calculatorWidth": 560
+  },
+  {
+    "name": "home-1024-fold",
+    "viewport": 1024,
+    "pageWidth": 1024,
+    "headerWidthPreserved": true,
+    "logoPositionPreserved": true,
+    "footerWidthPreserved": true,
+    "mainWidthBefore": 1024,
+    "mainWidthAfter": 976,
+    "calculatorWidth": 560
+  },
+  {
+    "name": "home-1279-fold",
+    "viewport": 1279,
+    "pageWidth": 1279,
+    "headerWidthPreserved": true,
+    "logoPositionPreserved": true,
+    "footerWidthPreserved": true,
+    "mainWidthBefore": 1279,
+    "mainWidthAfter": 1231,
+    "calculatorWidth": 560
+  },
+  {
+    "name": "home-1280-fold",
+    "viewport": 1280,
+    "pageWidth": 1280,
+    "headerWidthPreserved": true,
+    "logoPositionPreserved": true,
+    "footerWidthPreserved": true,
+    "mainWidthBefore": 1280,
+    "mainWidthAfter": 1216,
+    "calculatorWidth": 360
+  },
+  {
+    "name": "home-1440-fold",
+    "viewport": 1440,
+    "pageWidth": 1440,
+    "headerWidthPreserved": true,
+    "logoPositionPreserved": true,
+    "footerWidthPreserved": true,
+    "mainWidthBefore": 1280,
+    "mainWidthAfter": 1376,
+    "calculatorWidth": 360
+  },
+  {
+    "name": "home-1920-fold",
+    "viewport": 1920,
+    "pageWidth": 1920,
+    "headerWidthPreserved": true,
+    "logoPositionPreserved": true,
+    "footerWidthPreserved": true,
+    "mainWidthBefore": 1280,
+    "mainWidthAfter": 1440,
+    "calculatorWidth": 360
+  },
+  {
+    "name": "produtos-1920",
+    "viewport": 1920,
+    "pageWidth": 1920,
+    "headerWidthPreserved": true,
+    "logoPositionPreserved": true,
+    "footerWidthPreserved": true,
+    "mainWidthBefore": 1280,
+    "mainWidthAfter": 1280,
+    "calculatorWidth": null
+  },
+  {
+    "name": "sobre-1920",
+    "viewport": 1920,
+    "pageWidth": 1920,
+    "headerWidthPreserved": true,
+    "logoPositionPreserved": true,
+    "footerWidthPreserved": true,
+    "mainWidthBefore": 1280,
+    "mainWidthAfter": 1280,
+    "calculatorWidth": null
+  },
+  {
+    "name": "contato-1920",
+    "viewport": 1920,
+    "pageWidth": 1920,
+    "headerWidthPreserved": true,
+    "logoPositionPreserved": true,
+    "footerWidthPreserved": true,
+    "mainWidthBefore": 1280,
+    "mainWidthAfter": 1280,
+    "calculatorWidth": null
+  },
+  {
+    "name": "pedidos-1920",
+    "viewport": 1920,
+    "pageWidth": 1920,
+    "headerWidthPreserved": true,
+    "logoPositionPreserved": true,
+    "footerWidthPreserved": true,
+    "mainWidthBefore": 368,
+    "mainWidthAfter": 368,
+    "calculatorWidth": null
+  },
+  {
+    "name": "carrinho-1920",
+    "viewport": 1920,
+    "pageWidth": 1920,
+    "headerWidthPreserved": true,
+    "logoPositionPreserved": true,
+    "footerWidthPreserved": true,
+    "mainWidthBefore": 1280,
+    "mainWidthAfter": 1280,
+    "calculatorWidth": null
+  },
+  {
+    "name": "login-1920",
+    "viewport": 1920,
+    "pageWidth": 1920,
+    "headerWidthPreserved": true,
+    "logoPositionPreserved": true,
+    "footerWidthPreserved": true,
+    "mainWidthBefore": 368,
+    "mainWidthAfter": 368,
+    "calculatorWidth": null
+  },
+  {
+    "name": "cadastro-1920",
+    "viewport": 1920,
+    "pageWidth": 1920,
+    "headerWidthPreserved": true,
+    "logoPositionPreserved": true,
+    "footerWidthPreserved": true,
+    "mainWidthBefore": 448,
+    "mainWidthAfter": 448,
+    "calculatorWidth": null
+  },
+  {
+    "name": "termos-1920",
+    "viewport": 1920,
+    "pageWidth": 1920,
+    "headerWidthPreserved": true,
+    "logoPositionPreserved": true,
+    "footerWidthPreserved": true,
+    "mainWidthBefore": 1280,
+    "mainWidthAfter": 1280,
+    "calculatorWidth": null
+  },
+  {
+    "name": "privacidade-1920",
+    "viewport": 1920,
+    "pageWidth": 1920,
+    "headerWidthPreserved": true,
+    "logoPositionPreserved": true,
+    "footerWidthPreserved": true,
+    "mainWidthBefore": 1280,
+    "mainWidthAfter": 1280,
+    "calculatorWidth": null
+  },
+  {
+    "name": "carrinho-filled-1920",
+    "viewport": 1920,
+    "pageWidth": 1920,
+    "headerWidthPreserved": true,
+    "logoPositionPreserved": true,
+    "footerWidthPreserved": true,
+    "mainWidthBefore": 1280,
+    "mainWidthAfter": 1280,
+    "calculatorWidth": null
+  },
+  {
+    "name": "home-auth-1920",
+    "viewport": 1920,
+    "pageWidth": 1920,
+    "headerWidthPreserved": true,
+    "logoPositionPreserved": true,
+    "footerWidthPreserved": true,
+    "mainWidthBefore": 1280,
+    "mainWidthAfter": 1440,
+    "calculatorWidth": 360
+  },
+  {
+    "name": "home-auth-390",
+    "viewport": 390,
+    "pageWidth": 390,
+    "headerWidthPreserved": true,
+    "logoPositionPreserved": true,
+    "footerWidthPreserved": true,
+    "mainWidthBefore": 390,
+    "mainWidthAfter": 358,
+    "calculatorWidth": 358
+  },
+  {
+    "name": "pedidos-auth-1920",
+    "viewport": 1920,
+    "pageWidth": 1920,
+    "headerWidthPreserved": true,
+    "logoPositionPreserved": true,
+    "footerWidthPreserved": true,
+    "mainWidthBefore": 1280,
+    "mainWidthAfter": 1280,
+    "calculatorWidth": null
+  }
+]

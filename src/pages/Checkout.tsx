@@ -198,7 +198,7 @@ const Checkout = () => {
 
               {/* Order Total */}
               <div className="lg:col-span-1">
-                <div className="bg-card rounded-xl border border-border p-6 sticky top-28">
+                <div className="bg-card rounded-xl border border-border p-6 lg:sticky top-[calc(var(--header-height)+1rem)]">
                   <h2 className="font-display font-semibold text-lg text-foreground mb-4">
                     Total do Pedido
                   </h2>

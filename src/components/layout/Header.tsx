@@ -90,9 +90,9 @@ export function Header() {
   return (
     <header className="fixed top-0 left-0 right-0 z-50 bg-background/90 backdrop-blur-md">
       <div className="container-custom">
-        <div className="flex items-center gap-3 md:gap-5 h-16">
+        <div className="grid grid-cols-[minmax(0,1fr)_auto_auto] items-center gap-x-3 gap-y-2 py-2 sm:flex sm:gap-3 md:gap-5 sm:h-[var(--header-height)] sm:py-0">
           {/* Logo */}
-          <Link to="/" className="flex items-center shrink-0" aria-label="FNZ Supply — início">
+          <Link to="/" className="col-span-3 sm:col-span-1 flex items-center shrink-0 w-fit" aria-label="FNZ Supply — início">
             <Logo className="h-10 md:h-12" />
           </Link>
 

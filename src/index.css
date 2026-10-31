@@ -7,6 +7,7 @@
 
 @layer base {
   :root {
+    --header-height: 108px;
     /* Bento theme: cool gray canvas, white tiles, navy #1B2845, sand #F5E6D3 */
     --background: 228 22% 96%;
     --foreground: 222 44% 19%;
@@ -90,6 +91,10 @@
     --sidebar-ring: 217.2 91.2% 59.8%;
   }
 
+  @media (min-width: 640px) {
+    :root { --header-height: 64px; }
+  }
+
   .dark {
     --background: 223 100% 8%;
     --foreground: 45 92% 90%;
@@ -159,6 +164,40 @@
 @layer components {
   .container-custom {
     @apply mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl;
+  }
+
+  .container-wide {
+    --page-gutter: 16px;
+    width: min(1440px, calc(100% - 2 * var(--page-gutter)));
+    margin-inline: auto;
+  }
+
+  .home-purchase-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 32px;
+    padding-top: 24px;
+  }
+
+  .home-purchase-grid > * { min-width: 0; }
+  .home-calculator { width: 100%; max-width: 560px; margin-inline: auto; }
+
+  @media (min-width: 768px) {
+    .container-wide { --page-gutter: 24px; }
+  }
+
+  /* The same 1280px limit is used by HomePurchaseSection's matchMedia. */
+  @media (min-width: 1280px) {
+    .container-wide { --page-gutter: 32px; }
+    .home-purchase-grid {
+      grid-template-columns: minmax(0, 1fr) 360px;
+      grid-template-areas: "banner calculator" "differentials calculator" "materials materials";
+      gap: 24px 32px;
+    }
+    .home-banner { grid-area: banner; }
+    .home-calculator { grid-area: calculator; align-self: start; }
+    .home-differentials { grid-area: differentials; }
+    .home-materials { grid-area: materials; padding-top: 24px; }
   }
 
   /* White rounded tile used across the bento layout */

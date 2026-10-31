@@ -97,7 +97,7 @@ const Produtos = () => {
         </div>
       </section>
 
-      <section className="sticky top-16 z-40 bg-background/90 backdrop-blur-md">
+      <section aria-label="Filtros do catálogo" className="sm:sticky top-[var(--header-height)] z-40 bg-background/90 backdrop-blur-md">
         <div className="container-custom py-3">
           <div className="tile p-3 flex flex-col lg:flex-row gap-3 lg:items-center lg:justify-between">
             <label className="relative flex-1 max-w-md">

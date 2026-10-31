@@ -1,0 +1,38 @@
+[
+  {
+    "width": 390,
+    "headerBottom": 108,
+    "mainPadding": 108,
+    "filterTopAfterScroll": -292,
+    "filterPosition": "static",
+    "searchTopWhenClicked": 203,
+    "searchUncovered": true
+  },
+  {
+    "width": 639,
+    "headerBottom": 108,
+    "mainPadding": 108,
+    "filterTopAfterScroll": -316,
+    "filterPosition": "static",
+    "searchTopWhenClicked": 203,
+    "searchUncovered": true
+  },
+  {
+    "width": 640,
+    "headerBottom": 64,
+    "mainPadding": 64,
+    "filterTopAfterScroll": 64,
+    "filterPosition": "sticky",
+    "searchTopWhenClicked": 88,
+    "searchUncovered": true
+  },
+  {
+    "width": 1280,
+    "headerBottom": 64,
+    "mainPadding": 64,
+    "filterTopAfterScroll": 64,
+    "filterPosition": "sticky",
+    "searchTopWhenClicked": 88,
+    "searchUncovered": true
+  }
+]

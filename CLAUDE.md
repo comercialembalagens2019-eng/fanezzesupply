@@ -36,8 +36,8 @@ src/
   pages/                 # rotas (Index, Produtos, Carrinho, Pedidos, Sobre, Contato, Admin, Login…)
   components/
     layout/              # Header (busca com sugestões), Footer, Layout
-    home/                # HeroSection, PriceCalculator, Differentials, FeaturedProducts ("Escolha o material"),
-                         # SizeGuide, HowItWorks, QuickOrder, CTASection, FAQ
+    home/                # HomePurchaseSection (grid responsivo), HeroSection, PriceCalculator, Differentials,
+                         # FeaturedProducts (3 materiais), SizeGuide, QuickOrder, CustomPackaging, HowItWorks, FAQ
     checkout/            # CheckoutModal (fluxo de pagamento), CardPayment (abacatepay.js)
     orders/              # OrderProgress (linha do tempo do pedido)
     legal/               # LegalPage (Termos/Privacidade)
@@ -45,6 +45,7 @@ src/
   contexts/              # AuthContext (isAdmin), CartContext (carrinho local + tabela carts)
   data/products.ts       # catálogo exibido (importa preços de _shared/catalog.ts)
   lib/
+    authReturn.ts        # returnTo restrito a carrinho/produtos; compatibilidade com state.from do login
     pricing.ts           # getUnitPrice, fromPrice, shippingFor, formatBRL
     productSearch.ts     # busca sem acento, sugestões e filtro exato por id após permissões
     company.ts           # dados públicos da empresa (WhatsApp, e-mail, endereço, horário, mapa)
@@ -76,6 +77,8 @@ e2e/                     # Playwright (smoke.spec.ts)
 
 ### Convenções de código e UI
 - Identidade: azul-marinho (`navy`), bege (`beige`), branco, fundo cinza claro, `rounded-3xl` (`.tile`), sombras sutis. Container `container-custom` = `max-w-7xl` (1.280 px).
+- Home usa `Layout contentWidth="wide"` e `.container-wide` (até 1.440 px úteis); cabeçalho, rodapé e outras rotas mantêm `.container-custom`. `HomePurchaseSection` reordena filhos de chaves estáveis no limite de 1.280 px, com uma calculadora e restauração de foco. Guia e Pedido rápido permanecem até decisão explícita do dono. Capturas e evidências em `docs/reviews/home-2026-10-30/`.
+- `--header-height` é a altura compartilhada do cabeçalho e espaçamentos fixos. Filtros do catálogo/admin só fixam a partir de `sm`; resumos e navegação lateral só a partir de `lg`, evitando sobreposição no celular. Capturas adicionais do script ficam em `test-results/home-review/`, sem versionar.
 - Reaproveite componentes e tokens existentes; não duplique UI. Dados da empresa sempre de `src/lib/company.ts`.
 - Sem botões falsos ou links quebrados; toda ação precisa funcionar.
 - Acessibilidade: labels, `aria-*` em combobox/tabs/accordion, foco visível, alvos ≥ 44 px.

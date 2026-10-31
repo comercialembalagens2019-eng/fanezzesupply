@@ -36,7 +36,7 @@ const faq = [
 
 export function FAQ() {
   return (
-    <section className="container-custom mt-12" aria-labelledby="faq-heading">
+    <section className="mt-10 md:mt-16 mb-12 md:mb-16" aria-labelledby="faq-heading">
       <div className="grid gap-6 lg:grid-cols-12">
         <div className="lg:col-span-4">
           <h2 id="faq-heading" className="text-2xl md:text-3xl font-extrabold">Perguntas frequentes</h2>

@@ -8,11 +8,11 @@ const steps = [
 
 export function HowItWorks() {
   return (
-    <section className="container-custom mt-12" aria-labelledby="how-heading">
+    <section className="mt-10 md:mt-16" aria-labelledby="how-heading">
       <h2 id="how-heading" className="text-2xl md:text-3xl font-extrabold mb-5">Como funciona</h2>
-      <ol className="grid gap-3 md:grid-cols-3">
+      <ol className="grid gap-6 md:grid-cols-3 border-y border-border py-6">
         {steps.map((step, i) => (
-          <li key={step.title} className="tile p-6 flex md:flex-col gap-4">
+          <li key={step.title} className="flex gap-4">
             <span className="relative w-12 h-12 rounded-xl bg-primary text-beige grid place-items-center shrink-0">
               <step.icon className="w-5 h-5" aria-hidden="true" />
               <span className="absolute -top-2 -right-2 w-6 h-6 rounded-full bg-beige text-navy text-xs font-extrabold grid place-items-center">

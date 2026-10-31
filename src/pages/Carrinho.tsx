@@ -170,7 +170,7 @@ const Carrinho = () => {
 
             {/* Order Summary */}
             <div className="lg:col-span-1">
-              <div className="tile p-6 sticky top-20">
+              <div className="tile p-6 lg:sticky top-[calc(var(--header-height)+1rem)]">
                 <h2 className="font-display font-semibold text-lg text-foreground mb-4">
                   Resumo do Pedido
                 </h2>

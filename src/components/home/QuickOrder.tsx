@@ -37,7 +37,7 @@ function QuickOrderRow({ productId, size, step }: (typeof QUICK_ITEMS)[number]) 
       <div className="flex items-center rounded-xl ring-1 ring-black/10 overflow-hidden text-sm font-bold">
         <button
           type="button"
-          className="w-10 h-10 grid place-items-center hover:bg-muted disabled:opacity-40"
+          className="w-11 h-11 grid place-items-center hover:bg-muted disabled:opacity-40 focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring"
           onClick={() => setQuantity((q) => Math.max(product.minOrder, q - step))}
           disabled={quantity <= product.minOrder}
           aria-label={`Diminuir quantidade de ${label}`}
@@ -47,7 +47,7 @@ function QuickOrderRow({ productId, size, step }: (typeof QUICK_ITEMS)[number]) 
         <span className="w-16 text-center tabular-nums" aria-live="polite">{quantity.toLocaleString("pt-BR")}</span>
         <button
           type="button"
-          className="w-10 h-10 grid place-items-center hover:bg-muted"
+          className="w-11 h-11 grid place-items-center hover:bg-muted focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring"
           onClick={() => setQuantity((q) => q + step)}
           aria-label={`Aumentar quantidade de ${label}`}
         >
@@ -59,7 +59,7 @@ function QuickOrderRow({ productId, size, step }: (typeof QUICK_ITEMS)[number]) 
         <button
           type="button"
           onClick={() => addToCart(buildCartProduct(product, quantity, size), quantity)}
-          className="bg-primary text-primary-foreground font-bold text-sm px-4 h-10 rounded-xl hover:bg-navy-light transition-colors"
+          className="bg-primary text-primary-foreground font-bold text-sm px-4 min-h-11 rounded-xl hover:bg-navy-light transition-colors focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
         >
           Adicionar
         </button>
@@ -70,8 +70,8 @@ function QuickOrderRow({ productId, size, step }: (typeof QUICK_ITEMS)[number]) 
 
 export function QuickOrder() {
   return (
-    <section className="container-custom mt-10" aria-labelledby="quick-order-heading">
-      <div className="flex items-end justify-between mb-4">
+    <section className="mt-10 md:mt-16" aria-labelledby="quick-order-heading">
+      <div className="flex flex-wrap gap-3 items-end justify-between mb-5">
         <h2 id="quick-order-heading" className="text-2xl font-extrabold">Pedido rápido</h2>
         <Link to="/produtos" className="text-sm font-bold text-navy-light flex items-center gap-1 hover:text-foreground">
           Ver catálogo <ArrowRight className="w-4 h-4" aria-hidden="true" />
