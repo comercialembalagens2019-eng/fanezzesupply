@@ -29,7 +29,7 @@ export function HomePurchaseSection() {
     if (!focused?.isConnected) return;
     if (document.activeElement !== focused) focused.focus({ preventScroll: true });
     const bounds = focused.getBoundingClientRect();
-    const headerBottom = document.querySelector("header")?.getBoundingClientRect().bottom ?? 64;
+    const headerBottom = document.querySelector("header")?.getBoundingClientRect().bottom ?? 0;
     if (bounds.top < headerBottom + 16 || bounds.bottom > window.innerHeight) {
       focused.scrollIntoView({ block: "center", behavior: "instant" });
     }

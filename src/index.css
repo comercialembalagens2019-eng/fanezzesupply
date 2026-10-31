@@ -7,6 +7,7 @@
 
 @layer base {
   :root {
+    --header-height: 108px;
     /* Bento theme: cool gray canvas, white tiles, navy #1B2845, sand #F5E6D3 */
     --background: 228 22% 96%;
     --foreground: 222 44% 19%;
@@ -88,6 +89,10 @@
     --sidebar-accent-foreground: 240 5.9% 10%;
     --sidebar-border: 220 13% 91%;
     --sidebar-ring: 217.2 91.2% 59.8%;
+  }
+
+  @media (min-width: 640px) {
+    :root { --header-height: 64px; }
   }
 
   .dark {

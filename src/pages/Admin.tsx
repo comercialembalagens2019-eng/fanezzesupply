@@ -239,7 +239,7 @@ export default function Admin() {
           <Stat label="Carrinhos com itens" value={String(nonEmptyCarts.length)} icon={ShoppingCart} />
         </div>
 
-        <div className="sticky top-16 z-30 bg-background/90 backdrop-blur-md py-2">
+        <div className="sm:sticky top-[var(--header-height)] z-30 bg-background/90 backdrop-blur-md py-2">
           <div className="tile p-3 flex flex-col lg:flex-row gap-3 lg:items-center lg:justify-between">
             <div className="flex gap-1 rounded-xl bg-muted p-1" role="tablist">
               {tabs.map((t) => (

@@ -120,3 +120,35 @@ test("layout reflows at 200% equivalent viewport without horizontal page scroll"
     await expect(page.getByRole("region", { name: "Calculadora de preço", exact: true }).getByRole("button", { name: "Adicionar ao carrinho" })).toBeVisible();
   }
 });
+
+test("catalog search stays usable after scrolling with the taller mobile header", async ({ page }) => {
+  for (const width of [390, 639, 640, 1280]) {
+    await page.setViewportSize({ width, height: 450 });
+    await page.goto("/produtos");
+    const filters = page.getByRole("region", { name: "Filtros do catálogo", exact: true });
+    const search = filters.getByRole("searchbox", { name: "Buscar produtos", exact: true });
+    const header = page.locator("header");
+    const headerHeight = (await header.boundingBox())!.height;
+    const padding = await page.locator("main").evaluate((el) => parseFloat(getComputedStyle(el).paddingTop));
+    expect(padding).toBe(headerHeight);
+    await page.evaluate(() => window.scrollTo(0, 600));
+    await expect.poll(() => page.evaluate(() => scrollY)).toBe(600);
+    if (width < 640) {
+      await expect(filters).toHaveCSS("position", "static");
+      expect((await filters.boundingBox())!.y).toBeLessThan(0);
+    } else {
+      await expect(filters).toHaveCSS("position", "sticky");
+      expect((await filters.boundingBox())!.y).toBe(headerHeight);
+    }
+    // Clicking scrolls a non-sticky mobile search back into view, without an overlay.
+    await search.click();
+    await expect(search).toBeFocused();
+    expect((await search.boundingBox())!.y).toBeGreaterThanOrEqual(headerHeight);
+    expect(await search.evaluate((el) => {
+      const rect = el.getBoundingClientRect();
+      return document.elementFromPoint(rect.x + rect.width / 2, rect.y + rect.height / 2) === el;
+    })).toBe(true);
+    await search.fill("32x40");
+    await expect(search).toHaveValue("32x40");
+  }
+});

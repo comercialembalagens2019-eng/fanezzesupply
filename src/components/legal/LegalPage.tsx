@@ -25,7 +25,7 @@ export function LegalPage({ title, description, path, sections }: LegalPageProps
       </section>
 
       <section className="container-custom mt-4 grid gap-4 lg:grid-cols-[260px_1fr] items-start">
-        <nav className="tile p-5 lg:sticky lg:top-20" aria-label="Seções">
+        <nav className="tile p-5 lg:sticky top-[calc(var(--header-height)+1rem)]" aria-label="Seções">
           <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground mb-3">Nesta página</p>
           <ol className="space-y-2 text-sm">
             {sections.map((s, i) => (

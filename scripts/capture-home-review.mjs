@@ -4,7 +4,9 @@ import { mkdir, readFile, writeFile } from "node:fs/promises";
 // Run against the production preview: node scripts/capture-home-review.mjs before|prototype|after
 const phase = process.argv[2];
 if (!["before", "prototype", "after"].includes(phase)) throw new Error("Use before, prototype or after");
-const output = `docs/reviews/home-2026-10-30/${phase}`;
+// Most captures are review output, not permanent repository assets.
+const outputRoot = process.env.HOME_REVIEW_OUTPUT ?? "test-results/home-review";
+const output = `${outputRoot}/${phase}`;
 const baseUrl = process.env.HOME_REVIEW_URL ?? "http://127.0.0.1:4173";
 await mkdir(output, { recursive: true });
 const browser = await chromium.launch({
@@ -76,7 +78,7 @@ try {
   }
   await writeFile(`${output}/measurements.json`, JSON.stringify(measurements, null, 2) + "\n");
   if (phase === "after") {
-    const before = JSON.parse(await readFile("docs/reviews/home-2026-10-30/before/measurements.json", "utf8"));
+    const before = JSON.parse(await readFile(`${outputRoot}/before/measurements.json`, "utf8"));
     const comparison = measurements.map((current) => {
       const previous = before.find((entry) => entry.name === current.name);
       const equal = (key) => JSON.stringify(previous?.[key] && { x: previous[key].x, width: previous[key].width })
@@ -88,7 +90,7 @@ try {
         calculatorWidth: current.calculator?.width ?? null,
       };
     });
-    await writeFile("docs/reviews/home-2026-10-30/comparison.json", JSON.stringify(comparison, null, 2) + "\n");
+    await writeFile(`${outputRoot}/comparison.json`, JSON.stringify(comparison, null, 2) + "\n");
   }
   console.log(`${measurements.length} captures saved to ${output}`);
 } finally {
