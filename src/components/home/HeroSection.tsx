@@ -1,3 +1,4 @@
+import { lazy, Suspense, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { ArrowRight, MessageCircle } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
@@ -8,8 +9,23 @@ import { authPagePath } from "@/lib/authReturn";
 // Product shown in the banner; its photo and starting price come from the catalog.
 const spotlight = products.find((p) => p.id === "envelope-cinza")!;
 
+// three.js only loads when it will be used, so the first paint stays light.
+const Envelope3D = lazy(() => import("./Envelope3D"));
+
+function canShow3D() {
+  if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return false;
+  try {
+    return !!document.createElement("canvas").getContext("webgl2");
+  } catch {
+    return false;
+  }
+}
+
 export function HeroSection() {
   const { user } = useAuth();
+  const [use3D, setUse3D] = useState(false);
+  const [ready3D, setReady3D] = useState(false);
+  useEffect(() => setUse3D(canShow3D()), []);
 
   return (
     <section aria-labelledby="home-heading" className="h-full rounded-3xl bg-primary text-primary-foreground p-6 md:p-8 xl:p-10 grid sm:grid-cols-[1.1fr_0.9fr] gap-6 items-center">
@@ -49,10 +65,26 @@ export function HeroSection() {
         </div>
       </div>
 
-      <Link to={`/produtos?produto=${encodeURIComponent(spotlight.id)}`} aria-label={`Ver ${spotlight.name}`} className="block min-w-0 rounded-2xl overflow-hidden bg-white focus-visible:ring-4 focus-visible:ring-beige">
-        <img src={spotlight.image} alt={spotlight.name} width={1200} height={900} className="w-full aspect-[4/3] object-cover" />
-        <span className="block px-4 py-3 text-sm text-navy font-semibold">{spotlight.name} <ArrowRight className="inline w-4 h-4 ml-1" aria-hidden="true" /></span>
-      </Link>
+      <div className="min-w-0 rounded-2xl overflow-hidden bg-white">
+        {/* The photo stays underneath until the 3D envelope draws its first frame (or for good, without WebGL). */}
+        <div className="relative aspect-[4/3] bg-[#ebebeb]">
+          <img
+            src={spotlight.image}
+            alt={spotlight.name}
+            width={1200}
+            height={900}
+            className={`w-full h-full object-cover transition-opacity duration-500 ${ready3D ? "opacity-0" : "opacity-100"}`}
+          />
+          {use3D && (
+            <Suspense fallback={null}>
+              <Envelope3D onReady={() => setReady3D(true)} />
+            </Suspense>
+          )}
+        </div>
+        <Link to={`/produtos?produto=${encodeURIComponent(spotlight.id)}`} className="flex items-center min-h-11 px-4 py-3 text-sm text-navy font-semibold hover:underline underline-offset-4 focus-visible:ring-4 focus-visible:ring-beige focus-visible:ring-inset">
+          {spotlight.name} <ArrowRight className="inline w-4 h-4 ml-1" aria-hidden="true" />
+        </Link>
+      </div>
     </section>
   );
 }
