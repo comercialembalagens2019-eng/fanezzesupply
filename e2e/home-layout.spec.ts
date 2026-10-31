@@ -28,7 +28,7 @@ test("home width, module order and calculator placement follow each viewport", a
     const mainWidth = (await page.locator("main .container-wide").boundingBox())!.width;
     expect(mainWidth).toBe(Math.min(1440, width - (width >= 1280 ? 64 : width >= 768 ? 48 : 32)));
     await expect(page.getByRole("heading", { name: "Pedido rápido" })).toHaveCount(1);
-    await expect(page.getByRole("heading", { name: "Encontre o tamanho ideal para sua operação" })).toHaveCount(1);
+    await expect(page.getByRole("heading", { name: "Veja o tamanho antes de comprar" })).toHaveCount(1);
   }
 });
 
@@ -88,8 +88,10 @@ test("material anchor, precise links, size guide and quick order remain function
   await expect(materials.getByRole("heading", { level: 3 })).toHaveText(["Envelope", "Envelope COEX", "Envelope Cinza"]);
   await expect(page.getByRole("link", { name: "Pedir orçamento", exact: true })).toHaveCount(1);
   await expect(page.getByRole("link", { name: "Pedir orçamento", exact: true })).toHaveAttribute("href", /wa\.me/);
-  await page.getByRole("tab", { name: "Envelope Cinza", exact: true }).click();
-  await expect(page.locator('a[href="/produtos?produto=envelope-cinza&q=32x40"]')).toHaveCount(1);
+  const guide = page.getByRole("region", { name: "Veja o tamanho antes de comprar" });
+  await guide.getByRole("button", { name: "Envelope Cinza", exact: true }).click();
+  await guide.getByRole("button", { name: /^32x40 cm, Envelope Cinza/ }).click();
+  await expect(guide.getByRole("link", { name: "Comprar este tamanho" })).toHaveAttribute("href", "/produtos?produto=envelope-cinza&q=32x40");
   const quick = page.getByRole("region", { name: "Pedido rápido" });
   await quick.getByRole("button", { name: "Adicionar", exact: true }).first().click();
   await page.goto("/carrinho");

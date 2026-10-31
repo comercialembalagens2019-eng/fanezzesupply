@@ -8,7 +8,7 @@ test("home material links select an exact product and retain the size guide", as
   const results = page.getByRole("region", { name: "Resultados do catálogo" });
   await expect(results.getByRole("heading", { level: 3 })).toHaveText(["Envelope Cinza"]);
   await page.goBack();
-  await expect(page.locator('a[href="/produtos?produto=envelope-cinza&q=32x40"]')).toHaveCount(1);
+  await expect(page.getByRole("region", { name: "Veja o tamanho antes de comprar" }).getByRole("link", { name: "Comprar este tamanho" })).toHaveCount(1);
   await expect(page.getByRole("heading", { name: "Pedido rápido" })).toBeVisible();
 });
 
