@@ -1,0 +1,392 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>FNZ Supply · Envelopes de segurança no atacado (modelo D)</title>
+<meta name="description" content="Envelopes de segurança no atacado, direto de Joinville/SC: 18 tamanhos com preço por quantidade, NF-e e frete grátis na cidade.">
+<link rel="preconnect" href="https://api.fontshare.com">
+<link rel="preconnect" href="https://cdn.fontshare.com" crossorigin>
+<link href="https://api.fontshare.com/v2/css?f[]=general-sans@400,500,600,700&display=swap" rel="stylesheet">
+<script>document.documentElement.classList.add('js')</script>
+<style>
+:root {
+  --bg: #ffffff; --surface: #f6f6f6; --ink: #000000; --muted: #5f5f5f;
+  --accent: #fe7141; --accent-ink: #000000;
+  --field-1: #fe7141; --field-2: #d1ddd3; --field-3: #f0ff1c; --field-4: #000000; --field-4-ink: #f4f4f4;
+  --step-small: clamp(0.8125rem, 0.79rem + 0.1vw, 0.875rem);
+  --step-body: clamp(1.0625rem, 1rem + 0.25vw, 1.1875rem);
+  --step-lead: clamp(1.25rem, 1.1rem + 0.7vw, 1.625rem);
+  --step-head: clamp(2rem, 1.3rem + 3.2vw, 4rem);
+  --margin: clamp(20px, 2.2vw, 32px);
+  --gap-section: clamp(96px, 10vw, 160px);
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --t-hover: 180ms;
+}
+*, *::before, *::after { box-sizing: border-box; }
+html, body { margin: 0; overflow-x: clip; }
+body { background: var(--bg); color: var(--ink); font-family: "General Sans", system-ui, sans-serif; font-size: var(--step-body); line-height: 1.45; -webkit-font-smoothing: antialiased; }
+img { display: block; max-width: 100%; height: auto; }
+a { color: inherit; }
+h1, h2, h3, p, ul, ol, figure { margin: 0; }
+ul, ol { padding: 0; list-style: none; }
+button, input { font: inherit; color: inherit; }
+::selection { background: var(--accent); color: var(--accent-ink); }
+:focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; }
+.sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+h2 { font-size: var(--step-head); font-weight: 700; letter-spacing: -0.02em; line-height: 0.95; }
+.f1 { background: var(--field-1); } .f2 { background: var(--field-2); } .f3 { background: var(--field-3); } .f4 { background: var(--field-4); color: var(--field-4-ink); }
+.btn { display: inline-flex; align-items: center; justify-content: center; min-height: 52px; padding: 0 26px; border: 0; border-radius: 0; font-weight: 600; text-decoration: none; cursor: pointer; transition: transform var(--t-hover) var(--ease-out), background-color var(--t-hover); }
+.btn:active { transform: scale(0.97); }
+
+/* Hero: the wall of specimens, the docked panel */
+.hero { position: relative; height: 100svh; min-height: 640px; overflow: hidden; background: var(--bg); }
+.wall { --tile: clamp(96px, 7.8vw, 128px); display: grid; gap: 8px; padding-top: 8px; }
+.wall__row { display: flex; gap: 8px; width: max-content; animation: drift 60s linear infinite alternate; }
+.wall__row.is-offset { margin-left: calc(var(--tile) / -2); animation-direction: alternate-reverse; }
+.tile { width: var(--tile); height: var(--tile); flex: none; display: grid; place-items: center; }
+.tile img { width: auto; height: 60%; }
+@keyframes drift { from { transform: translateX(0); } to { transform: translateX(calc(var(--tile) * -1.5)); } }
+.panel { position: absolute; left: var(--margin); right: var(--margin); bottom: var(--margin); background: var(--ink); color: var(--field-4-ink); padding: clamp(24px, 3vw, 44px); display: grid; grid-template-columns: 1fr auto; gap: 18px 24px; align-items: center; }
+.panel h1 { font-size: clamp(2.5rem, 0.6rem + 4.6vw, 5.5rem); font-weight: 600; line-height: 0.98; letter-spacing: -0.03em; }
+.panel__lead { grid-column: 1; font-size: var(--step-lead); line-height: 1.35; max-width: 46ch; color: #e6e6e6; }
+.panel .btn { grid-column: 2; grid-row: 1 / 3; align-self: end; }
+.panel .btn { background: var(--bg); color: var(--ink); }
+.panel .btn:hover { background: var(--field-3); }
+.panel nav { grid-column: 1 / -1; display: flex; flex-wrap: wrap; align-items: center; gap: 8px 28px; font-size: 16px; padding-top: 8px; }
+.panel nav img { height: 26px; width: auto; margin-right: auto; }
+.panel nav a { text-decoration: none; color: #d9d9d9; transition: color var(--t-hover); }
+.panel nav a:hover { color: #fff; }
+
+main > section { padding-inline: var(--margin); margin-top: var(--gap-section); }
+
+/* Showcase: object on a disc */
+.show { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); gap: 64px; align-items: center; }
+.show__stage { position: relative; width: min(100%, 640px); aspect-ratio: 1; justify-self: end; }
+.disc { position: absolute; inset: 0; border-radius: 50%; transition: background-color 300ms var(--ease-out); }
+.show__obj { position: absolute; left: 50%; bottom: 10%; height: 80%; width: auto; transform: translateX(-50%); transition: opacity 300ms var(--ease-out); }
+.show__obj.is-fading { opacity: 0; }
+.show__fact { margin-top: 40px; max-width: 34ch; font-size: var(--step-lead); line-height: 1.35; }
+.show__list { order: -1; }
+.show__list h2 { margin-bottom: 40px; }
+.show__list ul { display: grid; gap: 4px; }
+.pick { display: block; background: none; border: 0; padding: 0; text-align: left; cursor: pointer; font-size: clamp(28px, 2.9vw, 44px); line-height: 1.15; letter-spacing: -0.02em; font-weight: 600; color: var(--muted); transition: color var(--t-hover); }
+.pick:hover { color: #2b2b2b; }
+.pick[aria-pressed="true"] { color: var(--ink); }
+
+/* List: sizes and prices, with the scale preview */
+.sizes__head { display: flex; justify-content: space-between; align-items: end; gap: 24px; margin-bottom: 8px; }
+.sizes__head p { max-width: 46ch; color: var(--ink); }
+.sizes__grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(300px, 30%); gap: 64px; align-items: start; }
+.cat { margin-top: 96px; }
+.cat:first-child { margin-top: 72px; }
+.cat__head { display: flex; justify-content: space-between; align-items: baseline; gap: 16px; margin-bottom: 40px; }
+.cat__head h3 { font-size: clamp(32px, 3.4vw, 50px); font-weight: 700; letter-spacing: -0.02em; line-height: 1; }
+.cat__head span { font-size: 16px; color: var(--muted); }
+.cat__rows { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 36px 64px; }
+.row { width: 100%; display: grid; grid-template-columns: 64px minmax(0, 1fr); gap: 20px; align-items: start; background: none; border: 0; padding: 8px 0; margin: -8px 0; text-align: left; cursor: pointer; transition: background-color var(--t-hover), opacity 240ms; }
+.row img { width: 64px; height: 80px; object-fit: contain; }
+.row:hover, .row[aria-pressed="true"] { background: var(--surface); }
+.row__top { display: flex; justify-content: space-between; gap: 12px; font-size: 18px; }
+.row__top b { font-weight: 600; font-variant-numeric: tabular-nums; }
+.row__top span { font-weight: 600; font-variant-numeric: tabular-nums; }
+.row__top small { font-weight: 400; color: var(--muted); font-size: 15px; }
+.row__text { display: grid; gap: 2px; }
+.row__note { font-size: 15px; color: #b6431a; font-weight: 500; }
+.row__min { font-size: 15px; color: var(--muted); }
+@media (hover: hover) and (pointer: fine) {
+  .cat__rows:has(.row:hover) .row:not(:hover) { opacity: 0.55; }
+}
+.scale { position: sticky; top: 24px; margin-top: 72px; background: var(--surface); padding: 28px; display: grid; grid-template-columns: minmax(0, 1fr); gap: 18px; }
+.scale h3 { font-size: 22px; font-weight: 600; letter-spacing: -0.01em; }
+.scale__draw { position: relative; height: 380px; display: flex; align-items: flex-end; justify-content: center; gap: 28px; }
+.scale__a4, .scale__env { flex: none; transition: width 260ms var(--ease-out), height 260ms var(--ease-out), background-color 260ms; }
+.scale__a4 { background: #e2e2e2; display: grid; place-items: center; color: var(--muted); font-size: 14px; }
+.scale__env { position: relative; background: #fff; outline: 1px solid #cfcfcf; outline-offset: -1px; }
+.scale__env::before { content: ""; position: absolute; inset: 0 0 auto; height: 9%; background: var(--strip, #222); }
+.scale__facts { display: grid; gap: 4px; }
+.scale__facts b { font-size: var(--step-lead); font-weight: 600; letter-spacing: -0.01em; }
+.scale .btn { background: var(--accent); color: var(--accent-ink); }
+.scale .btn:hover { background: #ff8a62; }
+
+/* How it works: tiles that grow */
+.how__grid { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: 10px; align-items: end; }
+.how__grid h2 { grid-column: 1 / 8; grid-row: 1; align-self: start; font-size: clamp(40px, 3.6vw, 52px); }
+.step { display: grid; gap: 14px; }
+.step:nth-of-type(1) { grid-column: 1 / 4; grid-row: 1; }
+.step:nth-of-type(2) { grid-column: 4 / 8; grid-row: 1; }
+.step:nth-of-type(3) { grid-column: 8 / 13; grid-row: 1; }
+.step__tile { position: relative; }
+.step:nth-of-type(1) .step__tile { height: 30vh; } .step:nth-of-type(2) .step__tile { height: 44vh; } .step:nth-of-type(3) .step__tile { height: 60vh; }
+.step__tile img { position: absolute; inset: 0; margin: auto; height: 62%; width: auto; }
+.step h3 { font-size: 22px; font-weight: 600; }
+.step p { font-size: 17px; max-width: 36ch; }
+
+/* FAQ: tabbed index cards */
+.faq { display: grid; grid-template-columns: minmax(0, 4fr) minmax(0, 8fr); gap: 64px; align-items: start; }
+.faq h2 { font-size: var(--step-head); position: sticky; top: 32px; }
+.cards { padding-top: 40px; }
+.card { position: relative; margin-top: 40px; z-index: var(--i); }
+.card summary { list-style: none; cursor: pointer; padding: 24px 28px; min-height: 96px; display: flex; align-items: center; }
+.card summary::-webkit-details-marker { display: none; }
+.card__tab { position: absolute; top: -40px; left: min(calc(var(--i) * 150px), calc(100% - 200px)); width: 200px; height: 40px; display: flex; align-items: center; padding: 0 18px; font-size: 16px; font-weight: 600; clip-path: polygon(0 100%, 8% 0, 92% 0, 100% 100%); }
+.card__q { font-size: 22px; font-weight: 600; }
+.card p { padding: 0 28px 28px; max-width: 50ch; font-size: 17px; }
+.card.c0, .card.c0 .card__tab { background: var(--field-2); } .card.c1, .card.c1 .card__tab { background: var(--field-3); } .card.c2, .card.c2 .card__tab { background: var(--field-1); }
+.card summary:hover .card__q { text-decoration: underline; text-underline-offset: 4px; }
+
+/* Contact: the clip-out coupon */
+.coupon { --notch: 14px; display: grid; grid-template-columns: 46% 54%; min-height: 380px; background: var(--field-1); border-radius: 14px;
+  -webkit-mask: radial-gradient(circle var(--notch) at 46% 0, #0000 98%, #000) top / 100% 51% no-repeat, radial-gradient(circle var(--notch) at 46% 100%, #0000 98%, #000) bottom / 100% 51% no-repeat; /* taste-skill-ignore: mask cuts the coupon/postcard edge, no colour fill */
+          mask: radial-gradient(circle var(--notch) at 46% 0, #0000 98%, #000) top / 100% 51% no-repeat, radial-gradient(circle var(--notch) at 46% 100%, #0000 98%, #000) bottom / 100% 51% no-repeat; } /* taste-skill-ignore: mask cuts the coupon/postcard edge, no colour fill */
+.coupon__left { padding: 48px; display: flex; flex-direction: column; justify-content: space-between; gap: 24px; border-right: 5px dotted var(--bg); }
+.coupon__left h2 { font-size: clamp(28px, 3vw, 44px); line-height: 1.02; }
+.coupon__left p { font-size: 16px; max-width: 34ch; }
+.coupon form { padding: 48px; display: grid; gap: 10px; align-content: center; }
+.coupon input { height: 52px; border: 0; padding: 0 16px; background: #ffa585; font-size: 16px; }
+.coupon input::placeholder { color: #3a1a0d; }
+.coupon button { height: 56px; border: 0; background: var(--ink); color: #fff; font-weight: 600; cursor: pointer; transition: transform var(--t-hover) var(--ease-out); }
+.coupon button:active { transform: scale(0.98); }
+.coupon__direct { font-size: 16px; }
+
+/* Footer: the back of the card */
+footer { margin-top: 120px; background: var(--ink); padding: 72px var(--margin) var(--margin); }
+.back { position: relative; background: var(--bg); padding: 72px 56px 32px; min-height: 420px; display: grid; grid-template-columns: 1fr 1fr; gap: 40px 56px;
+  -webkit-mask: radial-gradient(50px 18px at 50px 0, #0000 98%, #000) 0 0 / 100px 100% repeat-x; mask: radial-gradient(50px 18px at 50px 0, #0000 98%, #000) 0 0 / 100px 100% repeat-x; } /* taste-skill-ignore: mask cuts the coupon/postcard edge, no colour fill */
+.back h2 { font-size: 32px; letter-spacing: -0.01em; line-height: 1.1; }
+.back__msg p { margin-top: 14px; max-width: 42ch; font-size: 16px; }
+.back__addr { display: grid; gap: 12px; align-content: start; font-size: 18px; padding-right: 120px; }
+.back__addr a { text-decoration: none; }
+.back__addr a:hover { text-decoration: underline; text-underline-offset: 4px; }
+.stamp { position: absolute; top: 56px; right: 56px; width: 88px; padding: 6px; background: var(--bg); outline: 1px solid #d7d7d7; transform: rotate(4deg); }
+.stamp img { aspect-ratio: 3 / 4; object-fit: cover; width: 100%; }
+.imprint { grid-column: 1 / -1; text-align: center; font-size: var(--step-small); color: var(--muted); margin-top: 24px; }
+
+/* Entrances: content is visible without script */
+.js [data-reveal] > * { opacity: 0; transform: translateY(24px); transition: opacity 600ms var(--ease-out), transform 600ms var(--ease-out); transition-delay: calc(var(--n, 0) * 80ms); }
+.js [data-reveal].is-in > * { opacity: 1; transform: none; }
+
+@media (max-width: 900px) {
+  .wall { --tile: 22vw; gap: 6px; }
+  .wall__row { gap: 6px; }
+  .panel { left: 0; right: 0; bottom: 0; grid-template-columns: 1fr; padding: 24px var(--margin); min-height: 36svh; align-content: center; }
+  .panel h1 { font-size: 6.8vw; line-height: 1.05; letter-spacing: -0.02em; }
+  .panel__lead { font-size: 17px; }
+  .panel .btn { width: 100%; grid-column: 1; grid-row: auto; }
+  .panel nav { font-size: 14px; gap: 6px 16px; }
+  .show { min-height: 0; grid-template-columns: 1fr; gap: 28px; }
+  .show__stage { width: 86vw; }
+  .show__fact { margin-top: 24px; font-size: 18px; }
+  .show__list h2 { margin-bottom: 24px; font-size: 9vw; }
+  .pick { font-size: 26px; padding: 4px 0; }
+  .sizes__head { flex-direction: column; align-items: start; }
+  .sizes__grid { grid-template-columns: 1fr; gap: 0; }
+  .scale { position: static; margin: 16px 0 8px; padding: 16px; grid-template-columns: minmax(0, 1fr); gap: 12px 16px; align-items: center; }
+  .sizes__grid > .scale { display: none; }
+  .scale h3 { grid-column: 1 / -1; font-size: 18px; }
+  .scale__draw { height: 150px; gap: 10px; }
+  .scale .btn { grid-column: 1 / -1; min-height: 44px; }
+  .cat__head h3 { font-size: 8.5vw; }
+  .cat__head { flex-wrap: wrap; }
+  .cat__rows { grid-template-columns: 1fr; gap: 24px; }
+  .row { grid-template-columns: 52px minmax(0, 1fr); }
+  .row img { width: 52px; height: 64px; }
+  .how__grid { display: flex; flex-direction: column; gap: 28px; align-items: stretch; }
+  .how__grid h2 { font-size: 30px; }
+  .step:nth-of-type(1) .step__tile { height: 34vw; } .step:nth-of-type(2) .step__tile { height: 46vw; } .step:nth-of-type(3) .step__tile { height: 62vw; }
+  .faq { grid-template-columns: 1fr; gap: 16px; }
+  .faq h2 { font-size: 9vw; position: static; }
+  .card__tab { width: 120px; left: calc(var(--i) * 48px); max-width: calc(100% - 120px); }
+  .card summary { min-height: 88px; padding: 20px; }
+  .card p { padding: 0 20px 20px; font-size: 16px; }
+  .card__q { font-size: 18px; }
+  .coupon { grid-template-columns: 1fr; border-radius: 14px;
+    -webkit-mask: radial-gradient(circle var(--notch) at 0 46%, #0000 98%, #000) left / 51% 100% no-repeat, radial-gradient(circle var(--notch) at 100% 46%, #0000 98%, #000) right / 51% 100% no-repeat; /* taste-skill-ignore: mask cuts the coupon/postcard edge, no colour fill */
+            mask: radial-gradient(circle var(--notch) at 0 46%, #0000 98%, #000) left / 51% 100% no-repeat, radial-gradient(circle var(--notch) at 100% 46%, #0000 98%, #000) right / 51% 100% no-repeat; } /* taste-skill-ignore: mask cuts the coupon/postcard edge, no colour fill */
+  .coupon__left { border-right: 0; border-bottom: 5px dotted var(--bg); padding: 28px 22px; }
+  .coupon form { padding: 28px 22px; }
+  .coupon input { height: 54px; } .coupon button { height: 54px; }
+  .back { grid-template-columns: 1fr; padding: 64px 22px 24px;
+    -webkit-mask-size: calc(100% / 6) 100%; mask-size: calc(100% / 6) 100%; }
+  .back__addr { font-size: 17px; padding-right: 0; }
+  .stamp { width: 64px; top: 40px; right: 22px; }
+  .back__msg { padding-right: 80px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .wall__row { animation: none; }
+  .js [data-reveal] > * { transform: none; transition: opacity 300ms; }
+  * { scroll-behavior: auto; }
+  .show__obj, .scale__a4, .scale__env { transition: opacity 200ms; }
+}
+</style>
+</head>
+<body>
+<header class="hero" aria-label="FNZ Supply">
+  <div class="wall" aria-hidden="true">
+{{WALL}}
+  </div>
+  <div class="panel">
+    <h1>Envelopes de segurança no atacado.</h1>
+    <p class="panel__lead">Direto de Joinville/SC: 18 tamanhos com preço por quantidade, NF-e para o seu CNPJ e frete grátis na cidade.</p>
+    <a class="btn" href="#tamanhos">Ver tamanhos e preços</a>
+    <nav aria-label="Principal">
+      <img src="assets/fnz-logo-branco.png" alt="FNZ Supply" width="104" height="44">
+      <a href="#materiais">Materiais</a>
+      <a href="#como-comprar">Como comprar</a>
+      <a href="#perguntas">Perguntas</a>
+      <a href="#pedido">Pedido</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+  <section id="materiais" class="show" aria-labelledby="mat-h" data-reveal>
+    <div class="show__stage" style="--n:0">
+      <div class="disc f1" id="disc"></div>
+      <img class="show__obj" id="obj" src="{{MAT0_IMG}}" alt="Envelope da FNZ Supply" width="472" height="652">
+    </div>
+    <div class="show__list" style="--n:1">
+      <h2 id="mat-h">Os materiais</h2>
+      <ul>{{MATERIALS}}</ul>
+      <p class="show__fact" id="fact" aria-live="polite">{{MAT0_FACT}}</p>
+    </div>
+  </section>
+
+  <section id="tamanhos" class="sizes" aria-labelledby="sizes-h">
+    <div class="sizes__head" data-reveal>
+      <h2 id="sizes-h">Tamanhos e preços</h2>
+      <p style="--n:1">Dezoito tamanhos em três materiais. Escolha um e veja o envelope em escala, ao lado de uma folha A4.</p>
+    </div>
+    <div class="sizes__grid">
+      <div class="sizes__lists">
+{{LISTS}}
+      </div>
+      <aside class="scale" aria-live="polite" aria-label="Tamanho escolhido em escala">
+        <h3 id="scale-title">Envelope COEX 19x25</h3>
+        <div class="scale__draw" aria-hidden="true">
+          <div class="scale__a4" id="a4">A4</div>
+          <div class="scale__env" id="env"></div>
+        </div>
+        <div class="scale__facts">
+          <b id="scale-price">R$ 0,27 por unidade</b>
+          <span id="scale-best">R$ 0,24 a partir de 1.000 unidades</span>
+          <span id="scale-min">Mínimo de 500 unidades</span>
+        </div>
+        <a class="btn" id="scale-wa" href="{{WA}}" target="_blank" rel="noopener">Pedir este tamanho no WhatsApp</a>
+      </aside>
+    </div>
+  </section>
+
+  <section id="como-comprar" class="how" aria-labelledby="how-h">
+    <div class="how__grid" data-reveal>
+      <h2 id="how-h">Como comprar</h2>
+      <div class="step" style="--n:1"><div class="step__tile f2"><img src="assets/envelope-cinza.png" alt="" width="504" height="609" loading="lazy"></div><h3>Escolha o tamanho</h3><p>Material e medida certos para o que você envia, com o preço da quantidade.</p></div>
+      <div class="step" style="--n:2"><div class="step__tile f3"><img src="assets/envelope-branco.png" alt="" width="472" height="652" loading="lazy"></div><h3>Pague com o CNPJ</h3><p>Pix, boleto ou cartão de crédito à vista. A NF-e sai para a sua empresa.</p></div>
+      <div class="step" style="--n:3"><div class="step__tile f1"><img src="assets/envelope-cinza.png" alt="" width="504" height="609" loading="lazy"></div><h3>Receba e acompanhe</h3><p>Frete grátis em Joinville, R$ 19,90 nas demais cidades. Tudo em Meus pedidos.</p></div>
+    </div>
+  </section>
+
+  <section id="perguntas" class="faq" aria-labelledby="faq-h">
+    <h2 id="faq-h">Perguntas</h2>
+    <div class="cards">{{FAQ}}</div>
+  </section>
+
+  <section id="pedido" aria-labelledby="ped-h">
+    <div class="coupon">
+      <div class="coupon__left">
+        <h2 id="ped-h">Destaque e mande seu pedido</h2>
+        <p>Preencha e a mensagem abre pronta no WhatsApp da FNZ, com atendimento 24h.</p>
+      </div>
+      <form id="coupon" action="{{WA}}" method="get" target="_blank">
+        <label class="sr-only" for="c-empresa">Empresa</label><input id="c-empresa" name="empresa" placeholder="Empresa" autocomplete="organization" required>
+        <label class="sr-only" for="c-tam">Material e tamanho</label><input id="c-tam" name="tamanho" placeholder="Material e tamanho, ex.: Cinza 32x40" required>
+        <label class="sr-only" for="c-qtd">Quantidade</label><input id="c-qtd" name="quantidade" placeholder="Quantidade, ex.: 1.000" inputmode="numeric" required>
+        <label class="sr-only" for="c-cidade">Cidade</label><input id="c-cidade" name="cidade" placeholder="Cidade de entrega" autocomplete="address-level2" required>
+        <button type="submit">Enviar pelo WhatsApp</button>
+        <a class="coupon__direct" href="{{WA}}" target="_blank" rel="noopener">Ou chame direto: (47) 99149-0027</a>
+      </form>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="back">
+    <div class="back__msg">
+      <h2>Até o próximo envio.</h2>
+      <p>A FNZ Supply distribui embalagens em Joinville há mais de 40 anos. Compre com o CNPJ da sua empresa, com nota fiscal e preço de atacado.</p>
+      <p>Frete grátis na cidade; para as demais, R$ 19,90 por pedido.</p>
+    </div>
+    <address class="back__addr" style="font-style:normal">
+      <a href="{{WA}}" target="_blank" rel="noopener">WhatsApp (47) 99149-0027</a>
+      <a href="mailto:vendas@fnzsupply.com.br">vendas@fnzsupply.com.br</a>
+      <a href="https://www.google.com/maps/search/?api=1&query=Av.%20Antonio%20Ramos%20Alvim%2C%201084%2C%20Joinville%20SC" target="_blank" rel="noopener">Av. Antonio Ramos Alvim, 1084 · Joinville/SC</a>
+      <a href="{{SITE}}">fanezzesupply.com.br</a>
+    </address>
+    <figure class="stamp"><img src="assets/rua-das-palmeiras-1905.jpg" alt="Rua das Palmeiras, em Joinville, em 1905" width="480" height="603" loading="lazy"></figure>
+    <p class="imprint">© 2026 FNZ Supply · CNPJ 56.008.033/0001-32 · Selo: "Rua das Palmeiras (1905)", domínio público, via Wikimedia Commons</p>
+  </div>
+</footer>
+
+<script>
+(() => {
+  // Entrances, once per section.
+  const io = new IntersectionObserver((entries) => entries.forEach((e) => { if (e.isIntersecting) { e.target.classList.add('is-in'); io.unobserve(e.target); } }), { threshold: 0.15 });
+  document.querySelectorAll('[data-reveal]').forEach((el) => io.observe(el));
+
+  // Materials on the disc.
+  const disc = document.getElementById('disc'), obj = document.getElementById('obj'), fact = document.getElementById('fact');
+  document.querySelectorAll('.pick').forEach((b) => b.addEventListener('click', () => {
+    document.querySelectorAll('.pick').forEach((x) => x.setAttribute('aria-pressed', String(x === b)));
+    disc.className = 'disc ' + b.dataset.field;
+    fact.textContent = b.dataset.fact;
+    obj.classList.add('is-fading');
+    setTimeout(() => { obj.src = b.dataset.img; obj.classList.remove('is-fading'); }, 150);
+  }));
+
+  // Every size drawn at the same scale as an A4 sheet.
+  const a4 = document.getElementById('a4'), env = document.getElementById('env'), draw = document.querySelector('.scale__draw');
+  const show = (s) => {
+    // The taller of the two sets the scale, so a small envelope is never a speck.
+    const gap = parseFloat(getComputedStyle(draw).columnGap) || 0;
+    const cm = Math.min((draw.clientHeight - 8) / Math.max(29.7, s.h), (draw.clientWidth - gap - 8) / (21 + s.w));
+    a4.style.width = 21 * cm + 'px'; a4.style.height = 29.7 * cm + 'px';
+    env.style.width = s.w * cm + 'px'; env.style.height = s.h * cm + 'px';
+    env.style.background = s.body; env.style.setProperty('--strip', s.strip);
+    document.getElementById('scale-title').textContent = s.cat + ' ' + s.size;
+    document.getElementById('scale-price').textContent = s.price + ' por unidade';
+    document.getElementById('scale-best').textContent = s.best ? s.best + ' a partir de 1.000 unidades' : 'Mesmo preço em todos os tamanhos';
+    document.getElementById('scale-min').textContent = 'Mínimo de ' + s.min.toLocaleString('pt-BR') + ' unidades';
+    document.getElementById('scale-wa').href = '{{WA}}?text=' + encodeURIComponent('Olá! Quero um orçamento de ' + s.cat + ' ' + s.size + '.');
+  };
+  const rows = document.querySelectorAll('.row'), scale = document.querySelector('.scale'), grid = document.querySelector('.sizes__grid');
+  const phone = matchMedia('(max-width: 900px)');
+  rows.forEach((r) => {
+    const s = JSON.parse(r.dataset.size);
+    const pick = () => {
+      rows.forEach((x) => x.setAttribute('aria-pressed', String(x === r)));
+      if (phone.matches) r.parentElement.append(scale); else if (scale.parentElement !== grid) grid.append(scale);
+      show(s);
+    };
+    r.addEventListener('click', pick);
+    r.addEventListener('mouseenter', () => { if (!phone.matches) show(s); });
+    r.addEventListener('focus', () => show(s));
+  });
+  document.querySelector('.sizes__lists').addEventListener('mouseleave', () => { const on = document.querySelector('.row[aria-pressed="true"]'); show(JSON.parse((on || rows[0]).dataset.size)); });
+  rows[0].click();
+  addEventListener('resize', () => { const on = document.querySelector('.row[aria-pressed="true"]'); if (on) show(JSON.parse(on.dataset.size)); });
+
+  // One card open at a time.
+  const cards = document.querySelectorAll('.card');
+  cards.forEach((c) => c.addEventListener('toggle', () => { if (c.open) cards.forEach((o) => { if (o !== c) o.open = false; }); }));
+
+  // The coupon becomes a ready WhatsApp message.
+  document.getElementById('coupon').addEventListener('submit', (e) => {
+    e.preventDefault();
+    const f = e.target;
+    const text = `Olá! Pedido pelo site.\nEmpresa: ${f.empresa.value}\nMaterial e tamanho: ${f.tamanho.value}\nQuantidade: ${f.quantidade.value}\nCidade: ${f.cidade.value}`;
+    window.open('{{WA}}?text=' + encodeURIComponent(text), '_blank', 'noopener');
+  });
+})();
+</script>
+</body>
+</html>
